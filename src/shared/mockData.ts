@@ -1,5 +1,5 @@
 import { UnsignedEventKind32123, SignedEventKind32123, signCommentEvent, commenterPrivateKey, signTrackEvent, WavlakeEventContent, publisherPrivateKey } from "./interfaces";
-import { Event } from "nostr-tools";
+import { Event, getEventHash } from "nostr-tools";
 
 const wavlakeEventContent: WavlakeEventContent = {
   title: "I Can Be",
@@ -25,10 +25,21 @@ export const unsignedMockTrackEvent: UnsignedEventKind32123 = {
 
 export const signedMockTrackEvent: SignedEventKind32123 = signTrackEvent(unsignedMockTrackEvent)
 
-export const comments: Event[] = new Array(9).map(comment => signCommentEvent({
-  content: "test comment",
+const nonTrackComment = signCommentEvent({
+  content: `fake comment for another track`,
   kind: 123,
-  tags: [["e", ]],
-  created_at: 12345 + comment,
+  tags: [["e", "fake-event-hash"]],
+  created_at: 12345,
   pubkey: commenterPrivateKey,
-}))
+});
+
+export const mockComments: Event[] = [
+  ...Array.from(Array(4).keys()).map(comment => signCommentEvent({
+    content: `test comment #${comment}`,
+    kind: 123,
+    tags: [["e", getEventHash(signedMockTrackEvent)]],
+    created_at: 12345 + comment,
+    pubkey: commenterPrivateKey,
+  })),
+  nonTrackComment,
+];
