@@ -11,10 +11,10 @@ const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
 )
 
 const Wavman: React.FC<{}> = ({}) => {
-  const { data: tracks, loading: tracksLoading } = useListEvents([{ kinds: [32123] }]);
-  const { data: comments, loading: commentsLoading } = useListEvents([{ kinds: [32123] }]);
-
+  const { data: tracks, loading: tracksLoading } = useListEvents([{ kinds: [32123], limit: 100 }]);
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+  const { data: comments, loading: commentsLoading } = useListEvents([{ kinds: [32123], limit: 20 } ]);
+
   const pickRandomTrack = (tracks: Event[]) => setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   
   useEffect(() => {
