@@ -1,28 +1,22 @@
-import { Filter, SubscriptionOptions, Event } from "nostr-tools";
-import { useContext, useEffect, useState } from "react";
+import { Event } from "nostr-tools";
+import { useContext } from "react";
 import { RelayContext } from "./relayContext";
-
-export const usePostEvent = (event: Event) => {
+// import { mutate, FetcherResponse } from 'swr/mutation'
+ 
+export const usePostComment = async (key: string, { args }: { args: { event: Event }}): FetcherResponse<Event> => {
 	const { relay } = useContext(RelayContext);
+  if (relay) {
+    const pub = relay.publish(event)
+    pub.on('ok', () => {
+      console.log(`${relay.url} has accepted our event`)
+    })
+    pub.on('failed', (reason: string) => {
+      console.log(`failed to publish to ${relay.url}: ${reason}`)
+    })
+  } else {
+    console.log('usePostComment: relay is null');
+  }
 
-  const [loading, setLoading] = useState(true);
-	// when the component, *which uses this hook* mounts,
-	// add a listener.
-	useEffect(() => {
-    if (relay) {
-      console.log('posted event: ', Event);
-      const pub = relay.publish(event)
-      pub.on('ok', () => {
-        console.log(`${relay.url} has accepted our event`)
-      })
-      pub.on('failed', (reason: string) => {
-        console.log(`failed to publish to ${relay.url}: ${reason}`)
-      })
-    } else {
-      console.log('usePostComment: relay is null');
-    }
-    setLoading(false);
-	}, [event]);
-
-  return { loading };
-};
+  // const mutation = 
+  // return [mutation, { data, error, loading }];
+}

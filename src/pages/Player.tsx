@@ -1,6 +1,8 @@
-import { SignedEventKind32123, WavlakeEventContent } from "@/nostr/interfaces";
+import { WavlakeEventContent } from "@/nostr/interfaces";
 import { useListEvents } from "@/nostr/useListEvents";
-import { MouseEventHandler, useEffect, useRef, useState } from "react";
+import { useRelaySubscription } from "@/nostr/useRelaySubcribe";
+import { Event } from "nostr-tools";
+import { MouseEventHandler, useEffect, useState } from "react";
 import ReactPlayer from "react-player";
 
 const NowPlaying: React.FC<{
@@ -35,40 +37,38 @@ const PlayerControls: React.FC<{
 );
 
 
-const Player: React.FC<{}> = ({}) => {
-  const { loading, tracks } = useListEvents([{ kinds: [32123] }]);
-
+const Player: React.FC<{
+  loading: boolean;
+  nextHandler: () => void;
+  nowPlayingTrack?: Event;
+}> = ({
+  loading,
+  nextHandler,
+  nowPlayingTrack,
+}) => {
   const [hasWindow, setHasWindow] = useState(false);
-  const [nowPlayingTrack, setNowPlayingTrack] = useState<SignedEventKind32123>();
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const pickRandomTrack = (tracks: SignedEventKind32123[]) => setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
-  
   useEffect(() => {
     if (typeof window != "undefined") {
       setHasWindow(true);
     }
-    if (tracks.length) {
-      pickRandomTrack(tracks);
-    }
-  }, [tracks]);
+  }, []);
+  
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  if (loading) return (<div>Loading...</div>);
+  if (!nowPlayingTrack) return (<div>No track...</div>);
 
   const playHandler = () => {
     setIsPlaying(!isPlaying);
-  };
-  const nextHandler = () => {
-    pickRandomTrack(tracks)
   };
 
   const zapHandler = () => {
     console.log('Zap!')
   }
 
-  if (loading) return (<div>Loading...</div>);
-  if (!nowPlayingTrack) return (<div>no track...</div>);
-  const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack?.content) 
-  console.log({trackContent})
+  const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content) 
+
   return (
     <div className="flex-col">
       <NowPlaying title={trackContent.title} artist={trackContent.creator} />
