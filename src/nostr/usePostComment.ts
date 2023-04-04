@@ -1,22 +1,33 @@
 import { Event } from "nostr-tools";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { RelayContext } from "./relayContext";
 // import { mutate, FetcherResponse } from 'swr/mutation'
  
-export const usePostComment = async (key: string, { args }: { args: { event: Event }}): FetcherResponse<Event> => {
+export const usePostComment = (): [(event: Event) => Promise<void>, { data?: Event, loading: boolean, error?: string }] => {
 	const { relay } = useContext(RelayContext);
-  if (relay) {
-    const pub = relay.publish(event)
-    pub.on('ok', () => {
-      console.log(`${relay.url} has accepted our event`)
-    })
-    pub.on('failed', (reason: string) => {
-      console.log(`failed to publish to ${relay.url}: ${reason}`)
-    })
-  } else {
-    console.log('usePostComment: relay is null');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [data, setData] = useState<Event | undefined>(undefined);
+
+  const mutation = async (event: Event) => {
+    setLoading(true);
+    setError(undefined);
+    setData(undefined);
+    if (relay) {
+      const pub = relay.publish(event)
+      pub.on('ok', () => {
+        setLoading(false);
+        setData(event);
+      })
+      pub.on('failed', (reason: string) => {
+        setLoading(false);
+        setError(`failed to publish to ${relay.url}: ${reason}`);
+      })
+    } else {
+      setLoading(false);
+      setError('usePostComment: relay is null');
+    }
   }
 
-  // const mutation = 
-  // return [mutation, { data, error, loading }];
+  return [mutation, { data, error, loading }];
 }

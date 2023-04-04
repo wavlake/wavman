@@ -5,11 +5,12 @@ import useSWR from 'swr'
 
 export const useListEvents = (
   filter: Filter[],
-  opts?: SubscriptionOptions
+  skip: boolean = false,
+  opts?: SubscriptionOptions,
 ) => {
 	const { relay } = useContext(RelayContext);
   const fetcher = async () => {
-    if (relay) {
+    if (relay && !skip) {
       const events = await relay.list(filter, opts)
       return events;
     } else {

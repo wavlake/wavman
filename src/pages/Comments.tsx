@@ -10,21 +10,21 @@ const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
 
 const Comments: React.FC<{
   loading: boolean;
+  submitCommentHandler: (comment: string) => void;
   comments?: Event[];
 }> = ({
   loading,
+  submitCommentHandler,
   comments,
 }) => {
-  const submitCommentHandler = () => {
-    console.log('submit comment')
-  };
   if (loading) return (<div>Loading...</div>);
   if (!comments) return (<div>No comments yet...</div>);
 
   return (
     <div className="flex-col">
+      <input></input>
+      <button onClick={() => submitCommentHandler('Test comment')}>Add Comment</button>
       {comments.map(comment => <Comment comment={comment} key={comment.id} />)}
-      <button onClick={submitCommentHandler} />
     </div>
   )
 }
