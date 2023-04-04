@@ -1,5 +1,5 @@
-import { UnsignedEventKind32123, SignedEventKind32123, signCommentEvent, commenterPrivateKey, signTrackEvent, WavlakeEventContent, publisherPrivateKey } from "./interfaces";
-import { Event, getEventHash } from "nostr-tools";
+import { signCommentEvent, commenterPrivateKey, signTrackEvent, WavlakeEventContent, publisherPrivateKey } from "./interfaces";
+import { UnsignedEvent, Event, getEventHash } from "nostr-tools";
 
 const wavlakeEventContent: WavlakeEventContent = {
   title: "I Can Be",
@@ -14,7 +14,7 @@ const wavlakeEventContent: WavlakeEventContent = {
   version: "1.0"
 };
 
-export const unsignedMockTrackEvent: UnsignedEventKind32123 = {
+export const unsignedMockTrackEvent: UnsignedEvent = {
   content: JSON.stringify(wavlakeEventContent),
   kind: 32123,
   tags: [],
@@ -22,7 +22,7 @@ export const unsignedMockTrackEvent: UnsignedEventKind32123 = {
   pubkey: publisherPrivateKey,
 };
 
-export const signedMockTrackEvent: SignedEventKind32123 = signTrackEvent(unsignedMockTrackEvent)
+export const signedMockTrackEvent: Event = signTrackEvent(unsignedMockTrackEvent)
 
 export const mockComments: Event[] = Array.from(Array(4).keys()).map(comment => signCommentEvent({
   content: `test comment #${comment}`,

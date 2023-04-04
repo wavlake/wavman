@@ -1,32 +1,32 @@
 import { Filter, SubscriptionOptions, Event } from "nostr-tools";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { RelayContext } from "./relayContext";
+import useSWRSubscription from 'swr/subscription';
+import type { SWRSubscriptionOptions } from 'swr/subscription';
 
-// SubEvent not exported by nostr-tools
-type SubEvent = (event: Event) => void | Promise<void>;
-
-export const useRelaySubscription = (filter: Filter[], listener: SubEvent, opts?: SubscriptionOptions) => {
+export const useRelaySubscription = (filter: Filter[], opts?: SubscriptionOptions) => {
 	const { relay } = useContext(RelayContext);
-  const [loading, setLoading] = useState(true);
-	useEffect(() => {
-    if (relay) {
-      console.log('added sub: ', filter);
-      const sub = relay.sub(filter, opts)
-      sub.on('event', listener)
-      sub.on('eose', () => {
-        console.log('got the eose, unsubing? ', filter);
-        // sub.unsub()
-      })
-      return () => {
-        console.log('removed sub: ', filter);
-        sub.unsub();
-      };
-    } else {
-      console.log('useRelaySubscription: relay is null');
+  const subKey = JSON.stringify(filter);
+  const { data, error } = useSWRSubscription(subKey,
+    (key, { next }: SWRSubscriptionOptions<Event, Error>) => {
+      if (relay) {
+        const sub = relay.sub(filter, opts)
+        sub.on('event', (event) => next(null, event))
+        sub.on('eose', () => {
+          console.log('End of Stored Events Notice', filter);
+          // unsub and won't recieve any more events
+          // sub.unsub()
+          // control a loading component?
+        })
+        // cleanup function
+        return () => {
+          console.log('removed sub: ', filter);
+          sub.unsub();
+        };
+      } else {
+        next(new Error('useRelaySubscription: relay is null'));
+      }
     }
-
-  setLoading(false);
-	}, [filter, listener, opts]);
-
-  return { loading };
+  );
+  return { data, error };
 };
