@@ -25,21 +25,10 @@ export const unsignedMockTrackEvent: UnsignedEventKind32123 = {
 
 export const signedMockTrackEvent: SignedEventKind32123 = signTrackEvent(unsignedMockTrackEvent)
 
-const nonTrackComment = signCommentEvent({
-  content: `fake comment for another track`,
+export const mockComments: Event[] = Array.from(Array(4).keys()).map(comment => signCommentEvent({
+  content: `test comment #${comment}`,
   kind: 123,
-  tags: [["e", "fake-event-hash"]],
-  created_at: 12345,
+  tags: [["e", getEventHash(signedMockTrackEvent)]],
+  created_at: 12345 + comment,
   pubkey: commenterPrivateKey,
-});
-
-export const mockComments: Event[] = [
-  ...Array.from(Array(4).keys()).map(comment => signCommentEvent({
-    content: `test comment #${comment}`,
-    kind: 123,
-    tags: [["e", getEventHash(signedMockTrackEvent)]],
-    created_at: 12345 + comment,
-    pubkey: commenterPrivateKey,
-  })),
-  nonTrackComment,
-];
+}));
