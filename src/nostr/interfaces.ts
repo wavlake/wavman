@@ -4,7 +4,6 @@ export interface WavlakeEventContent {
   title: string;
   description: string;
   link: string;
-  author: string;
   type: string; // MIME type
   guid: string;
   creator: string;
