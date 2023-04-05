@@ -1,5 +1,5 @@
-import Comments from "./Comments";
-import Player from "./Player";
+import Comments from "./CommentsScreen";
+import Screen from "./Screen";
 import { useRelayList, useRelaySubcription, usePublishEvent } from "@/nostr";
 import {
   Event,
@@ -11,6 +11,7 @@ import {
 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import PlayerControls from "./PlayerControls";
 
 const signComment = (content: string, parentTrack: Event): Event => {
   // replace with user PK
@@ -66,7 +67,14 @@ const Wavman: React.FC<{}> = ({}) => {
     setTrackIndex(trackIndex + 1);
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
-
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playHandler = () => {
+    setIsPlaying(!isPlaying);
+  };
+  const zapHandler = () => {
+    console.log("Zap!");
+  };
+  
   useEffect(() => {
     if (tracks?.length) pickRandomTrack(tracks);
   }, [tracks]);
@@ -75,11 +83,6 @@ const Wavman: React.FC<{}> = ({}) => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
   
-  const methods = useForm({
-    defaultValues: {
-      comment: '',
-    }
-  })
 
   interface Form {
     comment: string;
@@ -94,19 +97,19 @@ const Wavman: React.FC<{}> = ({}) => {
 
   return (
     <div className="flex-col">
-      <Player
-        loading={tracksLoading}
+      <Screen
         nowPlayingTrack={nowPlayingTrack}
-        nextHandler={nextHandler}
+        isPlaying={isPlaying}
+        commentsLoading={commentsLoading}
+        comments={comments || []}
+        submitHandler={submitHandler}
       />
-      <FormProvider {...methods} >
-        <form onSubmit={methods.handleSubmit(submitHandler)}>
-          <Comments
-            loading={commentsLoading}
-            comments={comments || []}
-          />
-        </form>
-      </FormProvider>
+      <PlayerControls
+        isPlaying={isPlaying}
+        nextHandler={nextHandler}
+        zapHandler={zapHandler}
+        playHandler={playHandler}
+      />
     </div>
   );
 };

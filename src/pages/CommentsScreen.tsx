@@ -1,20 +1,17 @@
-import { usePublishEvent } from "@/nostr/usePublishEvent";
 import { Event } from "nostr-tools";
 import { useFormContext } from "react-hook-form";
-import useSWRMutation from "swr/mutation";
 
 const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
   <div>{comment.content}</div>
 );
 
-const Comments: React.FC<{
+const CommentsScreen: React.FC<{
   loading: boolean;
-  comments?: Event[];
+  comments: Event[];
 }> = ({ loading, comments }) => {
   const { register } = useFormContext();
 
-  if (loading) return <div>Loading...</div>;
-  if (!comments) return <div>No comments yet...</div>;
+  if (loading) return <div>Comments Loading Screen</div>;
 
   return (
     <div className="flex-col">
@@ -23,11 +20,13 @@ const Comments: React.FC<{
       <button type="submit">
         Add Comment
       </button>
-      {comments.map((comment) => (
+      {!comments.length ? 
+        <div>No comments yet...</div>
+      : comments.map((comment) => (
         <Comment comment={comment} key={comment.id} />
       ))}
     </div>
   );
 };
 
-export default Comments;
+export default CommentsScreen;
