@@ -17,14 +17,14 @@ const CommentsScreen: React.FC<{
     <div className="flex-col">
       <input {...register("comment")} />
       {/* TODO - disable when not logged in */}
-      <button type="submit">
-        Add Comment
-      </button>
-      {!comments.length ? 
+      <button type="submit">Add Comment</button>
+      {!comments.length ? (
         <div>No comments yet...</div>
-      : comments.map((comment) => (
-        <Comment comment={comment} key={comment.id} />
-      ))}
+      ) : (
+        comments.map((comment) => (
+          <Comment comment={comment} key={comment.id} />
+        ))
+      )}
     </div>
   );
 };

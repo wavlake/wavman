@@ -10,13 +10,10 @@ const TrackInfo: React.FC<{
   </div>
 );
 
-
-
 const NowPlayingScreen: React.FC<{
   isPlaying: boolean;
   trackContent: WavlakeEventContent;
-}> = ({ trackContent: { title, creator }}) => {
-
+}> = ({ trackContent: { title, creator } }) => {
   return (
     <div className="flex-col">
       <TrackInfo title={title} artist={creator} />

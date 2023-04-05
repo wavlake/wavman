@@ -1,9 +1,9 @@
-import { WavlakeEventContent } from "@/nostr";
-import { Event } from "nostr-tools";
-import { FormProvider, useForm } from "react-hook-form";
 import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
 import ReactPlayerWrapper from "./ReactPlayerWrapper";
+import { WavlakeEventContent } from "@/nostr";
+import { Event } from "nostr-tools";
+import { FormProvider, useForm } from "react-hook-form";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -23,24 +23,21 @@ const Screen: React.FC<{
   const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
   const methods = useForm({
     defaultValues: {
-      comment: '',
-    }
-  })
+      comment: "",
+    },
+  });
 
   return (
     <>
       <ReactPlayerWrapper url={trackContent.enclosure} isPlaying={isPlaying} />
       <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />
-      <FormProvider {...methods} >
+      <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(submitHandler)}>
-          <CommentsScreen
-            loading={commentsLoading}
-            comments={comments || []}
-          />
+          <CommentsScreen loading={commentsLoading} comments={comments || []} />
         </form>
       </FormProvider>
     </>
   );
-}
+};
 
-export default Screen
+export default Screen;

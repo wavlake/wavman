@@ -4,10 +4,7 @@ import ReactPlayer from "react-player";
 const ReactPlayerWrapper: React.FC<{
   isPlaying: boolean;
   url: string;
-}> = ({
-  isPlaying,
-  url
-}) => {
+}> = ({ isPlaying, url }) => {
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
     if (typeof window != "undefined") {
@@ -28,6 +25,6 @@ const ReactPlayerWrapper: React.FC<{
       )}
     </>
   );
-}
+};
 
-export default ReactPlayerWrapper
+export default ReactPlayerWrapper;

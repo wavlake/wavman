@@ -1,4 +1,5 @@
 import Comments from "./CommentsScreen";
+import PlayerControls from "./PlayerControls";
 import Screen from "./Screen";
 import { useRelayList, useRelaySubcription, usePublishEvent } from "@/nostr";
 import {
@@ -11,7 +12,6 @@ import {
 } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import PlayerControls from "./PlayerControls";
 
 const signComment = (content: string, parentTrack: Event): Event => {
   // replace with user PK
@@ -33,25 +33,28 @@ const signComment = (content: string, parentTrack: Event): Event => {
 };
 
 const randomSHA256String = (length: number) => {
-  const alphanumericString = Array.from(Array(length + 30), () => Math.floor(Math.random() * 36).toString(36)).join('');
+  const alphanumericString = Array.from(Array(length + 30), () =>
+    Math.floor(Math.random() * 36).toString(36)
+  ).join("");
   const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  return alphanumericString.replace(SHA256Regex, '').slice(0, length);
-}
+  return alphanumericString.replace(SHA256Regex, "").slice(0, length);
+};
 
 const Wavman: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-raondomize this filter once the user reaches the end of the list
-  const [randomChar, setRandomChar] = useState<string[]>(Array.from(randomSHA256String(4)));
+  const [randomChar, setRandomChar] = useState<string[]>(
+    Array.from(randomSHA256String(4))
+  );
   const { data: tracks, loading: tracksLoading } = useRelayList([
-    { kinds: [32123], ["#f"]: randomChar},
+    { kinds: [32123], ["#f"]: randomChar },
   ]);
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const shouldSkipComments = !nowPlayingTrack;
-  const { allEvents: comments, loading: commentsLoading } =
-    useRelaySubcription(
-      [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
-      shouldSkipComments
-    );
+  const { allEvents: comments, loading: commentsLoading } = useRelaySubcription(
+    [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
+    shouldSkipComments
+  );
   const [
     postComment,
     {
@@ -74,7 +77,7 @@ const Wavman: React.FC<{}> = ({}) => {
   const zapHandler = () => {
     console.log("Zap!");
   };
-  
+
   useEffect(() => {
     if (tracks?.length) pickRandomTrack(tracks);
   }, [tracks]);
@@ -82,12 +85,11 @@ const Wavman: React.FC<{}> = ({}) => {
   const nextHandler = () => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
-  
 
   interface Form {
     comment: string;
-  };
-  
+  }
+
   const submitHandler = ({ comment }: Form) => {
     if (nowPlayingTrack) {
       const signedEvent = signComment(comment, nowPlayingTrack);
