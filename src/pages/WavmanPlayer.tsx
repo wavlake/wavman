@@ -105,7 +105,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
 
   return (
-    <div className="w-[90vw] h-[90vh] bg-slate-100 place-self-center align-middle grid place-items-center">
+    <div className="w-11/12 h-[90vh] max-h-192 max-w-sm bg-slate-100 place-self-center align-middle grid place-items-center">
       <Screen
         nowPlayingTrack={nowPlayingTrack}
         isPlaying={isPlaying}
