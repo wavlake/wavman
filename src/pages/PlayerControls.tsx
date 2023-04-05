@@ -40,12 +40,6 @@ const PlayerControls: React.FC<{
 
   return (
     <div className="w-48 h-48">
-      {pageViewActionMap[pageView].map((action, index) => (
-        <div
-          key={action}
-          className={selectedActionIndex === index ? 'border-2 border-teal-500' : ''}
-        >{action}</div>
-      ))}
       <button className="" onClick={upHandler}>Up</button>
       <button onClick={leftHandler}>Left</button>
       <button onClick={downHandler}>Down</button>
