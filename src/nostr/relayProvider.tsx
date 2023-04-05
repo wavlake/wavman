@@ -1,4 +1,7 @@
 import { RelayContext } from "./relayContext";
+import { useEventSubscription } from "./useEventSubscription";
+import { useListEvents } from "./useListEvents";
+import { usePublishEvent } from "./usePublishEvent";
 import { relayInit } from "nostr-tools";
 import { useEffect, useRef, PropsWithChildren } from "react";
 
@@ -24,7 +27,16 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   }, []);
 
   return (
-    <RelayContext.Provider value={{ relay }}>{children}</RelayContext.Provider>
+    <RelayContext.Provider
+      value={{
+        relay,
+        usePublishEvent,
+        useEventSubscription,
+        useListEvents,
+      }}
+    >
+      {children}
+    </RelayContext.Provider>
   );
 };
 

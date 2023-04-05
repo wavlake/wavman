@@ -1,7 +1,7 @@
 import Comments from "./CommentsScreen";
 import PlayerControls from "./PlayerControls";
 import Screen from "./Screen";
-import { useRelayList, useRelaySubcription, usePublishEvent } from "@/nostr";
+import { useRelay } from "@/nostr";
 import {
   Event,
   getPublicKey,
@@ -40,18 +40,21 @@ const randomSHA256String = (length: number) => {
   return alphanumericString.replace(SHA256Regex, "").slice(0, length);
 };
 
-const Wavman: React.FC<{}> = ({}) => {
+const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
-  // will need to re-raondomize this filter once the user reaches the end of the list
+  // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChar, setRandomChar] = useState<string[]>(
     Array.from(randomSHA256String(4))
-  );
-  const { data: tracks, loading: tracksLoading } = useRelayList([
+    );
+
+  const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
+
+  const { data: tracks, loading: tracksLoading } = useListEvents([
     { kinds: [32123], ["#f"]: randomChar },
   ]);
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const shouldSkipComments = !nowPlayingTrack;
-  const { allEvents: comments, loading: commentsLoading } = useRelaySubcription(
+  const { allEvents: comments, loading: commentsLoading } = useEventSubscription(
     [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
     shouldSkipComments
   );
@@ -116,4 +119,4 @@ const Wavman: React.FC<{}> = ({}) => {
   );
 };
 
-export default Wavman;
+export default WavmanPlayer;

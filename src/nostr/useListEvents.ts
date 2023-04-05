@@ -1,14 +1,13 @@
-import { RelayContext } from "./relayContext";
 import { Filter, SubscriptionOptions } from "nostr-tools";
-import { useContext } from "react";
 import useSWR from "swr";
+import { useRelay } from "./useRelay";
 
-export const useRelayList = (
+export const useListEvents = (
   filter: Filter[],
   skip: boolean = false,
   opts?: SubscriptionOptions
 ) => {
-  const { relay } = useContext(RelayContext);
+  const { relay } = useRelay();
   const fetcher = async () => {
     if (relay && !skip) {
       const events = await relay.list(filter, opts);

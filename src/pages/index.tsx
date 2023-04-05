@@ -1,4 +1,4 @@
-import Wavman from "./Wavman";
+import WavmanPlayer from "./WavmanPlayer";
 import RelayProvider from "@/nostr/relayProvider";
 import { Inter } from "next/font/google";
 import Head from "next/head";
@@ -16,7 +16,7 @@ export default function Home() {
       </Head>
       <main className="grid-row">
         <RelayProvider url="wss://relay.wavlake.com/">
-          <Wavman />
+          <WavmanPlayer />
         </RelayProvider>
       </main>
     </>

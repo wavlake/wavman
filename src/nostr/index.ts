@@ -12,6 +12,4 @@ export {
   mockComments,
 } from "./mockData";
 
-export { useRelaySubcription } from "./useRelaySubscription";
-export { useRelayList } from "./useRelayList";
-export { usePublishEvent } from "./usePublishEvent";
+export { useRelay } from "./useRelay";

@@ -1,15 +1,15 @@
-import { RelayContext } from "./relayContext";
+import { useRelay } from '@/nostr';
 import { Filter, SubscriptionOptions, Event } from "nostr-tools";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import useSWRSubscription from "swr/subscription";
 import type { SWRSubscriptionOptions } from "swr/subscription";
 
-export const useRelaySubcription = (
+export const useEventSubscription = (
   filter: Filter[],
   skip = false,
   opts?: SubscriptionOptions
 ) => {
-  const { relay } = useContext(RelayContext);
+  const { relay } = useRelay();
   const [loading, setLoading] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const subKey = JSON.stringify(filter);

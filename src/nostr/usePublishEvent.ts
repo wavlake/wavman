@@ -1,12 +1,14 @@
-import { RelayContext } from "./relayContext";
 import { Event } from "nostr-tools";
-import { useContext, useState } from "react";
+import { useState } from "react";
+import { useRelay } from "./useRelay";
 
-export const usePublishEvent = (): [
+export type UsePublishEvent = () => [
   (event: Event) => void,
   { data?: Event; loading: boolean; error?: string }
-] => {
-  const { relay } = useContext(RelayContext);
+];
+
+export const usePublishEvent: UsePublishEvent = () => {
+  const { relay } = useRelay();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const [data, setData] = useState<Event | undefined>(undefined);
