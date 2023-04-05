@@ -1,7 +1,6 @@
 import { Event } from "nostr-tools";
 import { useContext, useState } from "react";
 import { RelayContext } from "./relayContext";
-// import { mutate, FetcherResponse } from 'swr/mutation'
  
 export const usePostComment = (): [(event: Event) => Promise<void>, { data?: Event, loading: boolean, error?: string }] => {
 	const { relay } = useContext(RelayContext);
@@ -23,9 +22,6 @@ export const usePostComment = (): [(event: Event) => Promise<void>, { data?: Eve
         setLoading(false);
         setError(`failed to publish to ${relay.url}: ${reason}`);
       })
-    } else {
-      setLoading(false);
-      setError('usePostComment: relay is null');
     }
   }
 

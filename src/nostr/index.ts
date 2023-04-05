@@ -11,3 +11,7 @@ export {
   signedMockTrackEvent,
   mockComments,
 } from './mockData';
+
+export { useCommentSubscription } from './useCommentSubcription';
+export { useGetTracks } from './useGetTracks';
+export { usePostComment } from './usePostComment';

@@ -1,6 +1,4 @@
 import { WavlakeEventContent } from "@/nostr/interfaces";
-import { useListEvents } from "@/nostr/useListEvents";
-import { useRelaySubscription } from "@/nostr/useRelaySubcribe";
 import { Event } from "nostr-tools";
 import { MouseEventHandler, useEffect, useState } from "react";
 import ReactPlayer from "react-player";

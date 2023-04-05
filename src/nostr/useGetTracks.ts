@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { RelayContext } from "./relayContext";
 import useSWR from 'swr'
 
-export const useListEvents = (
+export const useGetTracks = (
   filter: Filter[],
   skip: boolean = false,
   opts?: SubscriptionOptions,
@@ -13,8 +13,6 @@ export const useListEvents = (
     if (relay && !skip) {
       const events = await relay.list(filter, opts)
       return events;
-    } else {
-      console.log('useListEvents: relay is null');
     }
   }
   const subKey = JSON.stringify(filter);

@@ -1,25 +1,17 @@
-import { useListEvents } from "@/nostr/useListEvents";
-import { usePostComment } from "@/nostr/usePostComment";
+import { useGetTracks, useCommentSubscription, usePostComment } from "@/nostr";
 import { Event, getPublicKey, generatePrivateKey, getEventHash, signEvent, UnsignedEvent } from "nostr-tools";
 import { useEffect, useState } from "react";
 import Comments from "./Comments";
 import Player from "./Player";
 
-const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
-  <div>
-    {comment.content}
-  </div>
-)
-
 const Wavman: React.FC<{}> = ({}) => {
-  const { data: tracks, loading: tracksLoading } = useListEvents([{ kinds: [32123], limit: 10 }]);
+  const { data: tracks, loading: tracksLoading } = useGetTracks([{ kinds: [32123], limit: 10 }]);
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const shouldSkipComments = !nowPlayingTrack;
-  const { data: comments, loading: commentsLoading, mutate: addComment } = useListEvents([{ ['#e']: [nowPlayingTrack?.id || ''], limit: 20 }], shouldSkipComments);
+  const { allEvents: comments, loading: commentsLoading } = useCommentSubscription([{ ['#e']: [nowPlayingTrack?.id || ''], limit: 20 }], shouldSkipComments);
   const [postComment, { data: postedComment, loading: postCommentLoading, error: postCommentError }] = usePostComment();
-
   const [trackIndex, setTrackIndex] = useState(0);
-
+  console.log({comments, commentsLoading, tracksLoading, postCommentLoading})
   const pickRandomTrack = (tracks: Event[]) => {
     setNowPlayingTrack(tracks[trackIndex]);
     setTrackIndex(trackIndex + 1);
@@ -56,7 +48,7 @@ const Wavman: React.FC<{}> = ({}) => {
   return (
     <div className="flex-col">
       <Player loading={tracksLoading} nowPlayingTrack={nowPlayingTrack} nextHandler={nextHandler} />
-      <Comments loading={commentsLoading} comments={comments} submitCommentHandler={submitCommentHandler} />
+      <Comments loading={commentsLoading} comments={comments || []} submitCommentHandler={submitCommentHandler} />
     </div>
   )
 }
