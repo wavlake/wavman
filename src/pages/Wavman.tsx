@@ -10,6 +10,25 @@ import {
   UnsignedEvent,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
+
+const signComment = (content: string, parentTrack: Event): Event => {
+  const sk = generatePrivateKey();
+  const pk = getPublicKey(sk);
+  const unsignedEvent: UnsignedEvent = {
+    kind: 1,
+    pubkey: pk,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [["e", parentTrack.id, "wss://relay.wavlake.com/", "reply"]],
+    content,
+  };
+
+  return {
+    ...unsignedEvent,
+    id: getEventHash(unsignedEvent),
+    sig: signEvent(unsignedEvent, sk),
+  };
+};
 
 const Wavman: React.FC<{}> = ({}) => {
   const { data: tracks, loading: tracksLoading } = useGetTracks([
@@ -31,7 +50,7 @@ const Wavman: React.FC<{}> = ({}) => {
     },
   ] = usePostComment();
   const [trackIndex, setTrackIndex] = useState(0);
-  console.log({ comments, commentsLoading, tracksLoading, postCommentLoading });
+
   const pickRandomTrack = (tracks: Event[]) => {
     setNowPlayingTrack(tracks[trackIndex]);
     setTrackIndex(trackIndex + 1);
@@ -45,26 +64,24 @@ const Wavman: React.FC<{}> = ({}) => {
   const nextHandler = () => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
-  const submitCommentHandler = (content: string) => {
-    if (nowPlayingTrack) {
-      let sk = generatePrivateKey();
-      let pk = getPublicKey(sk);
-      let unsignedEvent: UnsignedEvent = {
-        kind: 1,
-        pubkey: pk,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [["e", nowPlayingTrack.id, "wss://relay.wavlake.com/", "reply"]],
-        content,
-      };
-      const signedEvent: Event = {
-        ...unsignedEvent,
-        id: getEventHash(unsignedEvent),
-        sig: signEvent(unsignedEvent, sk),
-      };
+  
+  const methods = useForm({
+    defaultValues: {
+      comment: '',
+    }
+  })
 
+  interface Form {
+    comment: string;
+  };
+  
+  const submitHandler = ({ comment }: Form) => {
+    if (nowPlayingTrack) {
+      const signedEvent = signComment(comment, nowPlayingTrack);
       postComment(signedEvent);
     }
   };
+  console.log({tracks})
   return (
     <div className="flex-col">
       <Player
@@ -72,11 +89,14 @@ const Wavman: React.FC<{}> = ({}) => {
         nowPlayingTrack={nowPlayingTrack}
         nextHandler={nextHandler}
       />
-      <Comments
-        loading={commentsLoading}
-        comments={comments || []}
-        submitCommentHandler={submitCommentHandler}
-      />
+      <FormProvider {...methods} >
+        <form onSubmit={methods.handleSubmit(submitHandler)}>
+          <Comments
+            loading={commentsLoading}
+            comments={comments || []}
+          />
+        </form>
+      </FormProvider>
     </div>
   );
 };

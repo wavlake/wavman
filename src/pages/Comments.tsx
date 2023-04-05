@@ -1,5 +1,6 @@
 import { usePostComment } from "@/nostr/usePostComment";
 import { Event } from "nostr-tools";
+import { useFormContext } from "react-hook-form";
 import useSWRMutation from "swr/mutation";
 
 const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
@@ -8,16 +9,17 @@ const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
 
 const Comments: React.FC<{
   loading: boolean;
-  submitCommentHandler: (comment: string) => void;
   comments?: Event[];
-}> = ({ loading, submitCommentHandler, comments }) => {
+}> = ({ loading, comments }) => {
+  const { register } = useFormContext();
+
   if (loading) return <div>Loading...</div>;
   if (!comments) return <div>No comments yet...</div>;
 
   return (
     <div className="flex-col">
-      <input></input>
-      <button onClick={() => submitCommentHandler("Test comment")}>
+      <input {...register("comment")} />
+      <button type="submit">
         Add Comment
       </button>
       {comments.map((comment) => (
