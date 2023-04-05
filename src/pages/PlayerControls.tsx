@@ -48,14 +48,12 @@ const PlayerControls: React.FC<{
   const leftHandler = () => setSelectedIndex((selectedIndex) => calcMoveIndexLeft(selectedIndex));
   const rightHandler = () => setSelectedIndex((selectedIndex) => calcMoveIndexRight(selectedIndex));
 
-  // bg-green-700
-  // bg-amber-200
   return (
     <div>
       {pageViewActionMap[pageView].map((action, index) => (
         <div
           key={action}
-          className={selectedIndex === index ? 'border-2 border-amber-500' : ''}
+          className={selectedIndex === index ? 'border-amber-500' : ''}
         >{action}</div>
       ))}
       <button className="" onClick={upHandler}>Up</button>
