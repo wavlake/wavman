@@ -541,9 +541,9 @@ video {
   border-color: rgb(245 158 11 / var(--tw-border-opacity));
 }
 
-.bg-green-200 {
+.bg-amber-200 {
   --tw-bg-opacity: 1;
-  background-color: rgb(187 247 208 / var(--tw-bg-opacity));
+  background-color: rgb(253 230 138 / var(--tw-bg-opacity));
 }
 
 .bg-green-700 {
