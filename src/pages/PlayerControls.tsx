@@ -53,7 +53,7 @@ const PlayerControls: React.FC<{
       {pageViewActionMap[pageView].map((action, index) => (
         <div
           key={action}
-          className={selectedIndex === index ? 'border-amber-500' : ''}
+          className={selectedIndex === index ? 'border-2 border-amber-500' : ''}
         >{action}</div>
       ))}
       <button className="" onClick={upHandler}>Up</button>
