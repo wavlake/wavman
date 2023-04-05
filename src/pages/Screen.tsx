@@ -4,39 +4,52 @@ import ReactPlayerWrapper from "./ReactPlayerWrapper";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
+import { COMMENTS_VIEW, PageView, PLAYER_VIEW, SPLASH_VIEW, ZAP_VIEW } from "./shared";
 
 const Screen: React.FC<{
   isPlaying: boolean;
   submitHandler: (data: any) => void;
   commentsLoading: boolean;
   comments: Event[];
+  pageView: PageView;
   nowPlayingTrack?: Event;
 }> = ({
   isPlaying,
   submitHandler,
   commentsLoading,
   comments,
+  pageView,
   nowPlayingTrack,
 }) => {
-  if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
-
-  const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
   const methods = useForm({
     defaultValues: {
       comment: "",
     },
   });
+  if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
+
+  const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
 
   return (
-    <>
+    <FormProvider {...methods}>
       <ReactPlayerWrapper url={trackContent.enclosure} isPlaying={isPlaying} />
-      <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(submitHandler)}>
-          <CommentsScreen loading={commentsLoading} comments={comments || []} />
-        </form>
-      </FormProvider>
-    </>
+      <form onSubmit={methods.handleSubmit(submitHandler)}>
+        {(() => {
+          switch(pageView) {
+            case COMMENTS_VIEW:
+              return <CommentsScreen loading={commentsLoading} comments={comments || []} />;
+            case PLAYER_VIEW:
+              return <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />;
+            case ZAP_VIEW:
+              return <>zap</>;
+            case SPLASH_VIEW:
+              return <>splash</>;
+            default:
+              return <>default</>;
+          }
+        })()}
+      </form>
+    </FormProvider>
   );
 };
 

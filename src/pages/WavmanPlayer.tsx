@@ -1,4 +1,3 @@
-import Comments from "./CommentsScreen";
 import PlayerControls from "./PlayerControls";
 import Screen from "./Screen";
 import { useRelay } from "@/nostr";
@@ -11,7 +10,7 @@ import {
   UnsignedEvent,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { PageView, PLAYER_VIEW, SPLASH_VIEW } from "./shared";
 
 const signComment = (content: string, parentTrack: Event): Event => {
   // replace with user PK
@@ -52,12 +51,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const { data: tracks, loading: tracksLoading } = useListEvents([
     { kinds: [32123], ["#f"]: randomChar },
   ]);
-  const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
-  const shouldSkipComments = !nowPlayingTrack;
-  const { allEvents: comments, loading: commentsLoading } = useEventSubscription(
-    [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
-    shouldSkipComments
-  );
   const [
     postComment,
     {
@@ -68,27 +61,35 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   ] = usePublishEvent();
   const [trackIndex, setTrackIndex] = useState(0);
 
+  const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+  const shouldSkipComments = !nowPlayingTrack;
+  const { allEvents: comments, loading: commentsLoading } = useEventSubscription(
+    [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
+    shouldSkipComments
+  );
+  
   const pickRandomTrack = (tracks: Event[]) => {
     setNowPlayingTrack(tracks[trackIndex]);
     setTrackIndex(trackIndex + 1);
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
-  const [isPlaying, setIsPlaying] = useState(false);
-  const playHandler = () => {
-    setIsPlaying(!isPlaying);
+  useEffect(() => {
+    if (tracks?.length) pickRandomTrack(tracks);
+  }, [tracks]);
+  const skipHandler = () => {
+    if (tracks?.length) pickRandomTrack(tracks);
   };
   const zapHandler = () => {
     console.log("Zap!");
   };
-
-  useEffect(() => {
-    if (tracks?.length) pickRandomTrack(tracks);
-  }, [tracks]);
-
-  const nextHandler = () => {
-    if (tracks?.length) pickRandomTrack(tracks);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const playHandler = () => {
+    setIsPlaying(!isPlaying);
   };
-
+  const [pageView, setPageView] = useState<PageView>(PLAYER_VIEW);
+  const toggleViewHandler = (pageView: PageView) => {
+    setPageView(pageView);
+  }
   interface Form {
     comment: string;
   }
@@ -108,12 +109,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         commentsLoading={commentsLoading}
         comments={comments || []}
         submitHandler={submitHandler}
+        pageView={pageView}
       />
       <PlayerControls
         isPlaying={isPlaying}
-        nextHandler={nextHandler}
+        pageView={pageView}
+        skipHandler={skipHandler}
         zapHandler={zapHandler}
         playHandler={playHandler}
+        toggleViewHandler={toggleViewHandler}
       />
     </div>
   );
