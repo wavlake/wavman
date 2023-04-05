@@ -1,4 +1,4 @@
-import { useRelay } from '@/nostr';
+import { useRelay } from "@/nostr";
 import { Filter, SubscriptionOptions, Event } from "nostr-tools";
 import { useState } from "react";
 import useSWRSubscription from "swr/subscription";

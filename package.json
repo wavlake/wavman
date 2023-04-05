@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettify": "npx prettier --write ."
   },
   "dependencies": {
     "@types/node": "18.15.11",

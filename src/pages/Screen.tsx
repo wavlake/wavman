@@ -1,11 +1,17 @@
 import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
+import OnScreenActions from "./OnScreenActions";
 import ReactPlayerWrapper from "./ReactPlayerWrapper";
+import {
+  COMMENTS_VIEW,
+  PageView,
+  PLAYER_VIEW,
+  SPLASH_VIEW,
+  ZAP_VIEW,
+} from "./shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
-import { COMMENTS_VIEW, PageView, PLAYER_VIEW, SPLASH_VIEW, ZAP_VIEW } from "./shared";
-import OnScreenActions from "./OnScreenActions";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -34,16 +40,33 @@ const Screen: React.FC<{
   const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
 
   return (
-    <div className={`w-80 h-80 ${pageView === PLAYER_VIEW ? "bg-emerald-200" :"bg-violet-400"}`}>
+    <div
+      className={`h-80 w-80 ${
+        pageView === PLAYER_VIEW ? "bg-emerald-200" : "bg-violet-400"
+      }`}
+    >
       <FormProvider {...methods}>
-        <ReactPlayerWrapper url={trackContent.enclosure} isPlaying={isPlaying} />
+        <ReactPlayerWrapper
+          url={trackContent.enclosure}
+          isPlaying={isPlaying}
+        />
         <form onSubmit={methods.handleSubmit(submitHandler)}>
           {(() => {
-            switch(pageView) {
+            switch (pageView) {
               case COMMENTS_VIEW:
-                return <CommentsScreen loading={commentsLoading} comments={comments || []} />;
+                return (
+                  <CommentsScreen
+                    loading={commentsLoading}
+                    comments={comments || []}
+                  />
+                );
               case PLAYER_VIEW:
-                return <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />;
+                return (
+                  <NowPlayingScreen
+                    trackContent={trackContent}
+                    isPlaying={isPlaying}
+                  />
+                );
               case ZAP_VIEW:
                 return <>zap</>;
               case SPLASH_VIEW:
@@ -52,7 +75,10 @@ const Screen: React.FC<{
                 return <>default</>;
             }
           })()}
-          <OnScreenActions selectedActionIndex={selectedActionIndex} pageView={pageView} />
+          <OnScreenActions
+            selectedActionIndex={selectedActionIndex}
+            pageView={pageView}
+          />
         </form>
       </FormProvider>
     </div>

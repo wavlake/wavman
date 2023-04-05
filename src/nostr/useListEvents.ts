@@ -1,6 +1,6 @@
+import { useRelay } from "./useRelay";
 import { Filter, SubscriptionOptions } from "nostr-tools";
 import useSWR from "swr";
-import { useRelay } from "./useRelay";
 
 export const useListEvents = (
   filter: Filter[],

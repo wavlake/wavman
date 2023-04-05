@@ -1,6 +1,6 @@
+import { useRelay } from "./useRelay";
 import { Event } from "nostr-tools";
 import { useState } from "react";
-import { useRelay } from "./useRelay";
 
 export type UsePublishEvent = () => [
   (event: Event) => void,
