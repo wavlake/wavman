@@ -1,4 +1,10 @@
-import { Event, UnsignedEvent, signEvent, generatePrivateKey, getEventHash } from "nostr-tools"
+import {
+  Event,
+  UnsignedEvent,
+  signEvent,
+  generatePrivateKey,
+  getEventHash,
+} from "nostr-tools";
 
 export interface WavlakeEventContent {
   title: string;
@@ -11,7 +17,7 @@ export interface WavlakeEventContent {
   enclosure: string;
   duration: string;
   version: string;
-};
+}
 
 // generate a throwaway private key for mock data and mock comments
 export const publisherPrivateKey = generatePrivateKey();
@@ -26,5 +32,5 @@ export const signTrackEvent = (event: UnsignedEvent): Event => ({
 export const signCommentEvent = (event: UnsignedEvent): Event => ({
   ...event,
   id: getEventHash(event),
-  sig: signEvent(event, commenterPrivateKey)
+  sig: signEvent(event, commenterPrivateKey),
 });

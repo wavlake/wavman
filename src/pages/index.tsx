@@ -1,9 +1,9 @@
-import Head from 'next/head'
-import { Inter } from 'next/font/google'
-import RelayProvider from '@/nostr/relayProvider'
-import Wavman from './Wavman'
+import Wavman from "./Wavman";
+import RelayProvider from "@/nostr/relayProvider";
+import { Inter } from "next/font/google";
+import Head from "next/head";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   return (
@@ -15,10 +15,10 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="grid-row">
-        <RelayProvider url="wss://relay.wavlake.com/" >
+        <RelayProvider url="wss://relay.wavlake.com/">
           <Wavman />
         </RelayProvider>
       </main>
     </>
-  )
+  );
 }

@@ -1,4 +1,10 @@
-import { signCommentEvent, commenterPrivateKey, signTrackEvent, WavlakeEventContent, publisherPrivateKey } from "./interfaces";
+import {
+  signCommentEvent,
+  commenterPrivateKey,
+  signTrackEvent,
+  WavlakeEventContent,
+  publisherPrivateKey,
+} from "./interfaces";
 import { UnsignedEvent, Event, getEventHash } from "nostr-tools";
 
 const wavlakeEventContent: WavlakeEventContent = {
@@ -9,9 +15,10 @@ const wavlakeEventContent: WavlakeEventContent = {
   guid: "87c0d2f9-909f-48ce-8b02-3986aa9b0013",
   creator: "Official DETOX Music",
   pubDate: "Sat, 04 Mar 2023 20:35:29 GMT",
-  enclosure: "https://d12wklypp119aj.cloudfront.net/track/87c0d2f9-909f-48ce-8b02-3986aa9b0013.mp3",
+  enclosure:
+    "https://d12wklypp119aj.cloudfront.net/track/87c0d2f9-909f-48ce-8b02-3986aa9b0013.mp3",
   duration: "00:04:03",
-  version: "1.0"
+  version: "1.0",
 };
 
 export const unsignedMockTrackEvent: UnsignedEvent = {
@@ -22,12 +29,17 @@ export const unsignedMockTrackEvent: UnsignedEvent = {
   pubkey: publisherPrivateKey,
 };
 
-export const signedMockTrackEvent: Event = signTrackEvent(unsignedMockTrackEvent)
+export const signedMockTrackEvent: Event = signTrackEvent(
+  unsignedMockTrackEvent
+);
 
-export const mockComments: Event[] = Array.from(Array(4).keys()).map(comment => signCommentEvent({
-  content: `test comment #${comment}`,
-  kind: 123,
-  tags: [["e", getEventHash(signedMockTrackEvent)]],
-  created_at: 12345 + comment,
-  pubkey: commenterPrivateKey,
-}));
+export const mockComments: Event[] = Array.from(Array(4).keys()).map(
+  (comment) =>
+    signCommentEvent({
+      content: `test comment #${comment}`,
+      kind: 123,
+      tags: [["e", getEventHash(signedMockTrackEvent)]],
+      created_at: 12345 + comment,
+      pubkey: commenterPrivateKey,
+    })
+);

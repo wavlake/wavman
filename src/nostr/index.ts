@@ -4,14 +4,14 @@ export type {
   commenterPrivateKey,
   signCommentEvent,
   signTrackEvent,
-} from './interfaces';
+} from "./interfaces";
 
 export {
   unsignedMockTrackEvent,
   signedMockTrackEvent,
   mockComments,
-} from './mockData';
+} from "./mockData";
 
-export { useCommentSubscription } from './useCommentSubcription';
-export { useGetTracks } from './useGetTracks';
-export { usePostComment } from './usePostComment';
+export { useCommentSubscription } from "./useCommentSubcription";
+export { useGetTracks } from "./useGetTracks";
+export { usePostComment } from "./usePostComment";
