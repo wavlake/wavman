@@ -1,6 +1,6 @@
 import Comments from "./Comments";
 import Player from "./Player";
-import { useGetTracks, useCommentSubscription, usePostComment } from "@/nostr";
+import { useRelayList, useRelaySubcription, usePublishEvent } from "@/nostr";
 import {
   Event,
   getPublicKey,
@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 
 const signComment = (content: string, parentTrack: Event): Event => {
+  // replace with user PK
   const sk = generatePrivateKey();
   const pk = getPublicKey(sk);
   const unsignedEvent: UnsignedEvent = {
@@ -30,14 +31,17 @@ const signComment = (content: string, parentTrack: Event): Event => {
   };
 };
 
+const randomString = (length: number) => Array.from(Array(length), () => Math.floor(Math.random() * 36).toString(36)).join('');
+
 const Wavman: React.FC<{}> = ({}) => {
-  const { data: tracks, loading: tracksLoading } = useGetTracks([
-    { kinds: [32123], limit: 10 },
+  const [randomChar, setRandomChar] = useState<string[]>(Array.from(randomString(4)));
+  const { data: tracks, loading: tracksLoading } = useRelayList([
+    { kinds: [32123], ["#f"]: randomChar},
   ]);
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const shouldSkipComments = !nowPlayingTrack;
   const { allEvents: comments, loading: commentsLoading } =
-    useCommentSubscription(
+    useRelaySubcription(
       [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
       shouldSkipComments
     );
@@ -48,7 +52,7 @@ const Wavman: React.FC<{}> = ({}) => {
       loading: postCommentLoading,
       error: postCommentError,
     },
-  ] = usePostComment();
+  ] = usePublishEvent();
   const [trackIndex, setTrackIndex] = useState(0);
 
   const pickRandomTrack = (tracks: Event[]) => {

@@ -3,7 +3,7 @@ import { Filter, SubscriptionOptions } from "nostr-tools";
 import { useContext } from "react";
 import useSWR from "swr";
 
-export const useGetTracks = (
+export const useRelayList = (
   filter: Filter[],
   skip: boolean = false,
   opts?: SubscriptionOptions

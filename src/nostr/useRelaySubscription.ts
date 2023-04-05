@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import useSWRSubscription from "swr/subscription";
 import type { SWRSubscriptionOptions } from "swr/subscription";
 
-export const useCommentSubscription = (
+export const useRelaySubcription = (
   filter: Filter[],
   skip = false,
   opts?: SubscriptionOptions
@@ -13,7 +13,6 @@ export const useCommentSubscription = (
   const [loading, setLoading] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const subKey = JSON.stringify(filter);
-  console.log({subKey, allEvents})
   const { data, error } = useSWRSubscription(
     subKey,
     (_key, { next }: SWRSubscriptionOptions<Event, Error>) => {

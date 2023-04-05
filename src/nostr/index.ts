@@ -12,6 +12,6 @@ export {
   mockComments,
 } from "./mockData";
 
-export { useCommentSubscription } from "./useCommentSubcription";
-export { useGetTracks } from "./useGetTracks";
-export { usePostComment } from "./usePostComment";
+export { useRelaySubcription } from "./useRelaySubscription";
+export { useRelayList } from "./useRelayList";
+export { usePublishEvent } from "./usePublishEvent";

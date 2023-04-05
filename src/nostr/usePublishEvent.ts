@@ -2,7 +2,7 @@ import { RelayContext } from "./relayContext";
 import { Event } from "nostr-tools";
 import { useContext, useState } from "react";
 
-export const usePostComment = (): [
+export const usePublishEvent = (): [
   (event: Event) => void,
   { data?: Event; loading: boolean; error?: string }
 ] => {

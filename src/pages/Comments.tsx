@@ -1,4 +1,4 @@
-import { usePostComment } from "@/nostr/usePostComment";
+import { usePublishEvent } from "@/nostr/usePublishEvent";
 import { Event } from "nostr-tools";
 import { useFormContext } from "react-hook-form";
 import useSWRMutation from "swr/mutation";
@@ -19,6 +19,7 @@ const Comments: React.FC<{
   return (
     <div className="flex-col">
       <input {...register("comment")} />
+      {/* TODO - disable when not logged in */}
       <button type="submit">
         Add Comment
       </button>
