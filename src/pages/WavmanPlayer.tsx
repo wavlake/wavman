@@ -53,11 +53,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     Array.from(randomSHA256String(4))
   );
 
+  ///////// NOSTR /////////
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
 
+  // Get a batch of tracks
   const { data: tracks, loading: tracksLoading } = useListEvents([
     { kinds: [32123], ["#f"]: randomChar },
   ]);
+
+  // Post a comment mutation
   const [
     postComment,
     {
@@ -69,6 +73,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [trackIndex, setTrackIndex] = useState(0);
 
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+
+  // Get track comments, skip till a track is ready
   const shouldSkipComments = !nowPlayingTrack;
   const { allEvents: comments, loading: commentsLoading } =
     useEventSubscription(
@@ -76,6 +82,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       shouldSkipComments
     );
 
+  ///////// UI /////////
   const pickRandomTrack = (tracks: Event[]) => {
     setNowPlayingTrack(tracks[trackIndex]);
     setTrackIndex(trackIndex + 1);
@@ -88,7 +95,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
   const zapHandler = () => {
-    console.log("Zap!");
+    console.log("Implemented some zaps!");
   };
   const [isPlaying, setIsPlaying] = useState(false);
   const playHandler = () => {
@@ -105,6 +112,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   };
 
+  ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
   const [pageView, setPageView] = useState<PageView>(PLAYER_VIEW);
   const toggleViewHandler = (pageView: PageView) => {
