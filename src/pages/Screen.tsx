@@ -5,6 +5,7 @@ import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
 import { COMMENTS_VIEW, PageView, PLAYER_VIEW, SPLASH_VIEW, ZAP_VIEW } from "./shared";
+import OnScreenActions from "./OnScreenActions";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -12,6 +13,7 @@ const Screen: React.FC<{
   commentsLoading: boolean;
   comments: Event[];
   pageView: PageView;
+  selectedActionIndex: number;
   nowPlayingTrack?: Event;
 }> = ({
   isPlaying,
@@ -19,6 +21,7 @@ const Screen: React.FC<{
   commentsLoading,
   comments,
   pageView,
+  selectedActionIndex,
   nowPlayingTrack,
 }) => {
   const methods = useForm({
@@ -31,25 +34,28 @@ const Screen: React.FC<{
   const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
 
   return (
-    <FormProvider {...methods}>
-      <ReactPlayerWrapper url={trackContent.enclosure} isPlaying={isPlaying} />
-      <form onSubmit={methods.handleSubmit(submitHandler)}>
-        {(() => {
-          switch(pageView) {
-            case COMMENTS_VIEW:
-              return <CommentsScreen loading={commentsLoading} comments={comments || []} />;
-            case PLAYER_VIEW:
-              return <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />;
-            case ZAP_VIEW:
-              return <>zap</>;
-            case SPLASH_VIEW:
-              return <>splash</>;
-            default:
-              return <>default</>;
-          }
-        })()}
-      </form>
-    </FormProvider>
+    <div className={`w-80 h-80 ${pageView === PLAYER_VIEW ? "bg-emerald-200" :"bg-violet-400"}`}>
+      <FormProvider {...methods}>
+        <ReactPlayerWrapper url={trackContent.enclosure} isPlaying={isPlaying} />
+        <form onSubmit={methods.handleSubmit(submitHandler)}>
+          {(() => {
+            switch(pageView) {
+              case COMMENTS_VIEW:
+                return <CommentsScreen loading={commentsLoading} comments={comments || []} />;
+              case PLAYER_VIEW:
+                return <NowPlayingScreen trackContent={trackContent} isPlaying={isPlaying} />;
+              case ZAP_VIEW:
+                return <>zap</>;
+              case SPLASH_VIEW:
+                return <>splash</>;
+              default:
+                return <>default</>;
+            }
+          })()}
+          <OnScreenActions selectedActionIndex={selectedActionIndex} pageView={pageView} />
+        </form>
+      </FormProvider>
+    </div>
   );
 };
 

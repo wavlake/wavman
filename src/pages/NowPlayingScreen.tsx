@@ -15,7 +15,7 @@ const NowPlayingScreen: React.FC<{
   trackContent: WavlakeEventContent;
 }> = ({ trackContent: { title, creator } }) => {
   return (
-    <div className="flex-col">
+    <div className="">
       <TrackInfo title={title} artist={creator} />
     </div>
   );

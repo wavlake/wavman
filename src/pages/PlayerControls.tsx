@@ -1,23 +1,18 @@
-import { useState } from "react";
-import { COMMENTS_VIEW, PageView, PLAYER_VIEW, SPLASH_VIEW, ZAP_VIEW } from "./shared";
-
-type Actions = "PLAY" | "PAUSE" | "ZAP" | "SKIP" | ">" | "<";
+import { Dispatch, SetStateAction } from "react";
+import { Actions, COMMENTS_VIEW, PageView, pageViewActionMap, PLAYER_VIEW, SPLASH_VIEW, ZAP_VIEW } from "./shared";
 
 type ToggleViewHandler = (pageView: PageView) => void;
 type ActionHandler = () => void | ToggleViewHandler;
 const PlayerControls: React.FC<{
   isPlaying: boolean;
   pageView: PageView;
+  selectedActionIndex: number;
+  setSelectedActionIndex: Dispatch<SetStateAction<number>>;
   playHandler: () => void
   skipHandler: () => void
   zapHandler: () => void
   toggleViewHandler: (pageView: PageView) => void
-}> = ({ isPlaying, pageView, playHandler, skipHandler, zapHandler, toggleViewHandler }) => {
-  const [selectedIndex, setSelectedIndex] = useState(0); 
-  const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "SKIP"];
-  const pageViewActions: Actions[] = ["PLAY", "ZAP", "SKIP", ">"];
-  const zapViewActions: Actions[] = [];
-  const splashViewActions: Actions[] = [];
+}> = ({ isPlaying, pageView, selectedActionIndex, setSelectedActionIndex, playHandler, skipHandler, zapHandler, toggleViewHandler }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
     PLAY: playHandler,
     PAUSE: playHandler,
@@ -26,14 +21,9 @@ const PlayerControls: React.FC<{
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
   };
-  const pageViewActionMap: Record<PageView, Actions[]> = {
-    [PLAYER_VIEW]: pageViewActions,
-    [COMMENTS_VIEW]: commentViewActions,
-    [ZAP_VIEW]: zapViewActions,
-    [SPLASH_VIEW]: splashViewActions,
-  };
+
   const currentActions = pageViewActionMap[pageView];
-  const centerHandler = () => actionHandlerMap[currentActions[selectedIndex]]();
+  const centerHandler = () => actionHandlerMap[currentActions[selectedActionIndex]]();
 
   const calcMoveIndexRight = (index: number) => index + 1 >= currentActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) => index === 0 ? index : index - 1;
@@ -45,15 +35,15 @@ const PlayerControls: React.FC<{
   
   };
 
-  const leftHandler = () => setSelectedIndex((selectedIndex) => calcMoveIndexLeft(selectedIndex));
-  const rightHandler = () => setSelectedIndex((selectedIndex) => calcMoveIndexRight(selectedIndex));
+  const leftHandler = () => setSelectedActionIndex((selectedActionIndex) => calcMoveIndexLeft(selectedActionIndex));
+  const rightHandler = () => setSelectedActionIndex((selectedActionIndex) => calcMoveIndexRight(selectedActionIndex));
 
   return (
-    <div>
+    <div className="w-48 h-48">
       {pageViewActionMap[pageView].map((action, index) => (
         <div
           key={action}
-          className={selectedIndex === index ? 'border-2 border-amber-500' : ''}
+          className={selectedActionIndex === index ? 'border-2 border-teal-500' : ''}
         >{action}</div>
       ))}
       <button className="" onClick={upHandler}>Up</button>

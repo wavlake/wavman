@@ -10,7 +10,8 @@ import {
   UnsignedEvent,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
-import { PageView, PLAYER_VIEW, SPLASH_VIEW } from "./shared";
+import { Actions, PageView, PLAYER_VIEW, SPLASH_VIEW } from "./shared";
+import Logo from "./Logo";
 
 const signComment = (content: string, parentTrack: Event): Event => {
   // replace with user PK
@@ -101,8 +102,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   };
 
+  const [selectedActionIndex, setSelectedActionIndex] = useState(0);
+
   return (
-    <div className="flex-col">
+    <div className="w-[90vw] h-[90vh] bg-slate-100 place-self-center align-middle grid place-items-center">
       <Screen
         nowPlayingTrack={nowPlayingTrack}
         isPlaying={isPlaying}
@@ -110,10 +113,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         comments={comments || []}
         submitHandler={submitHandler}
         pageView={pageView}
+        selectedActionIndex={selectedActionIndex}
       />
+      <Logo />
       <PlayerControls
         isPlaying={isPlaying}
         pageView={pageView}
+        selectedActionIndex={selectedActionIndex}
+        setSelectedActionIndex={setSelectedActionIndex}
         skipHandler={skipHandler}
         zapHandler={zapHandler}
         playHandler={playHandler}

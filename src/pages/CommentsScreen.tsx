@@ -14,7 +14,7 @@ const CommentsScreen: React.FC<{
   if (loading) return <div>Comments Loading Screen</div>;
 
   return (
-    <div className="flex-col">
+    <div className="">
       <input {...register("comment")} />
       {/* TODO - disable when not logged in */}
       <button type="submit">Add Comment</button>
