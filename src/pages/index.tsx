@@ -13,6 +13,7 @@ export default function Home() {
         <meta name="description" content="Wavman" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
+        <link href="/output.css" rel="stylesheet" />
       </Head>
       <main className="grid-row">
         <RelayProvider url="wss://relay.wavlake.com/">
