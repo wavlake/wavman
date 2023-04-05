@@ -1,5 +1,13 @@
+import Logo from "./Logo";
 import PlayerControls from "./PlayerControls";
 import Screen from "./Screen";
+import {
+  Actions,
+  PageView,
+  PLAYER_VIEW,
+  resetSelectionOnPageChange,
+  SPLASH_VIEW,
+} from "./shared";
 import { useRelay } from "@/nostr";
 import {
   Event,
@@ -10,8 +18,6 @@ import {
   UnsignedEvent,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
-import { Actions, PageView, PLAYER_VIEW, SPLASH_VIEW } from "./shared";
-import Logo from "./Logo";
 
 const signComment = (content: string, parentTrack: Event): Event => {
   // replace with user PK
@@ -45,7 +51,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChar, setRandomChar] = useState<string[]>(
     Array.from(randomSHA256String(4))
-    );
+  );
 
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
 
@@ -64,11 +70,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const shouldSkipComments = !nowPlayingTrack;
-  const { allEvents: comments, loading: commentsLoading } = useEventSubscription(
-    [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
-    shouldSkipComments
-  );
-  
+  const { allEvents: comments, loading: commentsLoading } =
+    useEventSubscription(
+      [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
+      shouldSkipComments
+    );
+
   const pickRandomTrack = (tracks: Event[]) => {
     setNowPlayingTrack(tracks[trackIndex]);
     setTrackIndex(trackIndex + 1);
@@ -87,10 +94,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const playHandler = () => {
     setIsPlaying(!isPlaying);
   };
-  const [pageView, setPageView] = useState<PageView>(PLAYER_VIEW);
-  const toggleViewHandler = (pageView: PageView) => {
-    setPageView(pageView);
-  }
   interface Form {
     comment: string;
   }
@@ -103,9 +106,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
+  const [pageView, setPageView] = useState<PageView>(PLAYER_VIEW);
+  const toggleViewHandler = (pageView: PageView) => {
+    resetSelectionOnPageChange(pageView, setSelectedActionIndex);
+    setPageView(pageView);
+  };
 
   return (
-    <div className="w-11/12 h-[90vh] max-h-192 max-w-sm bg-slate-100 place-self-center align-middle grid place-items-center">
+    <div className="max-h-192 grid h-[90vh] w-11/12 max-w-sm place-items-center place-self-center bg-slate-100 align-middle">
       <Screen
         nowPlayingTrack={nowPlayingTrack}
         isPlaying={isPlaying}
@@ -117,7 +125,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       />
       <Logo />
       <PlayerControls
-        isPlaying={isPlaying}
         pageView={pageView}
         selectedActionIndex={selectedActionIndex}
         setSelectedActionIndex={setSelectedActionIndex}
