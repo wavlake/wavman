@@ -13,6 +13,7 @@ export const useCommentSubscription = (
   const [loading, setLoading] = useState(false);
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const subKey = JSON.stringify(filter);
+  console.log({subKey, allEvents})
   const { data, error } = useSWRSubscription(
     subKey,
     (_key, { next }: SWRSubscriptionOptions<Event, Error>) => {
@@ -29,11 +30,15 @@ export const useCommentSubscription = (
         // cleanup function
         return () => {
           sub.unsub();
+          setAllEvents([]);
           setLoading(false);
         };
       }
       setLoading(false);
-      return () => {};
+      return () => {
+        setAllEvents([]);
+        setLoading(false);
+      };
     }
   );
   return { lastEvent: data, allEvents, error, loading };

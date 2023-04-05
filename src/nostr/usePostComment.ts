@@ -3,7 +3,7 @@ import { Event } from "nostr-tools";
 import { useContext, useState } from "react";
 
 export const usePostComment = (): [
-  (event: Event) => Promise<void>,
+  (event: Event) => void,
   { data?: Event; loading: boolean; error?: string }
 ] => {
   const { relay } = useContext(RelayContext);
@@ -11,7 +11,7 @@ export const usePostComment = (): [
   const [error, setError] = useState<string | undefined>(undefined);
   const [data, setData] = useState<Event | undefined>(undefined);
 
-  const mutation = async (event: Event) => {
+  const mutation = (event: Event) => {
     setLoading(true);
     setError(undefined);
     setData(undefined);

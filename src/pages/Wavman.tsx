@@ -81,7 +81,7 @@ const Wavman: React.FC<{}> = ({}) => {
       postComment(signedEvent);
     }
   };
-  console.log({tracks})
+
   return (
     <div className="flex-col">
       <Player
