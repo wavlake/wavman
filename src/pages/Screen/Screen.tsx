@@ -1,14 +1,14 @@
 import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
 import OnScreenActions from "./OnScreenActions";
-import ReactPlayerWrapper from "./ReactPlayerWrapper";
+import ReactPlayerWrapper from "../ReactPlayerWrapper";
 import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "./shared";
+} from "../shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";

@@ -1,6 +1,6 @@
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
-import Screen from "./Screen";
+import Screen from "./Screen/Screen";
 import {
   Actions,
   PageView,

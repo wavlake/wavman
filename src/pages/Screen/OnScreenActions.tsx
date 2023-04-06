@@ -5,7 +5,7 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "./shared";
+} from "../shared";
 
 const buttonColorCalc = (selected: boolean, pageView: PageView) => {
   if (selected) {
