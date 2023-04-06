@@ -15,7 +15,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <link href="/output.css" rel="stylesheet" />
       </Head>
-      <main className="grid bg-rose-300">
+      <main className="grid bg-wavpink">
         <RelayProvider url="wss://relay.wavlake.com/">
           <WavmanPlayer />
         </RelayProvider>

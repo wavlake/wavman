@@ -1,6 +1,3 @@
-import CommentsScreen from "./CommentsScreen";
-import NowPlayingScreen from "./NowPlayingScreen";
-import OnScreenActions from "./OnScreenActions";
 import ReactPlayerWrapper from "../ReactPlayerWrapper";
 import {
   COMMENTS_VIEW,
@@ -8,8 +5,11 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-  OFF_VIEW
+  OFF_VIEW,
 } from "../shared";
+import CommentsScreen from "./CommentsScreen";
+import NowPlayingScreen from "./NowPlayingScreen";
+import OnScreenActions from "./OnScreenActions";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
@@ -39,10 +39,10 @@ const Screen: React.FC<{
   const getScreenColor = () => {
     switch (pageView) {
       case PLAYER_VIEW:
-        return "bg-emerald-200";
+        return "bg-wavgreen";
       case COMMENTS_VIEW:
       case ZAP_VIEW:
-        return "bg-violet-400";
+        return "bg-wavpurple";
       case OFF_VIEW:
       case SPLASH_VIEW:
       default:
@@ -51,12 +51,12 @@ const Screen: React.FC<{
   };
 
   return (
-    <div
-      className={`h-80 w-80 ${getScreenColor()}`}
-    >
+    <div className={`h-80 w-80 ${getScreenColor()}`}>
       {(() => {
         if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
-        const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
+        const trackContent: WavlakeEventContent = JSON.parse(
+          nowPlayingTrack.content
+        );
 
         return (
           <FormProvider {...methods}>
@@ -95,7 +95,8 @@ const Screen: React.FC<{
               />
             </form>
           </FormProvider>
-        )})()}
+        );
+      })()}
     </div>
   );
 };
