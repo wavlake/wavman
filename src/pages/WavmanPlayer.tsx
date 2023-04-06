@@ -1,5 +1,5 @@
 import Logo from "./Logo";
-import PlayerControls from "./PlayerControls";
+import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen";
 import {
   Actions,

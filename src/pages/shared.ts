@@ -10,6 +10,8 @@ export type PageView =
   | typeof ZAP_VIEW
   | typeof SPLASH_VIEW;
 export type Actions = "PLAY" | "PAUSE" | "ZAP" | "SKIP" | ">" | "<";
+type ToggleViewHandler = (pageView: PageView) => void;
+export type ActionHandler = () => void | ToggleViewHandler;
 
 // will need to handle a view navigation when index is out of bounds for the next view
 // (not an issue now due to same action count)

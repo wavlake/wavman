@@ -4,7 +4,7 @@ const TrackInfo: React.FC<{
   title: string;
   artist: string;
 }> = ({ title, artist }) => (
-  <div className="grid grid-cols-1">
+  <div className="grid grid-cols-1 grid-rows-2 place-items-center">
     <div className="col-span-1">{artist}</div>
     <div className="col-span-1">{title}</div>
   </div>

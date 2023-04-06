@@ -1,4 +1,5 @@
 import {
+  ActionHandler,
   Actions,
   COMMENTS_VIEW,
   PageView,
@@ -6,11 +7,10 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "./shared";
+} from "../shared";
 import { Dispatch, SetStateAction } from "react";
+import DPad from "./DPad";
 
-type ToggleViewHandler = (pageView: PageView) => void;
-type ActionHandler = () => void | ToggleViewHandler;
 const PlayerControls: React.FC<{
   pageView: PageView;
   selectedActionIndex: number;
@@ -38,17 +38,18 @@ const PlayerControls: React.FC<{
   };
 
   const currentActions = pageViewActionMap[pageView];
-  const centerHandler = () =>
-    actionHandlerMap[currentActions[selectedActionIndex]]();
-
+  
   const calcMoveIndexRight = (index: number) =>
-    index + 1 >= currentActions.length ? index : index + 1;
+  index + 1 >= currentActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) =>
-    index === 0 ? index : index - 1;
-
+  index === 0 ? index : index - 1;
+  
   const upHandler = () => {};
   const downHandler = () => {};
-
+  
+  const centerHandler = () =>{
+    actionHandlerMap[currentActions[selectedActionIndex]]();
+  };
   const leftHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexLeft(selectedActionIndex)
@@ -59,15 +60,13 @@ const PlayerControls: React.FC<{
     );
 
   return (
-    <div className="h-48 w-48">
-      <button className="" onClick={upHandler}>
-        Up
-      </button>
-      <button onClick={leftHandler}>Left</button>
-      <button onClick={downHandler}>Down</button>
-      <button onClick={rightHandler}>Right</button>
-      <button onClick={centerHandler}>Center</button>
-    </div>
+    <DPad 
+      upHandler={upHandler}
+      leftHandler={leftHandler}
+      centerHandler={centerHandler}
+      rightHandler={rightHandler}
+      downHandler={downHandler}
+    />
   );
 };
 
