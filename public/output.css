@@ -732,6 +732,21 @@ video {
   background-color: rgb(167 139 250 / var(--tw-bg-opacity));
 }
 
+.bg-emerald-300 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(110 231 183 / var(--tw-bg-opacity));
+}
+
+.bg-emerald-900 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(6 78 59 / var(--tw-bg-opacity));
+}
+
+.bg-emerald-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(6 95 70 / var(--tw-bg-opacity));
+}
+
 .align-middle {
   vertical-align: middle;
 }

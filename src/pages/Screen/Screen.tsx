@@ -8,6 +8,7 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
+  OFF_VIEW
 } from "../shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
@@ -35,52 +36,66 @@ const Screen: React.FC<{
       comment: "",
     },
   });
-  if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
-
-  const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
+  const getScreenColor = () => {
+    switch (pageView) {
+      case PLAYER_VIEW:
+        return "bg-emerald-200";
+      case COMMENTS_VIEW:
+      case ZAP_VIEW:
+        return "bg-violet-400";
+      case OFF_VIEW:
+      case SPLASH_VIEW:
+      default:
+        return "bg-emerald-800";
+    }
+  };
 
   return (
     <div
-      className={`h-80 w-80 ${
-        pageView === PLAYER_VIEW ? "bg-emerald-200" : "bg-violet-400"
-      }`}
+      className={`h-80 w-80 ${getScreenColor()}`}
     >
-      <FormProvider {...methods}>
-        <ReactPlayerWrapper
-          url={trackContent.enclosure}
-          isPlaying={isPlaying}
-        />
-        <form onSubmit={methods.handleSubmit(submitHandler)}>
-          {(() => {
-            switch (pageView) {
-              case COMMENTS_VIEW:
-                return (
-                  <CommentsScreen
-                    loading={commentsLoading}
-                    comments={comments || []}
-                  />
-                );
-              case PLAYER_VIEW:
-                return (
-                  <NowPlayingScreen
-                    trackContent={trackContent}
-                    isPlaying={isPlaying}
-                  />
-                );
-              case ZAP_VIEW:
-                return <>zap</>;
-              case SPLASH_VIEW:
-                return <>splash</>;
-              default:
-                return <>default</>;
-            }
-          })()}
-          <OnScreenActions
-            selectedActionIndex={selectedActionIndex}
-            pageView={pageView}
-          />
-        </form>
-      </FormProvider>
+      {(() => {
+        if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
+        const trackContent: WavlakeEventContent = JSON.parse(nowPlayingTrack.content);
+
+        return (
+          <FormProvider {...methods}>
+            <ReactPlayerWrapper
+              url={trackContent.enclosure}
+              isPlaying={isPlaying}
+            />
+            <form onSubmit={methods.handleSubmit(submitHandler)}>
+              {(() => {
+                switch (pageView) {
+                  case COMMENTS_VIEW:
+                    return (
+                      <CommentsScreen
+                        loading={commentsLoading}
+                        comments={comments || []}
+                      />
+                    );
+                  case PLAYER_VIEW:
+                    return (
+                      <NowPlayingScreen
+                        trackContent={trackContent}
+                        isPlaying={isPlaying}
+                      />
+                    );
+                  case ZAP_VIEW:
+                    return <>zap</>;
+                  case SPLASH_VIEW:
+                    return <>splash</>;
+                  default:
+                    return <>default</>;
+                }
+              })()}
+              <OnScreenActions
+                selectedActionIndex={selectedActionIndex}
+                pageView={pageView}
+              />
+            </form>
+          </FormProvider>
+        )})()}
     </div>
   );
 };

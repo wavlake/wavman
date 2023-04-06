@@ -3,13 +3,15 @@ import { Dispatch, SetStateAction } from "react";
 export const COMMENTS_VIEW = "comments";
 export const PLAYER_VIEW = "player";
 export const ZAP_VIEW = "zap";
+export const OFF_VIEW = "off";
 export const SPLASH_VIEW = "splash";
 export type PageView =
   | typeof COMMENTS_VIEW
   | typeof PLAYER_VIEW
   | typeof ZAP_VIEW
-  | typeof SPLASH_VIEW;
-export type Actions = "PLAY" | "PAUSE" | "ZAP" | "SKIP" | ">" | "<";
+  | typeof SPLASH_VIEW
+  | typeof OFF_VIEW;
+export type Actions = "PLAY" | "PAUSE" | "ZAP" | "SKIP" | ">" | "<" | "ON" | "OFF";
 type ToggleViewHandler = (pageView: PageView) => void;
 export type ActionHandler = () => void | ToggleViewHandler;
 
@@ -24,12 +26,14 @@ export const pageViewActionMap: Record<PageView, Actions[]> = {
   [COMMENTS_VIEW]: commentViewActions,
   [ZAP_VIEW]: zapViewActions,
   [SPLASH_VIEW]: splashViewActions,
+  [OFF_VIEW]: ["ON"],
 };
 const pageViewStartIndexMap: Record<PageView, number> = {
   [PLAYER_VIEW]: 3,
   [COMMENTS_VIEW]: 0,
   [ZAP_VIEW]: 0,
   [SPLASH_VIEW]: 0,
+  [OFF_VIEW]: 0,
 };
 
 export const resetSelectionOnPageChange = (

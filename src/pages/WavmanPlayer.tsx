@@ -3,6 +3,7 @@ import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
 import {
   Actions,
+  OFF_VIEW,
   PageView,
   PLAYER_VIEW,
   resetSelectionOnPageChange,
@@ -88,14 +89,23 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     setTrackIndex(trackIndex + 1);
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
+  const turnOnPlayer = () => setPageView(PLAYER_VIEW);
+  const turnOffPlayer = () => setPageView(OFF_VIEW);
+
+  // The player currently auto turns on when tracks are loaded
+  // Tracks load automatically when the page loads
   useEffect(() => {
-    if (tracks?.length) pickRandomTrack(tracks);
+    if (tracks?.length) {
+      pickRandomTrack(tracks);
+      turnOnPlayer();
+    }
   }, [tracks]);
+
   const skipHandler = () => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
   const zapHandler = () => {
-    console.log("Implemented some zaps!");
+    console.log("Implement some zaps!");
   };
   const [isPlaying, setIsPlaying] = useState(false);
   const playHandler = () => {
@@ -114,7 +124,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
-  const [pageView, setPageView] = useState<PageView>(PLAYER_VIEW);
+  const [pageView, setPageView] = useState<PageView>(SPLASH_VIEW);
   const toggleViewHandler = (pageView: PageView) => {
     resetSelectionOnPageChange(pageView, setSelectedActionIndex);
     setPageView(pageView);
