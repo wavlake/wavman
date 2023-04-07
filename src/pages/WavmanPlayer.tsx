@@ -131,7 +131,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   return (
-    <div className="max-h-192 grid h-[90vh] w-11/12 max-w-sm place-items-center place-self-center border-16 border-black bg-wavgray align-middle">
+    <div className="max-h-192 relative grid h-[90vh] w-11/12 max-w-sm place-items-center place-self-center border-16 border-black bg-wavgray align-middle">
+      <div className="absolute -left-4 -top-4 h-4 w-4 bg-wavgray"></div>
+      <div className="absolute -right-4 -top-4 h-4 w-4 bg-wavgray"></div>
+      <div className="absolute -left-4 -bottom-4 h-4 w-4 bg-wavgray"></div>
+      <div className="absolute -right-4 -bottom-4 h-4 w-4 bg-wavgray"></div>
       <Screen
         nowPlayingTrack={nowPlayingTrack}
         isPlaying={isPlaying}
