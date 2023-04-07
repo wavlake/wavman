@@ -1,3 +1,4 @@
+import { useNIP07Login } from "@/nostr/useNip07Login";
 import { Event } from "nostr-tools";
 import { useFormContext } from "react-hook-form";
 
@@ -12,12 +13,15 @@ const CommentsScreen: React.FC<{
   const { register } = useFormContext();
 
   if (loading) return <div>Comments Loading Screen</div>;
-
+  const { publicKey } = useNIP07Login();
   return (
     <div className="">
-      <input {...register("comment")} />
-      {/* TODO - disable when not logged in */}
-      <button type="submit">Add Comment</button>
+      {publicKey && 
+        <>
+          <input {...register("comment")} />
+          <button type="submit">Add Comment</button>
+        </>
+      }
       {!comments.length ? (
         <div>No comments yet...</div>
       ) : (

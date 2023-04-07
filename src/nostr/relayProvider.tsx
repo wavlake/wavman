@@ -1,9 +1,25 @@
-import { RelayContext } from "./relayContext";
 import { useEventSubscription } from "./useEventSubscription";
 import { useListEvents } from "./useListEvents";
 import { usePublishEvent } from "./usePublishEvent";
-import { relayInit } from "nostr-tools";
-import { useEffect, useRef, PropsWithChildren } from "react";
+import { relayInit, Relay } from "nostr-tools";
+import { useEffect, useRef, PropsWithChildren, createContext } from "react";
+
+type UsePublishEvent = typeof usePublishEvent;
+type UseListEvents = typeof useListEvents;
+type UseEventSubscription = typeof useEventSubscription;
+
+export const RelayContext = createContext<{
+  relay: Relay | null;
+  usePublishEvent: UsePublishEvent;
+  useListEvents: UseListEvents;
+  useEventSubscription: UseEventSubscription;
+}>({
+  relay: null,
+  usePublishEvent,
+  useListEvents,
+  useEventSubscription,
+});
+
 
 const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   children,

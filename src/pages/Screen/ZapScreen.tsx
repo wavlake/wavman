@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 const ZapScreen: React.FC<{
   paymentRequest: string;
 }> = ({ paymentRequest }) => {
-  const [qrImage, setQrImage] = useState<string | undefined>(undefined);
+  const [qrImage, setQrImage] = useState<string | undefined>();
   useEffect(() => {
     if (paymentRequest.length === 0) return;
     QRCode.toDataURL(`lightning:${paymentRequest}`)
