@@ -20,16 +20,68 @@ import {
 } from "nostr-tools";
 import { useEffect, useState } from "react";
 
+// TODO replace with user PK/login feature
+const sk = generatePrivateKey();
+const pk = getPublicKey(sk);
+const validateNostrPubKey = (nostrPubKey: string) => {
+  if (nostrPubKey == null || nostrPubKey === undefined || typeof nostrPubKey !== 'string') {
+    return false;
+  }
+  const schnorrSignatureRegex = /^[a-fA-F0-9]{64}$/;
+  if (!schnorrSignatureRegex.test(nostrPubKey)) {
+    return false;
+  }
+
+  return true;
+};
+const generateLNURLFromZapTag = (zapTag: string[]) => {
+  const [zap, zapAddress, lud] = zapTag;
+  const [username, domain] = zapAddress.split("@");
+  if (!username || !domain) return false;
+  return`http://${domain}/.well-known/lnurlp/${username}`
+};
 const signComment = (content: string, parentTrack: Event): Event => {
-  // replace with user PK
-  const sk = generatePrivateKey();
-  const pk = getPublicKey(sk);
   const unsignedEvent: UnsignedEvent = {
     kind: 1,
     pubkey: pk,
     created_at: Math.floor(Date.now() / 1000),
     tags: [["e", parentTrack.id, "wss://relay.wavlake.com/", "reply"]],
     content,
+  };
+
+  return {
+    ...unsignedEvent,
+    id: getEventHash(unsignedEvent),
+    sig: signEvent(unsignedEvent, sk),
+  };
+};
+
+const signZapEvent = ({
+  content,
+  amount,
+  lnurl,
+  recepientPubKey,
+  zappedEvent,
+}: {
+  content: string;
+  amount: number;
+  lnurl: string;
+  recepientPubKey: string;
+  zappedEvent: Event;
+}): Event => {
+  const sats2millisats = (amount: number) => amount * 1000;
+  const unsignedEvent = {
+    kind: 9734,
+    content,
+    tags: [
+      ["relays", "wss://relay.wavlake.com/"],
+      ["amount", sats2millisats(amount).toString()],
+      ["lnurl", lnurl],
+      ["p", recepientPubKey],
+      ["e", zappedEvent.id]
+    ],
+    pubkey: pk,
+    created_at: Math.floor(Date.now() / 1000),
   };
 
   return {
@@ -51,7 +103,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChar, setRandomChar] = useState<string[]>(
-    Array.from(randomSHA256String(4))
+    Array.from(randomSHA256String(30))
   );
 
   ///////// NOSTR /////////
@@ -104,8 +156,40 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const skipHandler = () => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
-  const zapHandler = () => {
-    console.log("Implement some zaps!");
+  const zapHandler = async () => {
+    if (nowPlayingTrack) {
+      const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
+      const lnurl = zapTag && generateLNURLFromZapTag(zapTag)
+      if (!lnurl) return false;
+      const res = await fetch(lnurl);
+      const {
+        allowsNostr,
+        callback,
+        maxSendable,
+        metadata,
+        minSendable,
+        nostrPubKey,
+        tag,
+      } = await res.json();
+      
+      if (!allowsNostr) return false;
+      if (!validateNostrPubKey(nostrPubKey)) return false;
+
+      const amount = 100;
+      const content = "Zapped!";
+      const zapEvent = signZapEvent({
+        content,
+        amount,
+        lnurl,
+        recepientPubKey: nostrPubKey,
+        zappedEvent: nowPlayingTrack,
+      });
+
+      const event = encodeURI(JSON.stringify(zapEvent));
+      const invoiceRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
+      const { pr } = await invoiceRes.json();
+      console.log({pr})
+    }
   };
   const [isPlaying, setIsPlaying] = useState(false);
   const playHandler = () => {
