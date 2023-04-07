@@ -51,9 +51,16 @@ const Screen: React.FC<{
   };
 
   return (
-    <div className={`h-80 w-80 ${getScreenColor()}`}>
+    <div
+      className={`flex h-56 w-64 items-center justify-center ${getScreenColor()}`}
+    >
       {(() => {
-        if (!nowPlayingTrack) return <div>Track Loading Screen</div>;
+        if (!nowPlayingTrack)
+          return (
+            <div>
+              <img className="h-20 animate-fadein" src={"wavlake.svg"} />
+            </div>
+          );
         const trackContent: WavlakeEventContent = JSON.parse(
           nowPlayingTrack.content
         );
