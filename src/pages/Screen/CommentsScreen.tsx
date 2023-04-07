@@ -1,3 +1,4 @@
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { Event } from "nostr-tools";
 
 const Comment: React.FC<{ comment: Event }> = ({ comment }) => (
@@ -9,12 +10,9 @@ const CommentsScreen: React.FC<{
   comments: Event[];
 }> = ({ loading, comments }) => {
   if (loading) return <div>Comments Loading Screen</div>;
-
+  const { publicKey } = useNIP07Login();
   return (
     <div className="">
-      {/* <input {...register("comment")} /> */}
-      {/* TODO - disable when not logged in */}
-      <button type="submit">Add Comment</button>
       {!comments ? (
         <div>No comments yet...</div>
       ) : (
