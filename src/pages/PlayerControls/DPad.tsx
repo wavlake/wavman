@@ -1,6 +1,9 @@
 import { ActionHandler } from "../shared";
 
-const buttonInfoMap: Record<string, { svgClass: string; buttonClass: string; svgSrc: string; }> = {
+const buttonInfoMap: Record<
+  string,
+  { svgClass: string; buttonClass: string; svgSrc: string }
+> = {
   up: {
     svgClass: "rotate-0",
     buttonClass: "col-start-2 col-end-2 row-start-1 row-end-1",
@@ -12,7 +15,7 @@ const buttonInfoMap: Record<string, { svgClass: string; buttonClass: string; svg
     svgSrc: "arrow.svg",
   },
   center: {
-    svgClass: "",
+    svgClass: "h-12",
     buttonClass: "col-start-2 col-end-2 row-start-2 row-end-2",
     svgSrc: "center-button.svg",
   },
@@ -28,16 +31,14 @@ const buttonInfoMap: Record<string, { svgClass: string; buttonClass: string; svg
   },
 };
 
-const DirectionalButton: React.FC<{ direction: string; clickHandler: ActionHandler }> =
-({ direction, clickHandler }) => {
-  const {
-    svgClass,
-    buttonClass,
-    svgSrc,
-  } = buttonInfoMap[direction];
+const DirectionalButton: React.FC<{
+  direction: string;
+  clickHandler: ActionHandler;
+}> = ({ direction, clickHandler }) => {
+  const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
-    <button className={`${buttonClass} w-full h-full`} onClick={clickHandler}>
-      <img className={svgClass} src={svgSrc} alt={`${direction} arrow`}/>
+    <button className={`${buttonClass} h-full w-full`} onClick={clickHandler}>
+      <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </button>
   );
 };
@@ -48,14 +49,8 @@ const DPad: React.FC<{
   centerHandler: () => void;
   rightHandler: () => void;
   downHandler: () => void;
-}> = ({
-  upHandler,
-  leftHandler,
-  centerHandler,
-  rightHandler,
-  downHandler,
-}) => (
-  <div className="h-52 w-52 grid grid-cols-3 grid-rows-3 place-items-center">
+}> = ({ upHandler, leftHandler, centerHandler, rightHandler, downHandler }) => (
+  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center">
     <DirectionalButton direction="left" clickHandler={leftHandler} />
     <DirectionalButton direction="center" clickHandler={centerHandler} />
     <DirectionalButton direction="right" clickHandler={rightHandler} />

@@ -4,32 +4,36 @@ const TrackInfo: React.FC<{
   title: string;
   artist: string;
 }> = ({ title, artist }) => (
-  <div className="grid items-center justify-center text-lg font-bold">
-    <p className="mx-auto flex text-center">{artist}</p>
-    <p className="mx-auto flex text-center">{`"${title}"`}</p>
+  <div className="mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
+    <div className="whitespace flex w-64 justify-center place-self-center text-center">
+      <p>{artist}</p>
+    </div>
+    <div className="flex h-12 w-full animate-marquee whitespace-nowrap no-scrollbar">
+      <p>{title}</p>
+    </div>
   </div>
 );
 
 const MusicNotes: React.FC<{
   isPlaying: boolean;
 }> = ({ isPlaying }) => (
-  <div className="my-8 grid grid-cols-3 grid-rows-1 place-items-center gap-x-0 text-lg font-bold">
+  <div className="grid grid-cols-5 grid-rows-1 place-items-center gap-x-0 text-base font-bold">
     <div
       className={` ${
         isPlaying ? "animate-dance animation-delay-400" : ""
-      } col-span-1 text-4xl`}
+      } col-span-1 col-start-2 text-4xl`}
     >
-      <img className="h-16" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
     <div className={` ${isPlaying ? "animate-dance" : ""} col-span-1 text-4xl`}>
-      <img className="h-16" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
     <div
       className={` ${
         isPlaying ? "animate-dance animation-delay-800" : ""
       } col-span-1 text-4xl`}
     >
-      <img className="h-16" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
   </div>
 );
@@ -39,7 +43,7 @@ const NowPlayingScreen: React.FC<{
   trackContent: WavlakeEventContent;
 }> = ({ trackContent: { title, creator }, isPlaying }) => {
   return (
-    <div className="">
+    <div className="h-40 w-64">
       <TrackInfo title={title} artist={creator} />
       <MusicNotes isPlaying={isPlaying} />
     </div>

@@ -218,31 +218,54 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   return (
-    <div className="max-h-192 relative grid h-[90vh] w-11/12 max-w-sm place-items-center place-self-center border-16 border-black bg-wavgray align-middle">
-      <div className="absolute -left-4 -top-4 h-4 w-4 bg-wavgray"></div>
-      <div className="absolute -right-4 -top-4 h-4 w-4 bg-wavgray"></div>
-      <div className="absolute -left-4 -bottom-4 h-4 w-4 bg-wavgray"></div>
-      <div className="absolute -right-4 -bottom-4 h-4 w-4 bg-wavgray"></div>
-      <Screen
-        nowPlayingTrack={nowPlayingTrack}
-        isPlaying={isPlaying}
-        commentsLoading={commentsLoading}
-        comments={comments || []}
-        submitHandler={submitHandler}
-        pageView={pageView}
-        paymentRequest={paymentRequest}
-        selectedActionIndex={selectedActionIndex}
-      />
-      <Logo />
-      <PlayerControls
-        pageView={pageView}
-        selectedActionIndex={selectedActionIndex}
-        setSelectedActionIndex={setSelectedActionIndex}
-        skipHandler={skipHandler}
-        zapHandler={zapHandler}
-        playHandler={playHandler}
-        toggleViewHandler={toggleViewHandler}
-      />
+    // Page Container
+    <div className="mx-auto mt-4 h-screen md:mt-12">
+      <div className="h-128 relative mx-auto grid max-w-sm border-8 border-black bg-wavgray">
+        {/* Screen Container */}
+        <div className="relative my-4 mx-4 border-8 border-black p-2">
+          <Screen
+            nowPlayingTrack={nowPlayingTrack}
+            isPlaying={isPlaying}
+            commentsLoading={commentsLoading}
+            comments={comments || []}
+            submitHandler={submitHandler}
+            pageView={pageView}
+            paymentRequest={paymentRequest}
+            selectedActionIndex={selectedActionIndex}
+          />
+          {/* Screen Border Cutouts */}
+          <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+        </div>
+
+        <Logo />
+
+        {/* Controls Container */}
+        <div className="relative mx-auto my-4 border-8 border-black p-0">
+          <PlayerControls
+            pageView={pageView}
+            selectedActionIndex={selectedActionIndex}
+            setSelectedActionIndex={setSelectedActionIndex}
+            skipHandler={skipHandler}
+            zapHandler={zapHandler}
+            playHandler={playHandler}
+            toggleViewHandler={toggleViewHandler}
+          />
+          {/* Controls Border Cutouts */}
+          <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+          <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+        </div>
+
+        {/* Player Border Cutouts */}
+        <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavpink"></div>
+        <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavpink"></div>
+        <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavpink"></div>
+        <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavpink"></div>
+      </div>
     </div>
   );
 };
