@@ -1,4 +1,4 @@
-import { useNIP07Login } from "@/nostr/useNip07Login";
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
