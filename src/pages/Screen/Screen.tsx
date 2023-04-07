@@ -13,6 +13,7 @@ import OnScreenActions from "./OnScreenActions";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
+import ZapScreen from "./ZapScreen";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -21,6 +22,7 @@ const Screen: React.FC<{
   comments: Event[];
   pageView: PageView;
   selectedActionIndex: number;
+  paymentRequest: string;
   nowPlayingTrack?: Event;
 }> = ({
   isPlaying,
@@ -29,6 +31,7 @@ const Screen: React.FC<{
   comments,
   pageView,
   selectedActionIndex,
+  paymentRequest,
   nowPlayingTrack,
 }) => {
   const methods = useForm({
@@ -82,7 +85,7 @@ const Screen: React.FC<{
                       />
                     );
                   case ZAP_VIEW:
-                    return <>zap</>;
+                    return <ZapScreen paymentRequest={paymentRequest} />;
                   case SPLASH_VIEW:
                     return <>splash</>;
                   default:

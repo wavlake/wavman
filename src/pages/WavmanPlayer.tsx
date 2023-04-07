@@ -8,6 +8,7 @@ import {
   PLAYER_VIEW,
   resetSelectionOnPageChange,
   SPLASH_VIEW,
+  ZAP_VIEW,
 } from "./shared";
 import { useRelay } from "@/nostr";
 import {
@@ -126,6 +127,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [trackIndex, setTrackIndex] = useState(0);
 
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+  const [paymentRequest, setpaymentRequest] = useState("");
 
   // Get track comments, skip till a track is ready
   const shouldSkipComments = !nowPlayingTrack;
@@ -158,6 +160,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const zapHandler = async () => {
     if (nowPlayingTrack) {
+      setPageView(ZAP_VIEW);
       const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
       const lnurl = zapTag && generateLNURLFromZapTag(zapTag)
       if (!lnurl) return false;
@@ -186,9 +189,9 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       });
 
       const event = encodeURI(JSON.stringify(zapEvent));
-      const invoiceRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
-      const { pr } = await invoiceRes.json();
-      console.log({pr})
+      const paymentRequestRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
+      const { pr } = await paymentRequestRes.json();
+      setpaymentRequest(pr);
     }
   };
   const [isPlaying, setIsPlaying] = useState(false);
@@ -223,6 +226,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         comments={comments || []}
         submitHandler={submitHandler}
         pageView={pageView}
+        paymentRequest={paymentRequest}
         selectedActionIndex={selectedActionIndex}
       />
       <Logo />
