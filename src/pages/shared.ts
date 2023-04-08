@@ -11,14 +11,22 @@ export type PageView =
   | typeof ZAP_VIEW
   | typeof SPLASH_VIEW
   | typeof OFF_VIEW;
-export type Actions = "PLAY" | "PAUSE" | "ZAP" | "SKIP" | ">" | "<" | "ON" | "OFF";
+export type Actions =
+  | "PLAY"
+  | "PAUSE"
+  | "ZAP"
+  | "NEXT"
+  | ">"
+  | "<"
+  | "ON"
+  | "OFF";
 type ToggleViewHandler = (pageView: PageView) => void;
 export type ActionHandler = () => void | ToggleViewHandler;
 
 // will need to handle a view navigation when index is out of bounds for the next view
 // (not an issue now due to same action count)
-const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "SKIP"];
-const pageViewActions: Actions[] = ["PLAY", "ZAP", "SKIP", ">"];
+const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
+const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
 const zapViewActions: Actions[] = [];
 const splashViewActions: Actions[] = [];
 export const pageViewActionMap: Record<PageView, Actions[]> = {
