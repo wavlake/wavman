@@ -31,6 +31,9 @@ module.exports = {
         wavgreen: {
           DEFAULT: "#96f9d4",
         },
+        wavdarkgreen: {
+          DEFAULT: "#546b08",
+        },
         wavpink: {
           DEFAULT: "#f19ab6",
         },

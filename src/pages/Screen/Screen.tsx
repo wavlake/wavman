@@ -46,7 +46,7 @@ const Screen: React.FC<{
       case OFF_VIEW:
       case SPLASH_VIEW:
       default:
-        return "bg-emerald-800";
+        return "bg-wavdarkgreen";
     }
   };
 
