@@ -1,14 +1,13 @@
-import Logo from "./Logo";
-import PlayerControls from "./PlayerControls/PlayerControls";
-import Screen from "./Screen/Screen";
 import {
   Actions,
-  OFF_VIEW,
   PageView,
   PLAYER_VIEW,
   resetSelectionOnPageChange,
   SPLASH_VIEW,
-} from "./shared";
+} from "../lib/shared";
+import Logo from "./Logo";
+import PlayerControls from "./PlayerControls/PlayerControls";
+import Screen from "./Screen/Screen";
 import { useRelay } from "@/nostr";
 import {
   Event,
@@ -90,7 +89,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
   const turnOnPlayer = () => setPageView(PLAYER_VIEW);
-  const turnOffPlayer = () => setPageView(OFF_VIEW);
 
   // The player currently auto turns on when tracks are loaded
   // Tracks load automatically when the page loads

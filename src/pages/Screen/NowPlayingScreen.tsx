@@ -1,5 +1,7 @@
 import { WavlakeEventContent } from "@/nostr";
 
+// Fix a build error where title and artist are undefined
+
 const TrackInfo: React.FC<{
   title: string;
   artist: string;
@@ -7,7 +9,7 @@ const TrackInfo: React.FC<{
   <div className="mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
     <div
       className={`${
-        artist.length > 20
+        artist?.length > 20
           ? "w-full animate-marquee whitespace-nowrap"
           : "whitespace w-64 justify-center"
       } flex place-self-center text-center no-scrollbar`}
@@ -16,10 +18,10 @@ const TrackInfo: React.FC<{
     </div>
     <div
       className={`${
-        title.length > 10 ? "animate-marquee" : "justify-center"
+        title?.length > 10 ? `animate-marquee` : `justify-center`
       } flex h-12 w-full whitespace-nowrap no-scrollbar`}
     >
-      <p>"{title}"</p>
+      <p>{`"${title}"`}</p>
     </div>
   </div>
 );
@@ -51,10 +53,10 @@ const MusicNotes: React.FC<{
 const NowPlayingScreen: React.FC<{
   isPlaying: boolean;
   trackContent: WavlakeEventContent;
-}> = ({ trackContent: { title, creator }, isPlaying }) => {
+}> = ({ trackContent, isPlaying }) => {
   return (
     <div className="h-40 w-64">
-      <TrackInfo title={title} artist={creator} />
+      <TrackInfo title={trackContent?.title} artist={trackContent?.creator} />
       <MusicNotes isPlaying={isPlaying} />
     </div>
   );

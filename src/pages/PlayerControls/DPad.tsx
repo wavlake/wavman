@@ -1,4 +1,4 @@
-import { ActionHandler } from "../shared";
+import { ActionHandler } from "../../lib/shared";
 import { useState } from "react";
 
 const buttonInfoMap: Record<

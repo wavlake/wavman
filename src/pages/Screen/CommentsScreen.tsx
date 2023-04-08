@@ -9,16 +9,16 @@ const CommentsScreen: React.FC<{
   loading: boolean;
   comments: Event[];
 }> = ({ loading, comments }) => {
-  const { register } = useFormContext();
+  // const { register } = useFormContext();
 
   if (loading) return <div>Comments Loading Screen</div>;
 
   return (
     <div className="">
-      <input {...register("comment")} />
+      {/* <input {...register("comment")} /> */}
       {/* TODO - disable when not logged in */}
       <button type="submit">Add Comment</button>
-      {!comments.length ? (
+      {!comments ? (
         <div>No comments yet...</div>
       ) : (
         comments.map((comment) => (
