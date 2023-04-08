@@ -1,15 +1,14 @@
 import ReactPlayerWrapper from "../ReactPlayerWrapper";
+// import CommentsScreen from "./CommentsScreen";
+import NowPlayingScreen from "./NowPlayingScreen";
+import OnScreenActions from "./OnScreenActions";
 import {
-  COMMENTS_VIEW,
+  // COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-  OFF_VIEW,
-} from "../shared";
-import CommentsScreen from "./CommentsScreen";
-import NowPlayingScreen from "./NowPlayingScreen";
-import OnScreenActions from "./OnScreenActions";
+} from "@/lib/shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
 import { FormProvider, useForm } from "react-hook-form";
@@ -43,10 +42,10 @@ const Screen: React.FC<{
     switch (pageView) {
       case PLAYER_VIEW:
         return "bg-wavgreen";
-      case COMMENTS_VIEW:
+      // case COMMENTS_VIEW:
+      //   return "bg-wavgreen";
       case ZAP_VIEW:
         return "bg-wavpurple";
-      case OFF_VIEW:
       case SPLASH_VIEW:
       default:
         return "bg-wavdarkgreen";
@@ -57,6 +56,7 @@ const Screen: React.FC<{
     <div
       className={`flex h-56 w-64 items-center justify-center ${getScreenColor()}`}
     >
+      {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
       {(() => {
         if (!nowPlayingTrack)
           return (
@@ -65,7 +65,7 @@ const Screen: React.FC<{
             </div>
           );
         const trackContent: WavlakeEventContent = JSON.parse(
-          nowPlayingTrack.content
+          nowPlayingTrack?.content
         );
 
         return (
@@ -74,16 +74,17 @@ const Screen: React.FC<{
               url={trackContent.enclosure}
               isPlaying={isPlaying}
             />
+
             <form onSubmit={methods.handleSubmit(submitHandler)}>
               {(() => {
                 switch (pageView) {
-                  case COMMENTS_VIEW:
-                    return (
-                      <CommentsScreen
-                        loading={commentsLoading}
-                        comments={comments || []}
-                      />
-                    );
+                  // case COMMENTS_VIEW:
+                  //   return (
+                  //     <CommentsScreen
+                  //       loading={commentsLoading}
+                  //       comments={comments || []}
+                  //     />
+                  //   );
                   case PLAYER_VIEW:
                     return (
                       <NowPlayingScreen

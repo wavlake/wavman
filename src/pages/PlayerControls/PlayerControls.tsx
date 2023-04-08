@@ -7,7 +7,7 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "../shared";
+} from "../../lib/shared";
 import DPad from "./DPad";
 import { Dispatch, SetStateAction } from "react";
 

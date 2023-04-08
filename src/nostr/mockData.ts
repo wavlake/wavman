@@ -23,7 +23,7 @@ const wavlakeEventContent: WavlakeEventContent = {
 
 export const unsignedMockTrackEvent: UnsignedEvent = {
   content: JSON.stringify(wavlakeEventContent),
-  kind: 32123,
+  kind: 1,
   tags: [],
   created_at: 12345,
   pubkey: publisherPrivateKey,
@@ -37,7 +37,7 @@ export const mockComments: Event[] = Array.from(Array(4).keys()).map(
   (comment) =>
     signCommentEvent({
       content: `test comment #${comment}`,
-      kind: 123,
+      kind: 1,
       tags: [["e", getEventHash(signedMockTrackEvent)]],
       created_at: 12345 + comment,
       pubkey: commenterPrivateKey,

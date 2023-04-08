@@ -12,7 +12,10 @@ const CommentsScreen: React.FC<{
 
   return (
     <div className="">
-      {!comments.length ? (
+      {/* <input {...register("comment")} /> */}
+      {/* TODO - disable when not logged in */}
+      <button type="submit">Add Comment</button>
+      {!comments ? (
         <div>No comments yet...</div>
       ) : (
         comments.map((comment) => (

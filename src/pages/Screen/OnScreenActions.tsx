@@ -5,7 +5,7 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "../shared";
+} from "../../lib/shared";
 
 const buttonColorCalc = (selected: boolean, pageView: PageView) => {
   if (selected) {
@@ -30,7 +30,7 @@ const OnScreenActions: React.FC<{
   pageView: PageView;
 }> = ({ selectedActionIndex, pageView }) => (
   <div className="mx-auto flex w-64 justify-around text-xs">
-    {pageViewActionMap[pageView].map((action, index) => (
+    {pageViewActionMap[pageView]?.map((action, index) => (
       <Action
         action={action}
         key={action}
