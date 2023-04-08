@@ -233,7 +233,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
             paymentRequest={paymentRequest}
             selectedActionIndex={selectedActionIndex}
           />
-          {/* Screen Border Cutouts */}
+          {/* Screen Border Top Cutouts */}
           <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
           <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
           <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
@@ -260,11 +260,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
         </div>
 
-        {/* Player Border Cutouts */}
-        <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavpink"></div>
-        <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavpink"></div>
-        <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavpink"></div>
-        <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavpink"></div>
+        {/* Player Border Lines & Cutouts */}
+        <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
+        <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
+        <div className="absolute left-0 bottom-0 h-4 w-2 bg-black"></div>
+        <div className="absolute right-0 bottom-0 h-4 w-2 bg-black"></div>
+        <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
+        <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
+        <div className="absolute -left-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
+        <div className="absolute -right-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
       </div>
     </div>
   );

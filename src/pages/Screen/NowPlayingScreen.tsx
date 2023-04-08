@@ -5,10 +5,20 @@ const TrackInfo: React.FC<{
   artist: string;
 }> = ({ title, artist }) => (
   <div className="mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
-    <div className="whitespace flex w-64 justify-center place-self-center text-center">
+    <div
+      className={`${
+        artist.length > 20
+          ? "w-full animate-marquee whitespace-nowrap"
+          : "whitespace w-64 justify-center"
+      } flex place-self-center text-center no-scrollbar`}
+    >
       <p>{artist}</p>
     </div>
-    <div className="flex h-12 w-full animate-marquee whitespace-nowrap no-scrollbar">
+    <div
+      className={`${
+        title.length > 12 ? "animate-marquee" : "justify-center"
+      } flex h-12 w-full whitespace-nowrap no-scrollbar`}
+    >
       <p>{title}</p>
     </div>
   </div>
