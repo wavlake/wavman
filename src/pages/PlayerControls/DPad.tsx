@@ -1,4 +1,5 @@
 import { ActionHandler } from "../shared";
+import { useState } from "react";
 
 const buttonInfoMap: Record<
   string,
@@ -35,9 +36,19 @@ const DirectionalButton: React.FC<{
   direction: string;
   clickHandler: ActionHandler;
 }> = ({ direction, clickHandler }) => {
+  const [isPressed, setIsPressed] = useState<boolean>(false);
   const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
-    <button className={`${buttonClass} h-full w-full`} onClick={clickHandler}>
+    <button
+      className={`${buttonClass} h-full w-full ${
+        isPressed ? "-translate-x-1 translate-y-1" : ""
+      }`}
+      onClick={clickHandler}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onTouchStart={() => setIsPressed(true)}
+      onTouchEnd={() => setIsPressed(false)}
+    >
       <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </button>
   );
