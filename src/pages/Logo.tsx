@@ -1,9 +1,9 @@
 const Logo: React.FC<{}> = () => (
-  <div className="flex items-center space-x-2">
+  <div className="mx-auto flex items-center space-x-2">
     <div className="">
-      <img className="h-16" src={"icon.svg"} />
+      <img className="h-8" src={"icon.svg"} />
     </div>
-    <div className="text-4xl font-bold">WAVMAN</div>
+    <div className="text-3xl tracking-tighter">WAVMAN</div>
   </div>
 );
 

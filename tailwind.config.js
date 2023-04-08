@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require("tailwindcss/plugin");
+
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
@@ -12,6 +14,8 @@ module.exports = {
     extend: {
       animation: {
         dance: "dance 2s linear infinite",
+        fadein: "fadein 1.5s linear",
+        marquee: "marquee 7s linear infinite",
       },
       borderWidth: {
         DEFAULT: "1px",
@@ -21,11 +25,14 @@ module.exports = {
         4: "4px",
         6: "6px",
         8: "8px",
-        16: "16px",
+        10: "10px",
       },
       colors: {
         wavgreen: {
           DEFAULT: "#96f9d4",
+        },
+        wavdarkgreen: {
+          DEFAULT: "#546b08",
         },
         wavpink: {
           DEFAULT: "#f19ab6",
@@ -55,8 +62,47 @@ module.exports = {
             animationTimingFunction: "steps(2, jump-end)",
           },
         },
+        fadein: {
+          "0%": {
+            opacity: "0.1",
+            animationTimingFunction: "steps(2, jump-end)",
+          },
+          "60%": {
+            opacity: "0.6",
+            animationTimingFunction: "steps(1, jump-end)",
+          },
+          "100%": {
+            opacity: "1",
+            animationTimingFunction: "steps(2, jump-end)",
+          },
+        },
+        marquee: {
+          "0%": {
+            transform: "translateX(60%)",
+            animationTimingFunction: "steps(7, jump-start)",
+          },
+          "100%": {
+            transform: "translateX(-60%)",
+            animationTimingFunction: "steps(7, jump-start)",
+          },
+        },
       },
     },
   },
-  plugins: [require("tailwindcss-animation-delay")],
+  plugins: [
+    require("tailwindcss-animation-delay"),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        ".no-scrollbar::-webkit-scrollbar": {
+          display: "none",
+        },
+        /* Hide scrollbar for IE, Edge and Firefox */
+        ".no-scrollbar": {
+          "-ms-overflow-style": "none" /* IE and Edge */,
+          "scrollbar-width": "none" /* Firefox */,
+        },
+      });
+    }),
+  ],
 };

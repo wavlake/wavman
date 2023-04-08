@@ -1,6 +1,10 @@
-import { ActionHandler } from "../shared";
+import { ActionHandler } from "../../lib/shared";
+import { useState } from "react";
 
-const buttonInfoMap: Record<string, { svgClass: string; buttonClass: string; svgSrc: string; }> = {
+const buttonInfoMap: Record<
+  string,
+  { svgClass: string; buttonClass: string; svgSrc: string }
+> = {
   up: {
     svgClass: "rotate-0",
     buttonClass: "col-start-2 col-end-2 row-start-1 row-end-1",
@@ -28,16 +32,24 @@ const buttonInfoMap: Record<string, { svgClass: string; buttonClass: string; svg
   },
 };
 
-const DirectionalButton: React.FC<{ direction: string; clickHandler: ActionHandler }> =
-({ direction, clickHandler }) => {
-  const {
-    svgClass,
-    buttonClass,
-    svgSrc,
-  } = buttonInfoMap[direction];
+const DirectionalButton: React.FC<{
+  direction: string;
+  clickHandler: ActionHandler;
+}> = ({ direction, clickHandler }) => {
+  const [isPressed, setIsPressed] = useState<boolean>(false);
+  const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
-    <button className={`${buttonClass} w-full h-full`} onClick={clickHandler}>
-      <img className={svgClass} src={svgSrc} alt={`${direction} arrow`}/>
+    <button
+      className={`${buttonClass} h-full w-full ${
+        isPressed ? "-translate-x-1 translate-y-1" : ""
+      }`}
+      onClick={clickHandler}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onTouchStart={() => setIsPressed(true)}
+      onTouchEnd={() => setIsPressed(false)}
+    >
+      <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </button>
   );
 };
@@ -48,14 +60,8 @@ const DPad: React.FC<{
   centerHandler: () => void;
   rightHandler: () => void;
   downHandler: () => void;
-}> = ({
-  upHandler,
-  leftHandler,
-  centerHandler,
-  rightHandler,
-  downHandler,
-}) => (
-  <div className="h-52 w-52 grid grid-cols-3 grid-rows-3 place-items-center">
+}> = ({ upHandler, leftHandler, centerHandler, rightHandler, downHandler }) => (
+  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center gap-4">
     <DirectionalButton direction="left" clickHandler={leftHandler} />
     <DirectionalButton direction="center" clickHandler={centerHandler} />
     <DirectionalButton direction="right" clickHandler={rightHandler} />

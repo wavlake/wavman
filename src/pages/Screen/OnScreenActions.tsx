@@ -5,12 +5,12 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-} from "../shared";
+} from "../../lib/shared";
 
 const buttonColorCalc = (selected: boolean, pageView: PageView) => {
   if (selected) {
     return pageView === PLAYER_VIEW
-      ? "bg-black text-emerald-200"
+      ? "bg-black text-wavgreen"
       : "bg-black text-violet-400";
   } else {
     return "bg-transparent";
@@ -29,8 +29,8 @@ const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   pageView: PageView;
 }> = ({ selectedActionIndex, pageView }) => (
-  <div className="grid grid-cols-3 grid-rows-1">
-    {pageViewActionMap[pageView].map((action, index) => (
+  <div className="mx-auto flex w-64 justify-around text-xs">
+    {pageViewActionMap[pageView]?.map((action, index) => (
       <Action
         action={action}
         key={action}
