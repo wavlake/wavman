@@ -16,7 +16,7 @@ const buttonInfoMap: Record<
     svgSrc: "arrow.svg",
   },
   center: {
-    svgClass: "h-12",
+    svgClass: "",
     buttonClass: "col-start-2 col-end-2 row-start-2 row-end-2",
     svgSrc: "center-button.svg",
   },
@@ -61,7 +61,7 @@ const DPad: React.FC<{
   rightHandler: () => void;
   downHandler: () => void;
 }> = ({ upHandler, leftHandler, centerHandler, rightHandler, downHandler }) => (
-  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center">
+  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center gap-4">
     <DirectionalButton direction="left" clickHandler={leftHandler} />
     <DirectionalButton direction="center" clickHandler={centerHandler} />
     <DirectionalButton direction="right" clickHandler={rightHandler} />
