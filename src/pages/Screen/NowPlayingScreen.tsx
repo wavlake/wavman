@@ -7,7 +7,7 @@ const TrackInfo: React.FC<{
   <div className="mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
     <div
       className={`${
-        artist.length > 20
+        artist.length > 23
           ? "w-full animate-marquee whitespace-nowrap"
           : "whitespace w-64 justify-center"
       } flex place-self-center text-center no-scrollbar`}
@@ -19,7 +19,7 @@ const TrackInfo: React.FC<{
         title.length > 12 ? "animate-marquee" : "justify-center"
       } flex h-12 w-full whitespace-nowrap no-scrollbar`}
     >
-      <p>{title}</p>
+      <p>"{title}"</p>
     </div>
   </div>
 );
