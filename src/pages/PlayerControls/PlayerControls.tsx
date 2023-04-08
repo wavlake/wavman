@@ -8,8 +8,8 @@ import {
   SPLASH_VIEW,
   ZAP_VIEW,
 } from "../shared";
-import { Dispatch, SetStateAction } from "react";
 import DPad from "./DPad";
+import { Dispatch, SetStateAction } from "react";
 
 const PlayerControls: React.FC<{
   pageView: PageView;
@@ -32,22 +32,22 @@ const PlayerControls: React.FC<{
     PLAY: playHandler,
     PAUSE: playHandler,
     ZAP: zapHandler,
-    SKIP: skipHandler,
+    NEXT: skipHandler,
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
   };
 
   const currentActions = pageViewActionMap[pageView];
-  
+
   const calcMoveIndexRight = (index: number) =>
-  index + 1 >= currentActions.length ? index : index + 1;
+    index + 1 >= currentActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) =>
-  index === 0 ? index : index - 1;
-  
+    index === 0 ? index : index - 1;
+
   const upHandler = () => {};
   const downHandler = () => {};
-  
-  const centerHandler = () =>{
+
+  const centerHandler = () => {
     actionHandlerMap[currentActions[selectedActionIndex]]();
   };
   const leftHandler = () =>
@@ -60,7 +60,7 @@ const PlayerControls: React.FC<{
     );
 
   return (
-    <DPad 
+    <DPad
       upHandler={upHandler}
       leftHandler={leftHandler}
       centerHandler={centerHandler}
