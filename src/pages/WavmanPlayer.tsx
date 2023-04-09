@@ -1,6 +1,5 @@
 import { FormProvider, useForm } from "react-hook-form";
 import {
-  Actions,
   PageView,
   PLAYER_VIEW,
   resetSelectionOnPageChange,
@@ -149,7 +148,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
   const turnOnPlayer = () => {
-    console.log('turn on player')
     setPageView(PLAYER_VIEW);
   };
 
