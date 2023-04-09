@@ -18,6 +18,7 @@ const PlayerControls: React.FC<{
   playHandler: () => void;
   skipHandler: () => void;
   zapHandler: () => void;
+  confirmZap: () => void;
   toggleViewHandler: (pageView: PageView) => void;
 }> = ({
   pageView,
@@ -27,6 +28,7 @@ const PlayerControls: React.FC<{
   skipHandler,
   zapHandler,
   toggleViewHandler,
+  confirmZap,
 }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
     PLAY: playHandler,
@@ -35,6 +37,9 @@ const PlayerControls: React.FC<{
     NEXT: skipHandler,
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
+    CONFIRM: confirmZap,
+    // ON: () => toggleViewHandler(PLAYER_VIEW),
+    // OFF: () => toggleViewHandler(OFF_VIEW),
   };
 
   const currentActions = pageViewActionMap[pageView];
@@ -57,7 +62,7 @@ const PlayerControls: React.FC<{
   const rightHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexRight(selectedActionIndex)
-    );
+    )
 
   return (
     <DPad

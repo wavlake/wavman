@@ -1,9 +1,13 @@
 import WavmanPlayer from "./WavmanPlayer";
 import RelayProvider from "@/nostr/relayProvider";
+import { NIP07Provider } from "@/nostr/useNIP07Login";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const localRelay = "ws://0.0.0.0:8008";
+const wavlakeProd = "wss://relay.wavlake.com/";
 
 export default function Home() {
   return (
@@ -16,8 +20,10 @@ export default function Home() {
         <link href="/output.css" rel="stylesheet" />
       </Head>
       <main className="grid bg-wavpink">
-        <RelayProvider url="wss://relay.wavlake.com/">
-          <WavmanPlayer />
+        <RelayProvider url={localRelay}>
+          <NIP07Provider>
+            <WavmanPlayer />
+          </NIP07Provider>
         </RelayProvider>
       </main>
     </>

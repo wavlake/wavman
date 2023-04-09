@@ -40,6 +40,7 @@ const DirectionalButton: React.FC<{
   const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
     <button
+      type="button"
       className={`${buttonClass} h-full w-full ${
         isPressed ? "-translate-x-1 translate-y-1" : ""
       }`}
