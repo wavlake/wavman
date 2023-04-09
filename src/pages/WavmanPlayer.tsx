@@ -150,7 +150,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const turnOnPlayer = () => {
     console.log('turn on player')
-    setPageView(PLAYER_VIEW)
+    setPageView(PLAYER_VIEW);
   };
 
   // The player currently auto turns on when tracks are loaded
@@ -175,48 +175,48 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     satAmount: number;
     content: string;
   }): Promise<string | undefined> => {
-    setPageView(QR_VIEW);
-      const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
-      const lnurl = zapTag && generateLNURLFromZapTag(zapTag)
-      if (!lnurl) {
-        console.log(`failed to parse lnurl from event's zap tag`, { zapTag } )
-        return;
-      }
-      const res = await fetch(lnurl);
-      const {
-        allowsNostr,
-        callback,
-        maxSendable,
-        metadata,
-        minSendable,
-        nostrPubKey,
-        tag,
-      } = await res.json();
-      
-      if (!allowsNostr) {
-        console.log('lnurl does not allow nostr')
-        return;
-      }
-      if (!validateNostrPubKey(nostrPubKey)) {
-        console.log('invalid nostr pubkey', { nostrPubKey })
-        return;
-      }
+    setPageViewAndResetSelectedAction(QR_VIEW);
+    const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
+    const lnurl = zapTag && generateLNURLFromZapTag(zapTag)
+    if (!lnurl) {
+      console.log(`failed to parse lnurl from event's zap tag`, { zapTag } )
+      return;
+    }
+    const res = await fetch(lnurl);
+    const {
+      allowsNostr,
+      callback,
+      maxSendable,
+      metadata,
+      minSendable,
+      nostrPubKey,
+      tag,
+    } = await res.json();
+    
+    if (!allowsNostr) {
+      console.log('lnurl does not allow nostr')
+      return;
+    }
+    if (!validateNostrPubKey(nostrPubKey)) {
+      console.log('invalid nostr pubkey', { nostrPubKey })
+      return;
+    }
 
-      const zapEvent = signZapEvent({
-        content,
-        amount,
-        lnurl,
-        recepientPubKey: nostrPubKey,
-        zappedEvent: nowPlayingTrack,
-      });
+    const zapEvent = signZapEvent({
+      content,
+      amount,
+      lnurl,
+      recepientPubKey: nostrPubKey,
+      zappedEvent: nowPlayingTrack,
+    });
 
-      const event = encodeURI(JSON.stringify(zapEvent));
-      const paymentRequestRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
-      const { pr } = await paymentRequestRes.json();
-      return pr;
+    const event = encodeURI(JSON.stringify(zapEvent));
+    const paymentRequestRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
+    const { pr } = await paymentRequestRes.json();
+    return pr;
   }
   const zapHandler = async () => {
-    setPageView(ZAP_VIEW);
+    setPageViewAndResetSelectedAction(ZAP_VIEW);
   };
   
   const [isPlaying, setIsPlaying] = useState(false);
@@ -228,10 +228,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
   const [pageView, setPageView] = useState<PageView>(SPLASH_VIEW);
-  const toggleViewHandler = (pageView: PageView) => {
-    console.log('toggle view handler', {pageView});
+  const setPageViewAndResetSelectedAction = (pageView: PageView) => {
     resetSelectionOnPageChange(pageView, setSelectedActionIndex);
     setPageView(pageView);
+  };
+  const toggleViewHandler = (pageView: PageView) => {
+    setPageViewAndResetSelectedAction(pageView);
   };
   const methods = useForm({
     defaultValues: {
@@ -251,7 +253,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       });
       if (!invoice) {
         console.log('Error retrieving invoice');
-        setPageView(ZAP_VIEW);
+        setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
       setpaymentRequest(invoice);

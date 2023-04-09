@@ -20,7 +20,7 @@ export type ActionHandler = () => void | ToggleViewHandler;
 const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
 const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
 const zapViewActions: Actions[] = ["<", "CONFIRM"];
-const qrViewActions: Actions[] = [];
+const qrViewActions: Actions[] = ["<"];
 const splashViewActions: Actions[] = [];
 export const pageViewActionMap: Record<PageView, Actions[]> = {
   [PLAYER_VIEW]: pageViewActions,
@@ -33,7 +33,7 @@ const pageViewStartIndexMap: Record<PageView, number> = {
   [PLAYER_VIEW]: 3,
   [COMMENTS_VIEW]: 0,
   [QR_VIEW]: 0,
-  [ZAP_VIEW]: 0,
+  [ZAP_VIEW]: 1,
   [SPLASH_VIEW]: 0,
 };
 
