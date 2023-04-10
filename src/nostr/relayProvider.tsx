@@ -40,7 +40,7 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
     return () => {
       relay.close();
     };
-  }, []);
+  }, [relay]);
 
   return (
     <RelayContext.Provider

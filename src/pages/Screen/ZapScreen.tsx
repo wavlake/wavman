@@ -5,14 +5,14 @@ const ZapScreen: React.FC<{
   zapError: string;
 }> = ({ zapError }) => {
   const { publicKey } = useNIP07Login();
-  const { register  } = useFormContext();
+  const methods = useFormContext();
 
   return (
     <div className="m-4 justify-self-center">
       Comment
-      {publicKey && <input {...register("content")} className="w-[17rem]" required/>}
+      {publicKey && <input {...methods?.register("content")} className="w-[17rem]" required/>}
       Zap Amount
-      <input {...register("satAmount")} type="number" step="10" className="w-[17rem]" />
+      <input {...methods?.register("satAmount")} type="number" step="10" className="w-[17rem]" />
       {zapError}
     </div>
   );

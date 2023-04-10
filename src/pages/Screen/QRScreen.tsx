@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 
 const QRScreen: React.FC<{
   paymentRequest: string;
-}> = ({ paymentRequest }) => {
+}> = ({ paymentRequest = "" }) => {
   const [qrImage, setQrImage] = useState<string | undefined>();
   useEffect(() => {
     if (paymentRequest.length === 0) return;
