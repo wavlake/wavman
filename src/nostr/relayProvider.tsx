@@ -20,7 +20,6 @@ export const RelayContext = createContext<{
   useEventSubscription,
 });
 
-
 const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   children,
   url,

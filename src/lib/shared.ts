@@ -11,7 +11,15 @@ export type PageView =
   | typeof QR_VIEW
   | typeof ZAP_VIEW
   | typeof SPLASH_VIEW;
-export type Actions = "PLAY" | "PAUSE" | "ZAP" | "NEXT" | ">" | "<" | "CONFIRM";
+export type Actions =
+  | "PLAY"
+  | "PAUSE"
+  | "ZAP"
+  | "NEXT"
+  | ">"
+  | "<"
+  | "CONFIRM"
+  | "COMMENTS";
 type ToggleViewHandler = (pageView: PageView) => void;
 export type ActionHandler = () => void | ToggleViewHandler;
 
@@ -20,7 +28,7 @@ export type ActionHandler = () => void | ToggleViewHandler;
 const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
 const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
 const zapViewActions: Actions[] = ["<", "CONFIRM"];
-const qrViewActions: Actions[] = ["<"];
+const qrViewActions: Actions[] = ["<", "COMMENTS"];
 const splashViewActions: Actions[] = [];
 export const pageViewActionMap: Record<PageView, Actions[]> = {
   [PLAYER_VIEW]: pageViewActions,

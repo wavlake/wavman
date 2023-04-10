@@ -38,6 +38,7 @@ const PlayerControls: React.FC<{
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
     CONFIRM: confirmZap,
+    COMMENTS: () => toggleViewHandler(COMMENTS_VIEW),
     // ON: () => toggleViewHandler(PLAYER_VIEW),
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
@@ -53,7 +54,7 @@ const PlayerControls: React.FC<{
   const downHandler = () => {};
 
   const centerHandler = () => {
-    actionHandlerMap[currentActions[selectedActionIndex]]();
+    actionHandlerMap[currentActions[selectedActionIndex]]?.();
   };
   const leftHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
@@ -62,10 +63,10 @@ const PlayerControls: React.FC<{
   const rightHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexRight(selectedActionIndex)
-    )
+    );
 
   return (
-    <div className="relative mx-auto w-40 my-4 border-8 border-black p-0">
+    <div className="relative mx-auto my-4 w-40 border-8 border-black p-0">
       <DPad
         upHandler={upHandler}
         leftHandler={leftHandler}
@@ -76,10 +77,9 @@ const PlayerControls: React.FC<{
       {/* Controls Border Cutouts */}
       <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
       <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -left-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -right-2 h-2 w-2 bg-wavgray"></div>
     </div>
-
   );
 };
 
