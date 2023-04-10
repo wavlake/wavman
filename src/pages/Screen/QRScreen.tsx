@@ -12,10 +12,14 @@ const QRScreen: React.FC<{
       .catch((e) => console.log(`${e}`));
   }, [paymentRequest]);
 
+  const clickHandler = () => {
+    navigator.clipboard.writeText(paymentRequest);
+  }
+
   return (
     <div className="m-4 justify-self-center">
       {paymentRequest.length ? (
-        <img src={qrImage} height={300} width={300} />
+        <img src={qrImage} height={300} width={300} onClick={clickHandler} onTouchStart={clickHandler} />
       ) : "Loading QR Code..."}
     </div>
   );
