@@ -1,3 +1,4 @@
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   COMMENTS_VIEW,
   PageView,
@@ -28,17 +29,21 @@ const Action: React.FC<{
 const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   pageView: PageView;
-}> = ({ selectedActionIndex, pageView }) => (
-  <div className="mx-auto flex w-56 justify-around text-xs">
-    {pageViewActionMap[pageView]?.map((action, index) => (
-      <Action
-        action={action}
-        key={action}
-        selected={selectedActionIndex === index}
-        pageView={pageView}
-      />
-    ))}
-  </div>
-);
+}> = ({ selectedActionIndex, pageView }) => {
+  const { publicKey } = useNIP07Login();
+  const filteredActions = pageViewActionMap[pageView].filter(action => publicKey ? true : action !== "ZAP");
+  return (
+    <div className="mx-auto flex w-56 justify-around text-xs">
+      {filteredActions.map((action, index) => (
+        <Action
+          action={action}
+          key={action}
+          selected={selectedActionIndex === index}
+          pageView={pageView}
+        />
+      ))}
+    </div>
+  )
+};
 
 export default OnScreenActions;
