@@ -1,6 +1,7 @@
 import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   COMMENTS_VIEW,
+  filterActions,
   PageView,
   pageViewActionMap,
   PLAYER_VIEW,
@@ -8,9 +9,9 @@ import {
   ZAP_VIEW,
 } from "../../lib/shared";
 
-const buttonColorCalc = (selected: boolean, pageView: PageView) => {
+const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {
-    return pageView === PLAYER_VIEW
+    return currentPage === PLAYER_VIEW
       ? "bg-black text-wavgreen"
       : "bg-black text-violet-400";
   } else {
@@ -21,17 +22,17 @@ const buttonColorCalc = (selected: boolean, pageView: PageView) => {
 const Action: React.FC<{
   action: string;
   selected: boolean;
-  pageView: PageView;
-}> = ({ action, selected, pageView }) => (
-  <div className={buttonColorCalc(selected, pageView)}>{action}</div>
+  currentPage: PageView;
+}> = ({ action, selected, currentPage }) => (
+  <div className={buttonColorCalc(selected, currentPage)}>{action}</div>
 );
 
 const OnScreenActions: React.FC<{
   selectedActionIndex: number;
-  pageView: PageView;
-}> = ({ selectedActionIndex, pageView }) => {
+  currentPage: PageView;
+}> = ({ selectedActionIndex, currentPage }) => {
   const { publicKey } = useNIP07Login();
-  const filteredActions = pageViewActionMap[pageView].filter(action => publicKey ? true : action !== "ZAP");
+  const filteredActions = filterActions(currentPage, "ZAP", publicKey) || [];
   return (
     <div className="mx-auto flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
@@ -39,7 +40,7 @@ const OnScreenActions: React.FC<{
           action={action}
           key={action}
           selected={selectedActionIndex === index}
-          pageView={pageView}
+          currentPage={currentPage}
         />
       ))}
     </div>

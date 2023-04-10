@@ -1,5 +1,4 @@
 import { NIP07ContextType } from "./useNIP07Login";
-import { Nip07Context } from "./useNip07LoginContext";
 import { Event, UnsignedEvent, getEventHash } from "nostr-tools";
 
 const sats2millisats = (amount: number) => amount * 1000;
@@ -124,7 +123,7 @@ export const publishCommentEvent = async ({
   nowPlayingTrack,
   publishEvent,
 }: {
-  nip07: Nip07Context;
+  nip07: NIP07ContextType;
   content: string;
   nowPlayingTrack: Event;
   publishEvent: (event: Event) => void;
@@ -134,8 +133,8 @@ export const publishCommentEvent = async ({
     content,
     tags: [["e", nowPlayingTrack.id]],
     created_at: Math.floor(Date.now() / 1000),
-    pubkey: nip07.publicKey,
+    pubkey: nip07.publicKey || "",
   };
-  const signedEvent = await nip07?.signEvent(unsigned);
+  const signedEvent = await nip07?.signEvent?.(unsigned);
   signedEvent && publishEvent(signedEvent);
 };

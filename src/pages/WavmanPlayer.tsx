@@ -1,3 +1,4 @@
+import { useWebLN } from "@/lightning/useWebLN";
 import {
   PageView,
   PLAYER_VIEW,
@@ -59,14 +60,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
   const [paymentRequest, setpaymentRequest] = useState("");
   const shouldSkipPaymentReceipt = !paymentRequest;
-  console.log({ shouldSkipPaymentReceipt });
   // ZapReceipt Listener
   const { lastEvent: paymentReceipt, loading: paymentReceiptLoading } =
     useEventSubscription(
       [{ kinds: [9735], ["#bolt11"]: [paymentRequest] }],
       shouldSkipPaymentReceipt
     );
-  console.log({ paymentReceipt });
   // Get track comments, skip till a track is ready
   const shouldSkipComments = !nowPlayingTrack;
   const { allEvents: comments, loading: commentsLoading } =
@@ -82,7 +81,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
   };
   const turnOnPlayer = () => {
-    setPageView(PLAYER_VIEW);
+    setCurrentPage(PLAYER_VIEW);
   };
 
   // The player currently auto turns on when tracks are loaded
@@ -110,10 +109,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
-  const [pageView, setPageView] = useState<PageView>(SPLASH_VIEW);
+  const [currentPage, setCurrentPage] = useState<PageView>(SPLASH_VIEW);
   const setPageViewAndResetSelectedAction = (pageView: PageView) => {
     resetSelectionOnPageChange(pageView, setSelectedActionIndex);
-    setPageView(pageView);
+    setCurrentPage(pageView);
   };
   const toggleViewHandler = (pageView: PageView) => {
     setPageViewAndResetSelectedAction(pageView);
@@ -139,20 +138,21 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   };
   const nip07 = useNIP07Login();
+  const webLN = useWebLN();
   const confirmZap = async () => {
     if (!nowPlayingTrack) {
       console.log("No track is playing");
       return;
     }
     if (!isFormValid()) return;
-    if (!nip07?.publicKey || !nip07?.signEvent) return;
 
-    if (content) {
+    if (content && nip07?.publicKey && nip07?.signEvent) {
       // publish kind 1 event comment, aka a reply
       publishCommentEvent({ nip07, content, nowPlayingTrack, publishEvent });
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);
     }
     if (satAmount && satAmount > 0) {
+      console.log("Zapping");
       const invoice = await getInvoice({
         nowPlayingTrack,
         satAmount,
@@ -164,8 +164,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
-      setPageViewAndResetSelectedAction(QR_VIEW);
-      setpaymentRequest(invoice);
+      if (webLN.isEnabled && webLN.sendPayment) {
+        // use webLN to pay
+        webLN.sendPayment(invoice);
+      } else {
+        // else provide QR code to pay
+        setPageViewAndResetSelectedAction(QR_VIEW);
+        setpaymentRequest(invoice);
+      }
     }
   };
 
@@ -181,13 +187,13 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               isPlaying={isPlaying}
               commentsLoading={commentsLoading}
               comments={comments || []}
-              pageView={pageView}
+              currentPage={currentPage}
               paymentRequest={paymentRequest}
               selectedActionIndex={selectedActionIndex}
             />
             <Logo />
             <PlayerControls
-              pageView={pageView}
+              currentPage={currentPage}
               selectedActionIndex={selectedActionIndex}
               setSelectedActionIndex={setSelectedActionIndex}
               skipHandler={skipHandler}

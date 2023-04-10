@@ -1,27 +1,28 @@
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   ActionHandler,
   Actions,
   COMMENTS_VIEW,
   PageView,
-  pageViewActionMap,
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
+  filterActions
 } from "../../lib/shared";
 import DPad from "./DPad";
 import { Dispatch, SetStateAction } from "react";
 
 const PlayerControls: React.FC<{
-  pageView: PageView;
+  currentPage: PageView;
   selectedActionIndex: number;
   setSelectedActionIndex: Dispatch<SetStateAction<number>>;
   playHandler: () => void;
   skipHandler: () => void;
   zapHandler: () => void;
   confirmZap: () => void;
-  toggleViewHandler: (pageView: PageView) => void;
+  toggleViewHandler: (currentPage: PageView) => void;
 }> = ({
-  pageView,
+  currentPage,
   selectedActionIndex,
   setSelectedActionIndex,
   playHandler,
@@ -42,11 +43,11 @@ const PlayerControls: React.FC<{
     // ON: () => toggleViewHandler(PLAYER_VIEW),
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
-
-  const currentActions = pageViewActionMap[pageView];
+  const { publicKey } = useNIP07Login();
+  const filteredActions = filterActions(currentPage, "ZAP", publicKey);
 
   const calcMoveIndexRight = (index: number) =>
-    index + 1 >= currentActions.length ? index : index + 1;
+    index + 1 >= filterActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) =>
     index === 0 ? index : index - 1;
 
@@ -54,7 +55,12 @@ const PlayerControls: React.FC<{
   const downHandler = () => {};
 
   const centerHandler = () => {
-    actionHandlerMap[currentActions[selectedActionIndex]]?.();
+    const action = actionHandlerMap[filteredActions[selectedActionIndex]]
+    try {
+      action?.();
+    } catch (e) {
+      console.log("Error in centerHandler", e);
+    } 
   };
   const leftHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>

@@ -1,3 +1,4 @@
+import { WebLNProvider } from "@/lightning/useWebLN";
 import WavmanPlayer from "./WavmanPlayer";
 import RelayProvider from "@/nostr/relayProvider";
 import { NIP07Provider } from "@/nostr/useNIP07Login";
@@ -22,7 +23,9 @@ export default function Home() {
       <main className="grid h-screen bg-wavpink">
         <RelayProvider url={localRelay}>
           <NIP07Provider>
-            <WavmanPlayer />
+            <WebLNProvider>
+              <WavmanPlayer />
+            </WebLNProvider>
           </NIP07Provider>
         </RelayProvider>
       </main>

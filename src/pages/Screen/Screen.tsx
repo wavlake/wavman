@@ -19,7 +19,7 @@ const Screen: React.FC<{
   isPlaying: boolean;
   commentsLoading: boolean;
   comments: Event[];
-  pageView: PageView;
+  currentPage: PageView;
   selectedActionIndex: number;
   paymentRequest: string;
   zapError: string;
@@ -28,14 +28,14 @@ const Screen: React.FC<{
   isPlaying,
   commentsLoading,
   comments,
-  pageView,
+  currentPage,
   selectedActionIndex,
   paymentRequest,
   zapError,
   nowPlayingTrack,
 }) => {
   const getScreenColor = () => {
-    switch (pageView) {
+    switch (currentPage) {
       case PLAYER_VIEW:
         return "bg-wavgreen";
       case COMMENTS_VIEW:
@@ -75,7 +75,7 @@ const Screen: React.FC<{
                 isPlaying={isPlaying}
               />
               {(() => {
-                switch (pageView) {
+                switch (currentPage) {
                   case COMMENTS_VIEW:
                     return (
                       <CommentsScreen
@@ -102,7 +102,7 @@ const Screen: React.FC<{
               })()}
               <OnScreenActions
                 selectedActionIndex={selectedActionIndex}
-                pageView={pageView}
+                currentPage={currentPage}
               />
             </>
           );
