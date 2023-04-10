@@ -28,24 +28,6 @@ export interface Form {
   satAmount: number;
 }
 
-const signComment = (content: string, parentTrack: Event): Event => {
-  const unsignedEvent: UnsignedEvent = {
-    kind: 1,
-    pubkey: pk,
-    created_at: Math.floor(Date.now() / 1000),
-    tags: [["e", parentTrack.id, "wss://relay.wavlake.com/", "reply"]],
-    content,
-  };
-
-  return {
-    ...unsignedEvent,
-    id: getEventHash(unsignedEvent),
-    sig: signEvent(unsignedEvent, sk),
-  };
-};
-
-
-
 const randomSHA256String = (length: number) => {
   const alphanumericString = Array.from(Array(length + 30), () =>
     Math.floor(Math.random() * 36).toString(36)
@@ -146,8 +128,9 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const [zapError, setZapError] = useState("");
   const isFormValid = (): boolean => {
+    const zapScreenError = "Do at least one, please";
     if (!satAmount && !content) {
-      setZapError("Do at least one, please");
+      setZapError(zapScreenError);
       return false;
     } else {
       setZapError("");
@@ -161,6 +144,19 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return;
     }
     if (!isFormValid()) return;
+    if (!nip07?.publicKey || !nip07?.signEvent) return;
+
+    if (!satAmount || satAmount <= 0) {
+      const unsigned: UnsignedEvent = {
+        kind: 1,
+        content,
+        tags: [["e", nowPlayingTrack.id]],
+        created_at: Math.floor(Date.now() / 1000),
+        pubkey: nip07.publicKey,
+      };
+      const signedEvent = await nip07?.signEvent(unsigned);
+      signedEvent && publishEvent(signedEvent);
+    }
     const invoice = await getInvoice({
       nowPlayingTrack,
       satAmount,
@@ -180,7 +176,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // Page Container
     <FormProvider {...methods}>
       <form onSubmit={() => console.log('form submit')}>
-        <div className="h-128 mt-4 relative mx-auto grid max-w-sm border-8 border-black bg-wavgray">
+        <div className="h-128 mt-4 relative mx-auto grid w-80 border-8 border-black bg-wavgray">
           <div className="max-w-xs mx-auto">
             <Screen
               zapError={zapError}
@@ -188,7 +184,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               isPlaying={isPlaying}
               commentsLoading={commentsLoading}
               comments={comments || []}
-              // submitHandler={submitHandler}
               pageView={pageView}
               paymentRequest={paymentRequest}
               selectedActionIndex={selectedActionIndex}
