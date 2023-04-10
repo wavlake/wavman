@@ -2,14 +2,16 @@ import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { useFormContext } from "react-hook-form";
 
 const ZapScreen: React.FC<{
-}> = ({ }) => {
+  zapError: string;
+}> = ({ zapError }) => {
   const { publicKey } = useNIP07Login();
-  const { register } = useFormContext();
+  const { register  } = useFormContext();
 
   return (
     <div className="m-4 justify-self-center">
-      {publicKey && <input {...register("content")} />}
-      <input {...register("satAmount")} type="number" step="1" />
+      {publicKey && <input {...register("content")} className="w-[17rem]" required/>}
+      <input {...register("satAmount")} type="number" step="10" className="w-[17rem]" />
+      {zapError}
     </div>
   );
 };

@@ -20,31 +20,14 @@ import {
   UnsignedEvent,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
+import { getInvoice } from "@/nostr/zapLogic";
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 
 export interface Form {
   content: string;
   satAmount: number;
 }
-// TODO replace with user PK/login feature
-const sk = generatePrivateKey();
-const pk = getPublicKey(sk);
-const validateNostrPubKey = (nostrPubKey: string) => {
-  if (nostrPubKey == null || nostrPubKey === undefined || typeof nostrPubKey !== 'string') {
-    return false;
-  }
-  const schnorrSignatureRegex = /^[a-fA-F0-9]{64}$/;
-  if (!schnorrSignatureRegex.test(nostrPubKey)) {
-    return false;
-  }
 
-  return true;
-};
-const generateLNURLFromZapTag = (zapTag: string[]) => {
-  const [zap, zapAddress, lud] = zapTag;
-  const [username, domain] = zapAddress.split("@");
-  if (!username || !domain) return false;
-  return`http://${domain}/.well-known/lnurlp/${username}`
-};
 const signComment = (content: string, parentTrack: Event): Event => {
   const unsignedEvent: UnsignedEvent = {
     kind: 1,
@@ -61,40 +44,7 @@ const signComment = (content: string, parentTrack: Event): Event => {
   };
 };
 
-const signZapEvent = ({
-  content,
-  amount,
-  lnurl,
-  recepientPubKey,
-  zappedEvent,
-}: {
-  content: string;
-  amount: number;
-  lnurl: string;
-  recepientPubKey: string;
-  zappedEvent: Event;
-}): Event => {
-  const sats2millisats = (amount: number) => amount * 1000;
-  const unsignedEvent = {
-    kind: 9734,
-    content,
-    tags: [
-      ["relays", "wss://relay.wavlake.com/"],
-      ["amount", sats2millisats(amount).toString()],
-      ["lnurl", lnurl],
-      ["p", recepientPubKey],
-      ["e", zappedEvent.id]
-    ],
-    pubkey: pk,
-    created_at: Math.floor(Date.now() / 1000),
-  };
 
-  return {
-    ...unsignedEvent,
-    id: getEventHash(unsignedEvent),
-    sig: signEvent(unsignedEvent, sk),
-  };
-};
 
 const randomSHA256String = (length: number) => {
   const alphanumericString = Array.from(Array(length + 30), () =>
@@ -164,55 +114,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     if (tracks?.length) pickRandomTrack(tracks);
   };
 
-  const getInvoice = async ({
-    nowPlayingTrack,
-    satAmount: amount,
-    content,
-  }: {
-    nowPlayingTrack: Event;
-    satAmount: number;
-    content: string;
-  }): Promise<string | undefined> => {
-    setPageViewAndResetSelectedAction(QR_VIEW);
-    const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
-    const lnurl = zapTag && generateLNURLFromZapTag(zapTag)
-    if (!lnurl) {
-      console.log(`failed to parse lnurl from event's zap tag`, { zapTag } )
-      return;
-    }
-    const res = await fetch(lnurl);
-    const {
-      allowsNostr,
-      callback,
-      maxSendable,
-      metadata,
-      minSendable,
-      nostrPubKey,
-      tag,
-    } = await res.json();
-    
-    if (!allowsNostr) {
-      console.log('lnurl does not allow nostr')
-      return;
-    }
-    if (!validateNostrPubKey(nostrPubKey)) {
-      console.log('invalid nostr pubkey', { nostrPubKey })
-      return;
-    }
-
-    const zapEvent = signZapEvent({
-      content,
-      amount,
-      lnurl,
-      recepientPubKey: nostrPubKey,
-      zappedEvent: nowPlayingTrack,
-    });
-
-    const event = encodeURI(JSON.stringify(zapEvent));
-    const paymentRequestRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
-    const { pr } = await paymentRequestRes.json();
-    return pr;
-  }
   const zapHandler = async () => {
     setPageViewAndResetSelectedAction(ZAP_VIEW);
   };
@@ -239,28 +140,40 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       satAmount: 100,
     },
   });
-  const confirmZap = async () => {
-    console.log('confirm zap');
-    const { content, satAmount } = methods.getValues();
-    if (nowPlayingTrack) {
-      const chopDecimal = (amount: number) => Math.floor(amount);
-      const invoice = await getInvoice({
-        nowPlayingTrack,
-        satAmount: chopDecimal(satAmount),
-        content
-      });
-      if (!invoice) {
-        console.log('Error retrieving invoice');
-        setPageViewAndResetSelectedAction(ZAP_VIEW);
-        return;
-      }
-      setpaymentRequest(invoice);
-      // const signedEvent = signComment(comment, nowPlayingTrack);
-      // publishEvent(signedEvent);
+  const content = methods.watch("content");
+  const satAmount = methods.watch("satAmount");
+
+  const [zapError, setZapError] = useState("");
+  const isFormValid = (): boolean => {
+    if (!satAmount && !content) {
+      setZapError("Please enter either a comment or an amount");
+      return false;
     } else {
+      setZapError("");
+      return true;
+    };
+  };
+  const nip07 = useNIP07Login();
+  const confirmZap = async () => {
+    if (!nowPlayingTrack) {
       console.log('No track is playing');
+      return;
     }
-  }
+    if (!isFormValid()) return;
+    const invoice = await getInvoice({
+      nowPlayingTrack,
+      satAmount,
+      content,
+      nip07
+     });
+    if (!invoice) {
+      console.log('Error retrieving invoice');
+      setPageViewAndResetSelectedAction(ZAP_VIEW);
+      return;
+    }
+    setPageViewAndResetSelectedAction(QR_VIEW);
+    setpaymentRequest(invoice);
+  };
 
   return (
     // Page Container
@@ -271,6 +184,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
             {/* Screen Container */}
             <div className="relative my-4 mx-4 border-8 border-black p-2">
               <Screen
+                zapError={zapError}
                 nowPlayingTrack={nowPlayingTrack}
                 isPlaying={isPlaying}
                 commentsLoading={commentsLoading}

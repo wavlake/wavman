@@ -1,8 +1,8 @@
 import { useContext, createContext, PropsWithChildren, useRef, useState, useEffect } from "react";
 import {  } from "react";
-import { Event } from "nostr-tools";
+import { Event, UnsignedEvent } from "nostr-tools";
 
-type SignEvent = (event: Event) => Promise<Event | undefined>;
+type SignEvent = (event: UnsignedEvent) => Promise<Event | undefined>;
 interface NIP07 {
   getPublicKey: () => Promise<string>;
   signEvent: SignEvent;
@@ -33,7 +33,8 @@ export const useNIP07Login = () => {
   return context;
 };
 
-export const NIP07Context = createContext<Partial<Omit<NIP07, 'getPublicKey'>> & { publicKey?: string }>({
+export type NIP07ContextType = Partial<Omit<NIP07, 'getPublicKey'>> & { publicKey?: string };
+export const NIP07Context = createContext<NIP07ContextType>({
   publicKey: undefined,
   signEvent: undefined,
 });

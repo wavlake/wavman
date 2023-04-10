@@ -22,6 +22,7 @@ const Screen: React.FC<{
   pageView: PageView;
   selectedActionIndex: number;
   paymentRequest: string;
+  zapError: string;
   nowPlayingTrack?: Event;
 }> = ({
   isPlaying,
@@ -30,6 +31,7 @@ const Screen: React.FC<{
   pageView,
   selectedActionIndex,
   paymentRequest,
+  zapError,
   nowPlayingTrack,
 }) => {
 
@@ -49,7 +51,7 @@ const Screen: React.FC<{
 
   return (
     <div
-      className={`flex h-56 w-64 items-center justify-center ${getScreenColor()}`}
+      className={`flex flex-col h-56 w-[19.1rem] justify-center ${getScreenColor()}`}
     >
       {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
       {(() => {
@@ -88,7 +90,7 @@ const Screen: React.FC<{
                 case QR_VIEW:
                   return <QRScreen paymentRequest={paymentRequest} />;
                 case ZAP_VIEW:
-                  return <ZapScreen />;
+                  return <ZapScreen zapError={zapError} />;
                 case SPLASH_VIEW:
                   return <>splash</>;
                 default:
