@@ -115,6 +115,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   const zapHandler = async () => {
+    setZapError("");
     setPageViewAndResetSelectedAction(ZAP_VIEW);
   };
   
@@ -146,7 +147,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [zapError, setZapError] = useState("");
   const isFormValid = (): boolean => {
     if (!satAmount && !content) {
-      setZapError("Please enter either a comment or an amount");
+      setZapError("Do at least one, please");
       return false;
     } else {
       setZapError("");
