@@ -40,14 +40,17 @@ const DirectionalButton: React.FC<{
   const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
     <button
+      type="button"
       className={`${buttonClass} h-full w-full ${
         isPressed ? "-translate-x-1 translate-y-1" : ""
       }`}
       onClick={clickHandler}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
-      onTouchStart={() => setIsPressed(true)}
-      onTouchEnd={() => setIsPressed(false)}
+      onTouchStart={() => {
+        setIsPressed(true)
+        setTimeout(() => setIsPressed(false), 300)
+      }}
     >
       <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </button>

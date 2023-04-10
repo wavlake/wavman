@@ -1,4 +1,4 @@
-import { RelayContext } from "./relayContext";
+import { RelayContext } from "./relayProvider";
 import { useContext } from "react";
 
 export const useRelay = () => {

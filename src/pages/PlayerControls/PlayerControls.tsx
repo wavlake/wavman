@@ -18,6 +18,7 @@ const PlayerControls: React.FC<{
   playHandler: () => void;
   skipHandler: () => void;
   zapHandler: () => void;
+  confirmZap: () => void;
   toggleViewHandler: (pageView: PageView) => void;
 }> = ({
   pageView,
@@ -27,6 +28,7 @@ const PlayerControls: React.FC<{
   skipHandler,
   zapHandler,
   toggleViewHandler,
+  confirmZap,
 }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
     PLAY: playHandler,
@@ -35,6 +37,9 @@ const PlayerControls: React.FC<{
     NEXT: skipHandler,
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
+    CONFIRM: confirmZap,
+    // ON: () => toggleViewHandler(PLAYER_VIEW),
+    // OFF: () => toggleViewHandler(OFF_VIEW),
   };
 
   const currentActions = pageViewActionMap[pageView];
@@ -57,16 +62,24 @@ const PlayerControls: React.FC<{
   const rightHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexRight(selectedActionIndex)
-    );
+    )
 
   return (
-    <DPad
-      upHandler={upHandler}
-      leftHandler={leftHandler}
-      centerHandler={centerHandler}
-      rightHandler={rightHandler}
-      downHandler={downHandler}
-    />
+    <div className="relative mx-auto w-40 my-4 border-8 border-black p-0">
+      <DPad
+        upHandler={upHandler}
+        leftHandler={leftHandler}
+        centerHandler={centerHandler}
+        rightHandler={rightHandler}
+        downHandler={downHandler}
+      />
+      {/* Controls Border Cutouts */}
+      <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+    </div>
+
   );
 };
 
