@@ -29,7 +29,7 @@ const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   pageView: PageView;
 }> = ({ selectedActionIndex, pageView }) => (
-  <div className="mx-auto flex w-72 justify-around text-xs">
+  <div className="mx-auto flex w-56 justify-around text-xs">
     {pageViewActionMap[pageView]?.map((action, index) => (
       <Action
         action={action}

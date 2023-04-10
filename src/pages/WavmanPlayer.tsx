@@ -180,59 +180,40 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // Page Container
     <FormProvider {...methods}>
       <form onSubmit={() => console.log('form submit')}>
-        <div className="mx-auto mt-4 h-screen md:mt-12">
-          <div className="h-128 relative mx-auto grid max-w-sm border-8 border-black bg-wavgray">
-            {/* Screen Container */}
-            <div className="relative my-4 mx-4 border-8 border-black p-2">
-              <Screen
-                zapError={zapError}
-                nowPlayingTrack={nowPlayingTrack}
-                isPlaying={isPlaying}
-                commentsLoading={commentsLoading}
-                comments={comments || []}
-                // submitHandler={submitHandler}
-                pageView={pageView}
-                paymentRequest={paymentRequest}
-                selectedActionIndex={selectedActionIndex}
-              />
-              {/* Screen Border Top Cutouts */}
-              <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-            </div>
-
+        <div className="h-128 mt-4 relative mx-auto grid max-w-sm border-8 border-black bg-wavgray">
+          <div className="max-w-xs mx-auto">
+            <Screen
+              zapError={zapError}
+              nowPlayingTrack={nowPlayingTrack}
+              isPlaying={isPlaying}
+              commentsLoading={commentsLoading}
+              comments={comments || []}
+              // submitHandler={submitHandler}
+              pageView={pageView}
+              paymentRequest={paymentRequest}
+              selectedActionIndex={selectedActionIndex}
+            />
             <Logo />
-
-            {/* Controls Container */}
-            <div className="relative mx-auto my-4 border-8 border-black p-0">
-              <PlayerControls
-                pageView={pageView}
-                selectedActionIndex={selectedActionIndex}
-                setSelectedActionIndex={setSelectedActionIndex}
-                skipHandler={skipHandler}
-                zapHandler={zapHandler}
-                playHandler={playHandler}
-                toggleViewHandler={toggleViewHandler}
-                confirmZap={confirmZap}
-              />
-              {/* Controls Border Cutouts */}
-              <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-              <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-            </div>
-
-            {/* Player Border Lines & Cutouts */}
-            <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
-            <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
-            <div className="absolute left-0 bottom-0 h-4 w-2 bg-black"></div>
-            <div className="absolute right-0 bottom-0 h-4 w-2 bg-black"></div>
-            <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
-            <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
-            <div className="absolute -left-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
-            <div className="absolute -right-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
+            <PlayerControls
+              pageView={pageView}
+              selectedActionIndex={selectedActionIndex}
+              setSelectedActionIndex={setSelectedActionIndex}
+              skipHandler={skipHandler}
+              zapHandler={zapHandler}
+              playHandler={playHandler}
+              toggleViewHandler={toggleViewHandler}
+              confirmZap={confirmZap}
+            />
           </div>
+          {/* Player Border Lines & Cutouts */}
+          <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
+          <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
+          <div className="absolute left-0 bottom-0 h-4 w-2 bg-black"></div>
+          <div className="absolute right-0 bottom-0 h-4 w-2 bg-black"></div>
+          <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
+          <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
+          <div className="absolute -left-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
+          <div className="absolute -right-2 -bottom-2 h-6 w-2 bg-wavpink"></div>
         </div>
       </form>
     </FormProvider>

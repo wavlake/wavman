@@ -1,5 +1,5 @@
 const Logo: React.FC<{}> = () => (
-  <div className="mx-auto flex items-center space-x-2">
+  <div className="mx-auto flex justify-center space-x-2">
     <div className="">
       <img className="h-8" src={"icon.svg"} />
     </div>

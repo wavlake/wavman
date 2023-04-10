@@ -55,7 +55,7 @@ const NowPlayingScreen: React.FC<{
   trackContent: WavlakeEventContent;
 }> = ({ trackContent, isPlaying }) => {
   return (
-    <div className="h-40 w-[19rem]">
+    <div className="h-40 w-56">
       <TrackInfo title={trackContent?.title} artist={trackContent?.creator} />
       <MusicNotes isPlaying={isPlaying} />
     </div>

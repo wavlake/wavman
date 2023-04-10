@@ -65,13 +65,21 @@ const PlayerControls: React.FC<{
     )
 
   return (
-    <DPad
-      upHandler={upHandler}
-      leftHandler={leftHandler}
-      centerHandler={centerHandler}
-      rightHandler={rightHandler}
-      downHandler={downHandler}
-    />
+    <div className="relative mx-auto w-40 my-4 border-8 border-black p-0">
+      <DPad
+        upHandler={upHandler}
+        leftHandler={leftHandler}
+        centerHandler={centerHandler}
+        rightHandler={rightHandler}
+        downHandler={downHandler}
+      />
+      {/* Controls Border Cutouts */}
+      <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+    </div>
+
   );
 };
 
