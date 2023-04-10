@@ -49,7 +49,7 @@ const DirectionalButton: React.FC<{
       onMouseUp={() => setIsPressed(false)}
       onTouchStart={() => {
         setIsPressed(true)
-        setTimeout(() => setIsPressed(false), 100)
+        setTimeout(() => setIsPressed(false), 300)
       }}
     >
       <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />

@@ -1,6 +1,7 @@
 import { Event, UnsignedEvent, getEventHash } from "nostr-tools";
 import { NIP07ContextType } from "./useNIP07Login";
 
+const sats2millisats = (amount: number) => amount * 1000;
 const chopDecimal = (amount: number) => Math.floor(amount);
 const generateLNURLFromZapTag = (zapTag: string[]) => {
   const [zap, zapAddress, lud] = zapTag;
@@ -20,7 +21,7 @@ const validateNostrPubKey = (nostrPubKey: string) => {
   return true;
 };
 
-const signZapEvent = ({
+const signZapEvent = async ({
   content,
   amount,
   lnurl,
@@ -34,19 +35,17 @@ const signZapEvent = ({
   recepientPubKey: string;
   zappedEvent: Event;
   nip07: NIP07ContextType;
-}): Event | void => {
+}): Promise<Event | void> => {
   if (!nip07?.publicKey || !nip07?.signEvent) {
     console.log('nip07 not initialized, unable to zap')
     return;
   }
-    
-  const sats2millisats = (amount: number) => amount * 1000;
   const unsignedEvent: UnsignedEvent = {
     kind: 9734,
     content,
     tags: [
       ["relays", "wss://relay.wavlake.com/"],
-      ["amount", sats2millisats(amount).toString()],
+      ["amount", amount.toString()],
       ["lnurl", lnurl],
       ["p", recepientPubKey],
       ["e", zappedEvent.id]
@@ -55,11 +54,9 @@ const signZapEvent = ({
     created_at: Math.floor(Date.now() / 1000),
   };
 
-  return {
-    ...unsignedEvent,
-    id: getEventHash(unsignedEvent),
-    sig: nip07.signEvent(unsignedEvent),
-  };
+  const signedEvent = await nip07.signEvent(unsignedEvent)
+  if (!signedEvent) return;
+  return signedEvent;
 };
 export const getInvoice = async ({
   nowPlayingTrack,
@@ -98,9 +95,10 @@ export const getInvoice = async ({
     return;
   }
 
-  const zapEvent = signZapEvent({
+  const milliSatAmount = sats2millisats(chopDecimal(amount));
+  const zapEvent = await signZapEvent({
     content,
-    amount: chopDecimal(amount),
+    amount: milliSatAmount,
     lnurl,
     recepientPubKey: nostrPubKey,
     zappedEvent: nowPlayingTrack,
@@ -108,7 +106,7 @@ export const getInvoice = async ({
   });
 
   const event = encodeURI(JSON.stringify(zapEvent));
-  const paymentRequestRes = await fetch(`${callback}?amount=${amount}&nostr=${event}&lnurl=${lnurl}`);
+  const paymentRequestRes = await fetch(`${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`);
   const { pr } = await paymentRequestRes.json();
   return pr;
 }

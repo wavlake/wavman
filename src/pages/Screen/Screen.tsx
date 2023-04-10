@@ -59,7 +59,7 @@ const Screen: React.FC<{
           if (!nowPlayingTrack)
             return (
               <div>
-                <img className="h-20 animate-fadein" src={"wavlake.svg"} />
+                <img className="mx-auto h-20 animate-fadein" src={"wavlake.svg"} />
               </div>
             );
           const trackContent: WavlakeEventContent = JSON.parse(
