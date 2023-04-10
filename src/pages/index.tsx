@@ -19,7 +19,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <link href="/output.css" rel="stylesheet" />
       </Head>
-      <main className="grid bg-wavpink">
+      <main className="grid h-screen bg-wavpink">
         <RelayProvider url={localRelay}>
           <NIP07Provider>
             <WavmanPlayer />

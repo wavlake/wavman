@@ -1,3 +1,4 @@
+import { Event, UnsignedEvent } from "nostr-tools";
 import {
   useContext,
   createContext,
@@ -5,7 +6,6 @@ import {
   useState,
   useEffect,
 } from "react";
-import { Event, UnsignedEvent } from "nostr-tools";
 
 type SignEvent = (event: UnsignedEvent) => Promise<Event | undefined>;
 interface NIP07 {
