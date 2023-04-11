@@ -1,6 +1,9 @@
 import ReactPlayerWrapper from "../ReactPlayerWrapper";
+import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
 import OnScreenActions from "./OnScreenActions";
+import QRScreen from "./QRScreen";
+import ZapScreen from "./ZapScreen";
 import {
   COMMENTS_VIEW,
   PageView,
@@ -11,15 +14,12 @@ import {
 } from "@/lib/shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
-import QRScreen from "./QRScreen";
-import ZapScreen from "./ZapScreen";
-import CommentsScreen from "./CommentsScreen";
 
 const Screen: React.FC<{
   isPlaying: boolean;
   commentsLoading: boolean;
   comments: Event[];
-  pageView: PageView;
+  currentPage: PageView;
   selectedActionIndex: number;
   paymentRequest: string;
   zapError: string;
@@ -28,15 +28,14 @@ const Screen: React.FC<{
   isPlaying,
   commentsLoading,
   comments,
-  pageView,
+  currentPage,
   selectedActionIndex,
   paymentRequest,
   zapError,
   nowPlayingTrack,
 }) => {
-
   const getScreenColor = () => {
-    switch (pageView) {
+    switch (currentPage) {
       case PLAYER_VIEW:
         return "bg-wavgreen";
       case COMMENTS_VIEW:
@@ -50,16 +49,19 @@ const Screen: React.FC<{
   };
 
   return (
-    <div className="relative my-4 mx-4 border-8 border-black p-2">
+    <div className="relative mx-4 my-4 border-8 border-black p-2">
       <div
-        className={`flex flex-col h-56 w-56 justify-center ${getScreenColor()}`}
+        className={`flex h-56 w-56 flex-col place-content-between ${getScreenColor()}`}
       >
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         {(() => {
           if (!nowPlayingTrack)
             return (
               <div>
-                <img className="mx-auto h-20 animate-fadein" src={"wavlake.svg"} />
+                <img
+                  className="mx-auto mt-16 h-20 animate-fadein"
+                  src={"wavlake.svg"}
+                />
               </div>
             );
           const trackContent: WavlakeEventContent = JSON.parse(
@@ -73,7 +75,7 @@ const Screen: React.FC<{
                 isPlaying={isPlaying}
               />
               {(() => {
-                switch (pageView) {
+                switch (currentPage) {
                   case COMMENTS_VIEW:
                     return (
                       <CommentsScreen
@@ -100,7 +102,7 @@ const Screen: React.FC<{
               })()}
               <OnScreenActions
                 selectedActionIndex={selectedActionIndex}
-                pageView={pageView}
+                currentPage={currentPage}
               />
             </>
           );
@@ -108,8 +110,8 @@ const Screen: React.FC<{
       </div>
       <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
       <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -left-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -right-2 h-2 w-2 bg-wavgray"></div>
     </div>
   );
 };

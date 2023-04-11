@@ -11,7 +11,15 @@ export type PageView =
   | typeof QR_VIEW
   | typeof ZAP_VIEW
   | typeof SPLASH_VIEW;
-export type Actions = "PLAY" | "PAUSE" | "ZAP" | "NEXT" | ">" | "<" | "CONFIRM";
+export type Actions =
+  | "PLAY"
+  | "PAUSE"
+  | "ZAP"
+  | "NEXT"
+  | ">"
+  | "<"
+  | "CONFIRM"
+  | "COMMENTS";
 type ToggleViewHandler = (pageView: PageView) => void;
 export type ActionHandler = () => void | ToggleViewHandler;
 
@@ -20,23 +28,35 @@ export type ActionHandler = () => void | ToggleViewHandler;
 const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
 const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
 const zapViewActions: Actions[] = ["<", "CONFIRM"];
-const qrViewActions: Actions[] = ["<"];
+const qrViewActions: Actions[] = ["<", "COMMENTS"];
 const splashViewActions: Actions[] = [];
-export const pageViewActionMap: Record<PageView, Actions[]> = {
+type PageViewActionMap = Record<PageView, Actions[]>;
+export const pageViewActionMap: PageViewActionMap = {
   [PLAYER_VIEW]: pageViewActions,
   [COMMENTS_VIEW]: commentViewActions,
   [QR_VIEW]: qrViewActions,
   [ZAP_VIEW]: zapViewActions,
   [SPLASH_VIEW]: splashViewActions,
 };
+// need to implement this based on the available actions
+// actions can change based on if nip07 is available or not
+// cant hardcode indexes, better to use ACTION enums
+// and find index of the action within resetSelectionOnPageChange
 const pageViewStartIndexMap: Record<PageView, number> = {
-  [PLAYER_VIEW]: 3,
+  [PLAYER_VIEW]: 0,
   [COMMENTS_VIEW]: 0,
   [QR_VIEW]: 0,
-  [ZAP_VIEW]: 1,
+  [ZAP_VIEW]: 0,
   [SPLASH_VIEW]: 0,
 };
-
+export const removeZapIfNotLoggedIn = (
+  currentPage: PageView,
+  actionToFilter: Actions,
+  publicKey?: string
+) =>
+  pageViewActionMap[currentPage]?.filter((action) =>
+    publicKey ? true : action !== actionToFilter
+  );
 export const resetSelectionOnPageChange = (
   pageView: PageView,
   setSelectedActionIndex: Dispatch<SetStateAction<number>>

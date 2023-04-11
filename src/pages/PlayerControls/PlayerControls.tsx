@@ -3,25 +3,26 @@ import {
   Actions,
   COMMENTS_VIEW,
   PageView,
-  pageViewActionMap,
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
+  removeZapIfNotLoggedIn,
 } from "../../lib/shared";
 import DPad from "./DPad";
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { Dispatch, SetStateAction } from "react";
 
 const PlayerControls: React.FC<{
-  pageView: PageView;
+  currentPage: PageView;
   selectedActionIndex: number;
   setSelectedActionIndex: Dispatch<SetStateAction<number>>;
   playHandler: () => void;
   skipHandler: () => void;
   zapHandler: () => void;
   confirmZap: () => void;
-  toggleViewHandler: (pageView: PageView) => void;
+  toggleViewHandler: (currentPage: PageView) => void;
 }> = ({
-  pageView,
+  currentPage,
   selectedActionIndex,
   setSelectedActionIndex,
   playHandler,
@@ -38,14 +39,15 @@ const PlayerControls: React.FC<{
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
     CONFIRM: confirmZap,
+    COMMENTS: () => toggleViewHandler(COMMENTS_VIEW),
     // ON: () => toggleViewHandler(PLAYER_VIEW),
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
-
-  const currentActions = pageViewActionMap[pageView];
+  const { publicKey } = useNIP07Login();
+  const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey);
 
   const calcMoveIndexRight = (index: number) =>
-    index + 1 >= currentActions.length ? index : index + 1;
+    index + 1 >= filteredActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) =>
     index === 0 ? index : index - 1;
 
@@ -53,7 +55,12 @@ const PlayerControls: React.FC<{
   const downHandler = () => {};
 
   const centerHandler = () => {
-    actionHandlerMap[currentActions[selectedActionIndex]]();
+    const action = actionHandlerMap[filteredActions[selectedActionIndex]];
+    try {
+      action?.();
+    } catch (e) {
+      console.log("Error in centerHandler", e);
+    }
   };
   const leftHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
@@ -62,10 +69,10 @@ const PlayerControls: React.FC<{
   const rightHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexRight(selectedActionIndex)
-    )
+    );
 
   return (
-    <div className="relative mx-auto w-40 my-4 border-8 border-black p-0">
+    <div className="relative mx-auto my-4 w-40 border-8 border-black p-0">
       <DPad
         upHandler={upHandler}
         leftHandler={leftHandler}
@@ -76,10 +83,9 @@ const PlayerControls: React.FC<{
       {/* Controls Border Cutouts */}
       <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>
       <div className="absolute -right-2 -top-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -left-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
-      <div className="absolute -right-2 -bottom-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -left-2 h-2 w-2 bg-wavgray"></div>
+      <div className="absolute -bottom-2 -right-2 h-2 w-2 bg-wavgray"></div>
     </div>
-
   );
 };
 
