@@ -1,7 +1,5 @@
 import WavmanPlayer from "./WavmanPlayer";
-import { WebLNProvider } from "@/lightning/useWebLN";
 import RelayProvider from "@/nostr/relayProvider";
-import { NIP07Provider } from "@/nostr/useNIP07Login";
 import Head from "next/head";
 
 const relayUrl = process.env.NEXT_PUBLIC_RELAY_URL || "";
@@ -18,11 +16,7 @@ export default function Home() {
       </Head>
       <main className="grid h-screen bg-wavpink">
         <RelayProvider url={relayUrl}>
-          <NIP07Provider>
-            <WebLNProvider>
-              <WavmanPlayer />
-            </WebLNProvider>
-          </NIP07Provider>
+          <WavmanPlayer />
         </RelayProvider>
       </main>
     </>

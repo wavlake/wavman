@@ -1,4 +1,3 @@
-import { Nip07SignEvent } from "./useNIP07Login";
 import { Event, UnsignedEvent } from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
@@ -33,19 +32,17 @@ const signZapEvent = async ({
   lnurl,
   recepientPubKey,
   zappedEvent,
-  commenterPubKey,
-  signEvent,
 }: {
   content: string;
   amount: number;
   lnurl: string;
   recepientPubKey: string;
   zappedEvent: Event;
-  commenterPubKey: string;
-  signEvent: Nip07SignEvent;
 }): Promise<Event | void> => {
+  const commenterPubKey = await window.nostr?.getPublicKey();
+
   try {
-    if (!commenterPubKey || !signEvent) {
+    if (!commenterPubKey) {
       console.log("nip07 not initialized, unable to zap");
       return;
     }
@@ -64,7 +61,7 @@ const signZapEvent = async ({
       created_at: Math.floor(Date.now() / 1000),
     };
 
-    const signedEvent = await signEvent(unsignedEvent);
+    const signedEvent = await window.nostr?.signEvent(unsignedEvent);
     if (!signedEvent) return;
     return signedEvent;
   } catch (err) {
@@ -75,14 +72,10 @@ export const getInvoice = async ({
   nowPlayingTrack,
   satAmount: amount,
   content,
-  commenterPubKey,
-  signEvent,
 }: {
   nowPlayingTrack: Event;
   satAmount: number;
   content: string;
-  commenterPubKey: string;
-  signEvent: Nip07SignEvent;
 }): Promise<string | undefined> => {
   try {
     const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
@@ -118,8 +111,6 @@ export const getInvoice = async ({
       lnurl,
       recepientPubKey: nostrPubKey,
       zappedEvent: nowPlayingTrack,
-      commenterPubKey,
-      signEvent,
     });
 
     const event = encodeURI(JSON.stringify(zapEvent));
@@ -134,25 +125,26 @@ export const getInvoice = async ({
 };
 
 export const publishCommentEvent = async ({
-  commenterPubKey,
-  signEvent,
   content,
   nowPlayingTrack,
   publishEvent,
 }: {
-  commenterPubKey: string;
-  signEvent: Nip07SignEvent;
   content: string;
   nowPlayingTrack: Event;
   publishEvent: (event: Event) => void;
 }) => {
-  const unsigned: UnsignedEvent = {
-    kind: 1,
-    content,
-    tags: [["e", nowPlayingTrack.id]],
-    created_at: Math.floor(Date.now() / 1000),
-    pubkey: commenterPubKey,
-  };
-  const signedEvent = await signEvent?.(unsigned);
-  signedEvent && publishEvent(signedEvent);
+  try {
+    const commenterPubKey = await window.nostr?.getPublicKey() || "";
+    const unsigned: UnsignedEvent = {
+      kind: 1,
+      content,
+      tags: [["e", nowPlayingTrack.id]],
+      created_at: Math.floor(Date.now() / 1000),
+      pubkey: commenterPubKey,
+    };
+    const signedEvent = await window.nostr?.signEvent?.(unsigned);
+    signedEvent && publishEvent(signedEvent);
+  } catch (err) {
+    console.log("error publishing comment event", { err, nowPlayingTrack });
+  }
 };

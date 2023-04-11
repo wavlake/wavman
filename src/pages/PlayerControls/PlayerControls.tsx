@@ -7,7 +7,6 @@ import {
   getFilteredPageActions,
 } from "../../lib/shared";
 import DPad from "./DPad";
-import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { Dispatch, SetStateAction } from "react";
 
 const PlayerControls: React.FC<{

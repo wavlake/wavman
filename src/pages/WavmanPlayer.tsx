@@ -5,14 +5,11 @@ import {
   SPLASH_VIEW,
   QR_VIEW,
   ZAP_VIEW,
-  COMMENTS_VIEW,
 } from "../lib/shared";
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
-import { useWebLN } from "@/lightning/useWebLN";
 import { useRelay } from "@/nostr";
-import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { getInvoice, publishCommentEvent } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
@@ -137,16 +134,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return true;
     }
   };
-  const { getPublicKey, signEvent } = useNIP07Login();
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
+
   const setThePubKey = () => {
-    getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey));
+    window.nostr?.getPublicKey().then((pubKey) => setCommenterPubKey(pubKey));
   };
   useEffect(() => {
     setThePubKey();
-  }, [getPublicKey, setCommenterPubKey]);
+  }, [setCommenterPubKey]);
 
-  const webLN = useWebLN();
   const confirmZap = async () => {
     setPageViewAndResetSelectedAction(QR_VIEW);
 
@@ -154,13 +150,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       console.log("No track is playing");
       return;
     }
-    if (!isFormValid() || !signEvent || !commenterPubKey) return;
+    if (!isFormValid()) return;
 
     if (content) {
       // publish kind 1 event comment, aka a reply
       publishCommentEvent({
-        commenterPubKey,
-        signEvent,
         content,
         nowPlayingTrack,
         publishEvent,
@@ -171,18 +165,17 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         nowPlayingTrack,
         satAmount,
         content,
-        commenterPubKey,
-        signEvent,
       });
       if (!invoice) {
         console.log("Error retrieving invoice");
         setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
-      if (webLN.sendPayment) {
+      const { enabled } = await window.webln?.enable() || {};
+      if (enabled) {
         // use webLN to pay
         try {
-          await webLN.sendPayment(invoice);
+          await window.webln?.sendPayment(invoice);
         } catch (e) {
           // failed to pay invoice, present QR code
           setpaymentRequest(invoice);
