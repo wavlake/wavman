@@ -1,5 +1,7 @@
 import { NIP07ContextType } from "./useNIP07Login";
-import { Event, UnsignedEvent, getEventHash } from "nostr-tools";
+import { Event, UnsignedEvent } from "nostr-tools";
+
+const useHttps = !!process.env.NEXT_PUBLIC_USE_HTTPS_LNURL;
 
 const sats2millisats = (amount: number) => amount * 1000;
 const chopDecimal = (amount: number) => Math.floor(amount);
@@ -7,7 +9,7 @@ const generateLNURLFromZapTag = (zapTag: string[]) => {
   const [zap, zapAddress, lud] = zapTag;
   const [username, domain] = zapAddress.split("@");
   if (!username || !domain) return false;
-  return `http://${domain}/.well-known/lnurlp/${username}`;
+  return `http${useHttps ? "s" : ""}://${domain}/.well-known/lnurlp/${username}`;
 };
 const validateNostrPubKey = (nostrPubKey: string) => {
   if (
@@ -73,48 +75,52 @@ export const getInvoice = async ({
   content: string;
   nip07: NIP07ContextType;
 }): Promise<string | undefined> => {
-  const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
-  const lnurl = zapTag && generateLNURLFromZapTag(zapTag);
-  if (!lnurl) {
-    console.log(`failed to parse lnurl from event's zap tag`, { zapTag });
-    return;
-  }
-  const res = await fetch(lnurl);
-  const {
-    allowsNostr,
-    callback,
-    maxSendable,
-    metadata,
-    minSendable,
-    nostrPubKey,
-    tag,
-  } = await res.json();
+  try {  
+    const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
+    const lnurl = zapTag && generateLNURLFromZapTag(zapTag);
+    if (!lnurl) {
+      console.log(`failed to parse lnurl from event's zap tag`, { zapTag });
+      return;
+    }
+    const res = await fetch(lnurl);
+    const {
+      allowsNostr,
+      callback,
+      maxSendable,
+      metadata,
+      minSendable,
+      nostrPubKey,
+      tag,
+    } = await res.json();
 
-  if (!allowsNostr) {
-    console.log("lnurl does not allow nostr");
-    return;
-  }
-  if (!validateNostrPubKey(nostrPubKey)) {
-    console.log("invalid nostr pubkey", { nostrPubKey });
-    return;
-  }
+    if (!allowsNostr) {
+      console.log("lnurl does not allow nostr");
+      return;
+    }
+    if (!validateNostrPubKey(nostrPubKey)) {
+      console.log("invalid nostr pubkey", { nostrPubKey });
+      return;
+    }
 
-  const milliSatAmount = sats2millisats(chopDecimal(amount));
-  const zapEvent = await signZapEvent({
-    content,
-    amount: milliSatAmount,
-    lnurl,
-    recepientPubKey: nostrPubKey,
-    zappedEvent: nowPlayingTrack,
-    nip07,
-  });
+    const milliSatAmount = sats2millisats(chopDecimal(amount));
+    const zapEvent = await signZapEvent({
+      content,
+      amount: milliSatAmount,
+      lnurl,
+      recepientPubKey: nostrPubKey,
+      zappedEvent: nowPlayingTrack,
+      nip07,
+    });
 
-  const event = encodeURI(JSON.stringify(zapEvent));
-  const paymentRequestRes = await fetch(
-    `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
-  );
-  const { pr } = await paymentRequestRes.json();
-  return pr;
+    const event = encodeURI(JSON.stringify(zapEvent));
+    const paymentRequestRes = await fetch(
+      `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
+    );
+    const { pr } = await paymentRequestRes.json();
+    return pr;
+  } catch (err) {
+    console.log("error getting invoice", { err, nowPlayingTrack });
+  }
 };
 
 export const publishCommentEvent = async ({

@@ -2,13 +2,9 @@ import WavmanPlayer from "./WavmanPlayer";
 import { WebLNProvider } from "@/lightning/useWebLN";
 import RelayProvider from "@/nostr/relayProvider";
 import { NIP07Provider } from "@/nostr/useNIP07Login";
-import { Inter } from "next/font/google";
 import Head from "next/head";
 
-const inter = Inter({ subsets: ["latin"] });
-
-const localRelay = "ws://0.0.0.0:8008";
-const wavlakeProd = "wss://relay.wavlake.com/";
+const relayUrl = process.env.NEXT_PUBLIC_RELAY_URL || "";
 
 export default function Home() {
   return (
@@ -21,7 +17,7 @@ export default function Home() {
         <link href="/output.css" rel="stylesheet" />
       </Head>
       <main className="grid h-screen bg-wavpink">
-        <RelayProvider url={wavlakeProd}>
+        <RelayProvider url={relayUrl}>
           <NIP07Provider>
             <WebLNProvider>
               <WavmanPlayer />
