@@ -34,7 +34,7 @@ const OnScreenActions: React.FC<{
   const { publicKey } = useNIP07Login();
   const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey) || [];
   return (
-    <div className="mx-auto flex w-56 justify-around text-xs">
+    <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
         <Action
           action={action}
