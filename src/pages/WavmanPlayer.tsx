@@ -139,8 +139,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const { getPublicKey, signEvent } = useNIP07Login();
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
-  useEffect(() => {
+  const setThePubKey = () => {
     getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey));
+  }
+  useEffect(() => {
+    setThePubKey()
   }, [getPublicKey, setCommenterPubKey]);
 
   const webLN = useWebLN();
@@ -227,7 +230,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
         </div>
       </form>
-      <button onClick={() => window.nostr?.getPublicKey()} >testNIP07</button>
+      <button onClick={() => setThePubKey()} >testNIP07</button>
     </FormProvider>
   );
 };
