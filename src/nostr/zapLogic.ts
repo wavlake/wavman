@@ -42,27 +42,33 @@ const signZapEvent = async ({
   zappedEvent: Event;
   nip07: NIP07ContextType;
 }): Promise<Event | void> => {
-  if (!nip07?.publicKey || !nip07?.signEvent) {
-    console.log("nip07 not initialized, unable to zap");
-    return;
-  }
-  const unsignedEvent: UnsignedEvent = {
-    kind: 9734,
-    content,
-    tags: [
-      ["relays", "wss://relay.wavlake.com/"],
-      ["amount", amount.toString()],
-      ["lnurl", lnurl],
-      ["p", recepientPubKey],
-      ["e", zappedEvent.id],
-    ],
-    pubkey: await nip07.publicKey,
-    created_at: Math.floor(Date.now() / 1000),
-  };
+  try {
+    if (!nip07?.publicKey || !nip07?.signEvent) {
+      console.log("nip07 not initialized, unable to zap");
+      return;
+    }
+    const commenterPubKey = await nip07?.publicKey;
 
-  const signedEvent = await nip07.signEvent(unsignedEvent);
-  if (!signedEvent) return;
-  return signedEvent;
+    const unsignedEvent: UnsignedEvent = {
+      kind: 9734,
+      content,
+      tags: [
+        ["relays", "wss://relay.wavlake.com/"],
+        ["amount", amount.toString()],
+        ["lnurl", lnurl],
+        ["p", recepientPubKey],
+        ["e", zappedEvent.id],
+      ],
+      pubkey: commenterPubKey,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+
+    const signedEvent = await nip07?.signEvent(unsignedEvent);
+    if (!signedEvent) return;
+    return signedEvent;
+  } catch (err) {
+    console.log("error signing zap event", { err, lnurl, zappedEvent });
+  }
 };
 export const getInvoice = async ({
   nowPlayingTrack,
@@ -134,12 +140,13 @@ export const publishCommentEvent = async ({
   nowPlayingTrack: Event;
   publishEvent: (event: Event) => void;
 }) => {
+  const commenterPubKey = await nip07?.publicKey || "";
   const unsigned: UnsignedEvent = {
     kind: 1,
     content,
     tags: [["e", nowPlayingTrack.id]],
     created_at: Math.floor(Date.now() / 1000),
-    pubkey: nip07.publicKey || "",
+    pubkey: commenterPubKey,
   };
   const signedEvent = await nip07?.signEvent?.(unsigned);
   signedEvent && publishEvent(signedEvent);

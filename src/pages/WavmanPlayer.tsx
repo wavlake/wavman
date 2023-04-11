@@ -152,7 +152,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);
     }
     if (satAmount && satAmount > 0) {
-      console.log("Zapping");
       const invoice = await getInvoice({
         nowPlayingTrack,
         satAmount,
