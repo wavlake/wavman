@@ -230,7 +230,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
         </div>
       </form>
-      <button onClick={() => setThePubKey()} >testNIP07</button>
     </FormProvider>
   );
 };

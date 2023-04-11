@@ -52,8 +52,7 @@ export const NIP07Provider: React.FC<PropsWithChildren> = ({ children }) => {
       return pk || undefined;
     },
   };
-
-  nip07.getPublicKey();
+  setTimeout(() => nip07.getPublicKey(), 100);
   return (
     <NIP07Context.Provider value={nip07}>{children}</NIP07Context.Provider>
   );
