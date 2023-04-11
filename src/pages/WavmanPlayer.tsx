@@ -137,18 +137,29 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return true;
     }
   };
-  const nip07 = useNIP07Login();
+  const { getPublicKey, signEvent } = useNIP07Login();
+  const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
+  useEffect(() => {
+    getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey));
+  }, [getPublicKey, setCommenterPubKey]);
+
   const webLN = useWebLN();
   const confirmZap = async () => {
     if (!nowPlayingTrack) {
       console.log("No track is playing");
       return;
     }
-    if (!isFormValid()) return;
+    if (!isFormValid() || !signEvent || !commenterPubKey) return;
 
-    if (content && nip07?.publicKey && nip07?.signEvent) {
+    if (content) {
       // publish kind 1 event comment, aka a reply
-      publishCommentEvent({ nip07, content, nowPlayingTrack, publishEvent });
+      publishCommentEvent({
+        commenterPubKey,
+        signEvent,
+        content,
+        nowPlayingTrack,
+        publishEvent,
+      });
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);
     }
     if (satAmount && satAmount > 0) {
@@ -156,7 +167,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         nowPlayingTrack,
         satAmount,
         content,
-        nip07,
+        commenterPubKey,
+        signEvent,
       });
       if (!invoice) {
         console.log("Error retrieving invoice");
@@ -189,6 +201,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               currentPage={currentPage}
               paymentRequest={paymentRequest}
               selectedActionIndex={selectedActionIndex}
+              commenterPubKey={commenterPubKey}
             />
             <Logo />
             <PlayerControls
@@ -200,6 +213,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               playHandler={playHandler}
               toggleViewHandler={toggleViewHandler}
               confirmZap={confirmZap}
+              commenterPublicKey={commenterPubKey}
             />
           </div>
           {/* Player Border Lines & Cutouts */}

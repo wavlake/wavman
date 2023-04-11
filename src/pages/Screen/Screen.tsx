@@ -24,6 +24,7 @@ const Screen: React.FC<{
   paymentRequest: string;
   zapError: string;
   nowPlayingTrack?: Event;
+  commenterPubKey?: string;
 }> = ({
   isPlaying,
   commentsLoading,
@@ -33,6 +34,7 @@ const Screen: React.FC<{
   paymentRequest,
   zapError,
   nowPlayingTrack,
+  commenterPubKey,
 }) => {
   const getScreenColor = () => {
     switch (currentPage) {
@@ -93,7 +95,12 @@ const Screen: React.FC<{
                   case QR_VIEW:
                     return <QRScreen paymentRequest={paymentRequest} />;
                   case ZAP_VIEW:
-                    return <ZapScreen zapError={zapError} />;
+                    return (
+                      <ZapScreen
+                        zapError={zapError}
+                        commenterPubKey={commenterPubKey}
+                      />
+                    );
                   case SPLASH_VIEW:
                     return <>splash</>;
                   default:
@@ -103,6 +110,7 @@ const Screen: React.FC<{
               <OnScreenActions
                 selectedActionIndex={selectedActionIndex}
                 currentPage={currentPage}
+                commenterPubKey={commenterPubKey}
               />
             </>
           );

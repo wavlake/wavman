@@ -4,9 +4,7 @@ import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
-  SPLASH_VIEW,
-  ZAP_VIEW,
-  removeZapIfNotLoggedIn,
+  getFilteredPageActions,
 } from "../../lib/shared";
 import DPad from "./DPad";
 import { useNIP07Login } from "@/nostr/useNIP07Login";
@@ -21,6 +19,7 @@ const PlayerControls: React.FC<{
   zapHandler: () => void;
   confirmZap: () => void;
   toggleViewHandler: (currentPage: PageView) => void;
+  commenterPublicKey?: string;
 }> = ({
   currentPage,
   selectedActionIndex,
@@ -30,6 +29,7 @@ const PlayerControls: React.FC<{
   zapHandler,
   toggleViewHandler,
   confirmZap,
+  commenterPublicKey,
 }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
     PLAY: playHandler,
@@ -43,8 +43,12 @@ const PlayerControls: React.FC<{
     // ON: () => toggleViewHandler(PLAYER_VIEW),
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
-  const { publicKey } = useNIP07Login();
-  const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey);
+
+  const filteredActions = getFilteredPageActions(
+    currentPage,
+    "ZAP",
+    commenterPublicKey
+  );
 
   const calcMoveIndexRight = (index: number) =>
     index + 1 >= filteredActions.length ? index : index + 1;
