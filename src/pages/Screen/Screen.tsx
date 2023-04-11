@@ -59,7 +59,7 @@ const Screen: React.FC<{
             return (
               <div>
                 <img
-                  className="mx-auto h-20 animate-fadein"
+                  className="mx-auto h-20 animate-fadein mt-16"
                   src={"wavlake.svg"}
                 />
               </div>
