@@ -53,7 +53,10 @@ export const removeZapIfNotLoggedIn = (
   currentPage: PageView,
   actionToFilter: Actions,
   publicKey?: string
-) => pageViewActionMap[currentPage]?.filter(action => publicKey ? true : action !== actionToFilter);
+) =>
+  pageViewActionMap[currentPage]?.filter((action) =>
+    publicKey ? true : action !== actionToFilter
+  );
 export const resetSelectionOnPageChange = (
   pageView: PageView,
   setSelectedActionIndex: Dispatch<SetStateAction<number>>

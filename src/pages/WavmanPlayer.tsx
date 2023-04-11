@@ -1,4 +1,3 @@
-import { useWebLN } from "@/lightning/useWebLN";
 import {
   PageView,
   PLAYER_VIEW,
@@ -11,6 +10,7 @@ import {
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
+import { useWebLN } from "@/lightning/useWebLN";
 import { useRelay } from "@/nostr";
 import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { getInvoice, publishCommentEvent } from "@/nostr/zapLogic";

@@ -1,5 +1,5 @@
-import { WebLNProvider } from "@/lightning/useWebLN";
 import WavmanPlayer from "./WavmanPlayer";
+import { WebLNProvider } from "@/lightning/useWebLN";
 import RelayProvider from "@/nostr/relayProvider";
 import { NIP07Provider } from "@/nostr/useNIP07Login";
 import { Inter } from "next/font/google";

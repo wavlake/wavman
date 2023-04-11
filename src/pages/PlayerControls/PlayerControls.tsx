@@ -1,4 +1,3 @@
-import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   ActionHandler,
   Actions,
@@ -7,9 +6,10 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-  removeZapIfNotLoggedIn
+  removeZapIfNotLoggedIn,
 } from "../../lib/shared";
 import DPad from "./DPad";
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { Dispatch, SetStateAction } from "react";
 
 const PlayerControls: React.FC<{
@@ -55,12 +55,12 @@ const PlayerControls: React.FC<{
   const downHandler = () => {};
 
   const centerHandler = () => {
-    const action = actionHandlerMap[filteredActions[selectedActionIndex]]
+    const action = actionHandlerMap[filteredActions[selectedActionIndex]];
     try {
       action?.();
     } catch (e) {
       console.log("Error in centerHandler", e);
-    } 
+    }
   };
   const leftHandler = () =>
     setSelectedActionIndex((selectedActionIndex) =>

@@ -1,7 +1,15 @@
-import { useContext, createContext, useState, PropsWithChildren, useEffect } from "react";
 import { WebLNProvider as WebLNProviderType } from "@webbtc/webln-types";
+import {
+  useContext,
+  createContext,
+  useState,
+  PropsWithChildren,
+  useEffect,
+} from "react";
 
-const WebLNContext = createContext<Partial<WebLNProviderType> & { isEnabled: boolean; }>({ isEnabled: false });
+const WebLNContext = createContext<
+  Partial<WebLNProviderType> & { isEnabled: boolean }
+>({ isEnabled: false });
 
 const getWebLN = async () => {
   const { webln } = window;
@@ -18,7 +26,7 @@ export const useWebLN = () => {
 
   if (context === undefined) {
     throw new Error("useWebLN was used outside of its Provider");
-  };
+  }
 
   return context;
 };

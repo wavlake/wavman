@@ -1,4 +1,3 @@
-import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   COMMENTS_VIEW,
   removeZapIfNotLoggedIn,
@@ -8,6 +7,7 @@ import {
   SPLASH_VIEW,
   ZAP_VIEW,
 } from "../../lib/shared";
+import { useNIP07Login } from "@/nostr/useNIP07Login";
 
 const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {
@@ -32,7 +32,8 @@ const OnScreenActions: React.FC<{
   currentPage: PageView;
 }> = ({ selectedActionIndex, currentPage }) => {
   const { publicKey } = useNIP07Login();
-  const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey) || [];
+  const filteredActions =
+    removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey) || [];
   return (
     <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
@@ -44,7 +45,7 @@ const OnScreenActions: React.FC<{
         />
       ))}
     </div>
-  )
+  );
 };
 
 export default OnScreenActions;
