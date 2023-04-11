@@ -1,7 +1,7 @@
 import { NIP07ContextType } from "./useNIP07Login";
 import { Event, UnsignedEvent } from "nostr-tools";
 
-const useHttps = !!process.env.NEXT_PUBLIC_USE_HTTPS_LNURL;
+const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
 const sats2millisats = (amount: number) => amount * 1000;
 const chopDecimal = (amount: number) => Math.floor(amount);
@@ -9,7 +9,7 @@ const generateLNURLFromZapTag = (zapTag: string[]) => {
   const [zap, zapAddress, lud] = zapTag;
   const [username, domain] = zapAddress.split("@");
   if (!username || !domain) return false;
-  return `http${useHttps ? "s" : ""}://${domain}/.well-known/lnurlp/${username}`;
+  return `${protocol}://${domain}/.well-known/lnurlp/${username}`;
 };
 const validateNostrPubKey = (nostrPubKey: string) => {
   if (
@@ -56,7 +56,7 @@ const signZapEvent = async ({
       ["p", recepientPubKey],
       ["e", zappedEvent.id],
     ],
-    pubkey: nip07.publicKey,
+    pubkey: await nip07.publicKey,
     created_at: Math.floor(Date.now() / 1000),
   };
 
@@ -75,7 +75,7 @@ export const getInvoice = async ({
   content: string;
   nip07: NIP07ContextType;
 }): Promise<string | undefined> => {
-  try {  
+  try { 
     const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
     const lnurl = zapTag && generateLNURLFromZapTag(zapTag);
     if (!lnurl) {
