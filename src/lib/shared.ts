@@ -49,7 +49,7 @@ const pageViewStartIndexMap: Record<PageView, number> = {
   [ZAP_VIEW]: 0,
   [SPLASH_VIEW]: 0,
 };
-export const filterActions = (
+export const removeZapIfNotLoggedIn = (
   currentPage: PageView,
   actionToFilter: Actions,
   publicKey?: string

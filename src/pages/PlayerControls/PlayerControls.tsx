@@ -7,7 +7,7 @@ import {
   PLAYER_VIEW,
   SPLASH_VIEW,
   ZAP_VIEW,
-  filterActions
+  removeZapIfNotLoggedIn
 } from "../../lib/shared";
 import DPad from "./DPad";
 import { Dispatch, SetStateAction } from "react";
@@ -44,10 +44,10 @@ const PlayerControls: React.FC<{
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
   const { publicKey } = useNIP07Login();
-  const filteredActions = filterActions(currentPage, "ZAP", publicKey);
+  const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey);
 
   const calcMoveIndexRight = (index: number) =>
-    index + 1 >= filterActions.length ? index : index + 1;
+    index + 1 >= filteredActions.length ? index : index + 1;
   const calcMoveIndexLeft = (index: number) =>
     index === 0 ? index : index - 1;
 

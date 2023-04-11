@@ -1,7 +1,7 @@
 import { useNIP07Login } from "@/nostr/useNIP07Login";
 import {
   COMMENTS_VIEW,
-  filterActions,
+  removeZapIfNotLoggedIn,
   PageView,
   pageViewActionMap,
   PLAYER_VIEW,
@@ -32,7 +32,7 @@ const OnScreenActions: React.FC<{
   currentPage: PageView;
 }> = ({ selectedActionIndex, currentPage }) => {
   const { publicKey } = useNIP07Login();
-  const filteredActions = filterActions(currentPage, "ZAP", publicKey) || [];
+  const filteredActions = removeZapIfNotLoggedIn(currentPage, "ZAP", publicKey) || [];
   return (
     <div className="mx-auto flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
