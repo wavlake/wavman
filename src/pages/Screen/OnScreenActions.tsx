@@ -31,7 +31,7 @@ const OnScreenActions: React.FC<{
     currentPage,
     "ZAP",
     commenterPubKey
-  );
+  ) || [];
   return (
     <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
