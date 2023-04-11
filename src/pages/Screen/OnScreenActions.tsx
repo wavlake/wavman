@@ -27,11 +27,8 @@ const OnScreenActions: React.FC<{
   currentPage: PageView;
   commenterPubKey?: string;
 }> = ({ selectedActionIndex, currentPage, commenterPubKey }) => {
-  const filteredActions = getFilteredPageActions(
-    currentPage,
-    "ZAP",
-    commenterPubKey
-  ) || [];
+  const filteredActions =
+    getFilteredPageActions(currentPage, "ZAP", commenterPubKey) || [];
   return (
     <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (

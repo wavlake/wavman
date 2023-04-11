@@ -141,13 +141,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
   const setThePubKey = () => {
     getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey));
-  }
+  };
   useEffect(() => {
-    setThePubKey()
+    setThePubKey();
   }, [getPublicKey, setCommenterPubKey]);
 
   const webLN = useWebLN();
   const confirmZap = async () => {
+    setPageViewAndResetSelectedAction(QR_VIEW);
+
     if (!nowPlayingTrack) {
       console.log("No track is playing");
       return;
@@ -163,7 +165,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         nowPlayingTrack,
         publishEvent,
       });
-      setPageViewAndResetSelectedAction(COMMENTS_VIEW);
     }
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
@@ -178,12 +179,16 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
-      if (webLN.isEnabled && webLN.sendPayment) {
+      if (webLN.sendPayment) {
         // use webLN to pay
-        webLN.sendPayment(invoice);
+        try {
+          await webLN.sendPayment(invoice);
+        } catch (e) {
+          // failed to pay invoice, present QR code
+          setpaymentRequest(invoice);
+        }
       } else {
-        // else provide QR code to pay
-        setPageViewAndResetSelectedAction(QR_VIEW);
+        // webLN not available? present QR code
         setpaymentRequest(invoice);
       }
     }
@@ -192,7 +197,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   return (
     // Page Container
     <FormProvider {...methods}>
-      <form onSubmit={() => console.log("form submit")}>
+      <form>
         <div className="h-128 relative mx-auto mt-4 grid w-80 border-8 border-black bg-wavgray">
           <div className="mx-auto max-w-xs">
             <Screen

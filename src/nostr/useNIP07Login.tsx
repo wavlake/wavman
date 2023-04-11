@@ -38,18 +38,21 @@ export const NIP07Provider: React.FC<PropsWithChildren> = ({ children }) => {
       return signedEvent;
     },
     getPublicKey: async (): Promise<string | undefined> => {
-      if (pubKey) return pubKey;
-      const pk = await window?.nostr
-        ?.getPublicKey()
-        .then((pk) => {
-          setPubKey(pk);
-          return pk;
-        })
-        .catch((err) => {
-          console.log("Error getting pubkey from NIP07", err);
-          return undefined;
-        });
-      return pk || undefined;
+      if (pubKey) {
+        return pubKey;
+      } else {
+        const pk = await window?.nostr
+          ?.getPublicKey()
+          .then((pk) => {
+            setPubKey(pk);
+            return pk;
+          })
+          .catch((err) => {
+            console.log("Error getting pubkey from NIP07", err);
+            return undefined;
+          });
+        return pk || undefined;
+      }
     },
   };
   setTimeout(() => nip07.getPublicKey(), 100);

@@ -7,19 +7,7 @@ import {
   useEffect,
 } from "react";
 
-const WebLNContext = createContext<
-  Partial<WebLNProviderType> & { isEnabled: boolean }
->({ isEnabled: false });
-
-const getWebLN = async () => {
-  const { webln } = window;
-
-  if (!webln) {
-    console.warn("WebLN not enabled");
-    return;
-  }
-  return webln;
-};
+const WebLNContext = createContext<Partial<WebLNProviderType> | undefined>({});
 
 export const useWebLN = () => {
   const context = useContext(WebLNContext);
@@ -32,26 +20,21 @@ export const useWebLN = () => {
 };
 
 export const WebLNProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [webLN, setWebLN] = useState<WebLNProviderType>();
-  const [isEnabled, setIsEnabled] = useState<boolean>(false);
-  useEffect(() => {
-    getWebLN()
-      .then(async (webLN) => {
-        if (!webLN) return;
-        const { enabled } = await webLN.enable();
-        setIsEnabled(enabled);
-        enabled && setWebLN(webLN);
-      })
-      .catch((e) => console.log(`${e}`));
-  }, []);
+  const webLN = {
+    enable: async () => {
+      const { enabled, remember } = (await window?.webln?.enable()) || {};
+      return { enabled, remember };
+    },
+    sendPayment: async (paymentRequest: string) => {
+      const { preimage } =
+        (await window?.webln?.sendPayment(paymentRequest)) || {};
+      return { preimage };
+    },
+  };
 
+  webLN.enable();
   return (
-    <WebLNContext.Provider
-      value={{
-        isEnabled,
-        ...webLN,
-      }}
-    >
+    <WebLNContext.Provider value={webLN as WebLNProviderType}>
       {children}
     </WebLNContext.Provider>
   );
