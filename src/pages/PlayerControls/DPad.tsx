@@ -47,6 +47,7 @@ const DirectionalButton: React.FC<{
       onClick={clickHandler}
       onMouseDown={() => setIsPressed(true)}
       onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
       onTouchStart={() => {
         setIsPressed(true);
         setTimeout(() => setIsPressed(false), 300);
