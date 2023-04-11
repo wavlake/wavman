@@ -21,7 +21,7 @@ export default function Home() {
         <link href="/output.css" rel="stylesheet" />
       </Head>
       <main className="grid h-screen bg-wavpink">
-        <RelayProvider url={localRelay}>
+        <RelayProvider url={wavlakeProd}>
           <NIP07Provider>
             <WebLNProvider>
               <WavmanPlayer />
