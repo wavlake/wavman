@@ -75,3 +75,8 @@ export const resetSelectionOnPageChange = (
 ): void => {
   setSelectedActionIndex(pageViewStartIndexMap[pageView]);
 };
+
+export const coerceEnvVarToBool = (envVar: string | undefined): boolean => {
+  if (!envVar) return false;
+  return envVar === "true";
+}

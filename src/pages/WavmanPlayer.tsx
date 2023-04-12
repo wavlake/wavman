@@ -5,6 +5,7 @@ import {
   SPLASH_VIEW,
   QR_VIEW,
   ZAP_VIEW,
+  coerceEnvVarToBool,
 } from "../lib/shared";
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
@@ -21,6 +22,7 @@ export interface Form {
   satAmount: number;
 }
 
+const randomTrackFeatureFlag = coerceEnvVarToBool(process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS);
 const randomSHA256String = (length: number) => {
   const alphanumericString = Array.from(Array(length + 30), () =>
     Math.floor(Math.random() * 36).toString(36)
@@ -38,10 +40,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   ///////// NOSTR /////////
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
-
   // Get a batch of tracks
   const { data: tracks, loading: tracksLoading } = useListEvents([
-    { kinds: [32123], ["#f"]: randomChar },
+    {
+      kinds: [32123],
+      ...randomTrackFeatureFlag ? { ["#f"]: randomChar } : {},
+    },
   ]);
 
   // Post a comment mutation
