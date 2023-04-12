@@ -51,8 +51,8 @@ const pageViewStartIndexMap: Record<PageView, number> = {
   [PLAYER_VIEW]: 0,
   [COMMENTS_VIEW]: 0,
   [QR_VIEW]: 0,
-  [ZAP_AMOUNT_VIEW]: 0,
-  [ZAP_COMMENT_VIEW]: 0,
+  [ZAP_AMOUNT_VIEW]: 1,
+  [ZAP_COMMENT_VIEW]: 1,
   [SPLASH_VIEW]: 0,
 };
 
@@ -60,10 +60,10 @@ export const getPageActions = (currentPage: PageView) => {
   const actions = pageViewActionMap[currentPage];
   if (!actions) {
     console.log("no actions found for page", { currentPage });
-    return []
+    return [];
   }
   return actions;
-}
+};
 
 // initially used to filter ZAP from action menu when not logged in
 // not needed due to anon zaps
@@ -85,4 +85,4 @@ export const resetSelectionOnPageChange = (
 export const coerceEnvVarToBool = (envVar: string | undefined): boolean => {
   if (!envVar) return false;
   return envVar === "true";
-}
+};
