@@ -1,4 +1,4 @@
-import { Event, UnsignedEvent, generatePrivateKey, getPublicKey } from "nostr-tools";
+import { Event, UnsignedEvent, generatePrivateKey, getEventHash, getPublicKey, signEvent } from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
@@ -26,22 +26,28 @@ const validateNostrPubKey = (nostrPubKey: string) => {
   return true;
 };
 
+const getAnonPubKey = async () => {
+  const anonPrivKey = generatePrivateKey();
+  const anonPubKey = getPublicKey(anonPrivKey);
+  return { anonPrivKey, anonPubKey };
+};
+
 const signZapEvent = async ({
   content,
   amount,
   lnurl,
   recepientPubKey,
   zappedEvent,
+  commenterPubKey
 }: {
   content: string;
   amount: number;
   lnurl: string;
   recepientPubKey: string;
   zappedEvent: Event;
+  commenterPubKey?: string;
 }): Promise<Event | void> => {
-  const commenterPubKey = await window.nostr?.getPublicKey?.().catch((e: string) => console.log(e)) ;
-  const anonPrivateKey = generatePrivateKey();
-  const anonPubKey = getPublicKey(anonPrivateKey);
+  const { anonPubKey, anonPrivKey } = await getAnonPubKey();
   try {
     const unsignedEvent: UnsignedEvent = {
       kind: 9734,
@@ -58,7 +64,15 @@ const signZapEvent = async ({
     };
 
     const signedEvent = await window.nostr?.signEvent?.(unsignedEvent).catch((e: string) => console.log(e));
-    if (!signedEvent) return;
+    if (!signedEvent) {
+      // use anonPrivKey
+      return {
+        ...unsignedEvent,
+        id: getEventHash(unsignedEvent),
+        sig: signEvent(unsignedEvent, anonPrivKey),
+      };
+    };
+  
     return signedEvent;
   } catch (err) {
     console.log("error signing zap event", { err, lnurl, zappedEvent });
@@ -68,10 +82,12 @@ export const getInvoice = async ({
   nowPlayingTrack,
   satAmount: amount,
   content,
+  commenterPubKey,
 }: {
   nowPlayingTrack: Event;
   satAmount: number;
   content: string;
+  commenterPubKey?: string;
 }): Promise<string | undefined> => {
   try {
     const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
@@ -107,6 +123,7 @@ export const getInvoice = async ({
       lnurl,
       recepientPubKey: nostrPubKey,
       zappedEvent: nowPlayingTrack,
+      commenterPubKey,
     });
 
     const event = encodeURI(JSON.stringify(zapEvent));
@@ -124,22 +141,34 @@ export const publishCommentEvent = async ({
   content,
   nowPlayingTrack,
   publishEvent,
+  commenterPubKey,
 }: {
   content: string;
   nowPlayingTrack: Event;
   publishEvent: (event: Event) => void;
+  commenterPubKey?: string;
 }) => {
+  const { anonPubKey, anonPrivKey } = await getAnonPubKey();
   try {
-    const commenterPubKey = await window.nostr?.getPublicKey?.().catch((e: string) => console.log(e)) || "";
-    const unsigned: UnsignedEvent = {
+    const unsignedEvent: UnsignedEvent = {
       kind: 1,
       content,
       tags: [["e", nowPlayingTrack.id]],
       created_at: Math.floor(Date.now() / 1000),
-      pubkey: commenterPubKey,
+      pubkey: commenterPubKey || anonPubKey,
     };
-    const signedEvent = await window.nostr?.signEvent?.(unsigned).catch((e: string) => console.log(e));
-    signedEvent && publishEvent(signedEvent);
+    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent).catch((e: string) => console.log(e));
+    if (!signedEvent) {
+      // use anonPrivKey
+      const anonSignedEvent = {
+        ...unsignedEvent,
+        id: getEventHash(unsignedEvent),
+        sig: signEvent(unsignedEvent, anonPrivKey),
+      };
+      publishEvent(anonSignedEvent);
+    };
+
+    publishEvent(signedEvent);
   } catch (err) {
     console.log("error publishing comment event", { err, nowPlayingTrack });
   }
