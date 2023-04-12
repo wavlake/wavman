@@ -7,7 +7,7 @@ import {
   getPageActions,
 } from "../../lib/shared";
 import DPad from "./DPad";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 const PlayerControls: React.FC<{
   currentPage: PageView;
@@ -19,6 +19,7 @@ const PlayerControls: React.FC<{
   confirmZapAmount: () => void;
   confirmZapComment: () => void;
   toggleViewHandler: (currentPage: PageView) => void;
+  centerButtonPressedState: ReturnType<typeof useState<boolean>>;
   commenterPublicKey?: string;
 }> = ({
   currentPage,
@@ -30,6 +31,7 @@ const PlayerControls: React.FC<{
   toggleViewHandler,
   confirmZapAmount,
   confirmZapComment,
+  centerButtonPressedState,
   commenterPublicKey,
 }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
@@ -81,6 +83,7 @@ const PlayerControls: React.FC<{
         centerHandler={centerHandler}
         rightHandler={rightHandler}
         downHandler={downHandler}
+        centerButtonPressedState={centerButtonPressedState}
       />
       {/* Controls Border Cutouts */}
       <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>

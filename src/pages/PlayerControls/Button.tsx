@@ -5,9 +5,10 @@ const Button: React.FC<
   PropsWithChildren<{
     clickHandler: ActionHandler;
     className: string;
+    buttonState?: ReturnType<typeof useState<boolean>>;
   }>
-> = ({ clickHandler, children, className }) => {
-  const [isPressed, setIsPressed] = useState<boolean>(false);
+> = ({ clickHandler, children, className, buttonState = useState<boolean>(false) }) => {
+  const [isPressed, setIsPressed] = buttonState;
   return (
     <button
       type="button"

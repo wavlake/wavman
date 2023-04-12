@@ -132,6 +132,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const satAmount = methods.watch("satAmount");
 
   const [zapError, setZapError] = useState("");
+  const centerButtonPressedState = useState<boolean | undefined>(false);
   const isFormValid = (): boolean => {
     const zapScreenError = "Must zap more than zero sats";
     if (!satAmount || satAmount <= 0) {
@@ -209,6 +210,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 selectedActionIndex={selectedActionIndex}
                 commenterPubKey={commenterPubKey}
                 skipHandler={skipHandler}
+                isCenterButtonPressed={centerButtonPressedState[0]}
               />
               <Logo />
               <PlayerControls
@@ -221,6 +223,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 toggleViewHandler={toggleViewHandler}
                 confirmZapAmount={confirmZapAmount}
                 confirmZapComment={confirmZapComment}
+                centerButtonPressedState={centerButtonPressedState}
                 commenterPublicKey={commenterPubKey}
               />
             </div>

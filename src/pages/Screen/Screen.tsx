@@ -26,6 +26,7 @@ const Screen: React.FC<{
   paymentRequest: string;
   zapError: string;
   skipHandler: () => void;
+  isCenterButtonPressed: boolean;
   nowPlayingTrack?: Event;
   commenterPubKey?: string;
 }> = ({
@@ -37,6 +38,7 @@ const Screen: React.FC<{
   paymentRequest,
   zapError,
   skipHandler,
+  isCenterButtonPressed,
   nowPlayingTrack,
   commenterPubKey,
 }) => {
@@ -114,6 +116,7 @@ const Screen: React.FC<{
                 selectedActionIndex={selectedActionIndex}
                 currentPage={currentPage}
                 commenterPubKey={commenterPubKey}
+                isCenterButtonPressed={isCenterButtonPressed}
               />
             </>
           );

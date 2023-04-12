@@ -21,8 +21,12 @@ const Action: React.FC<{
 const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   currentPage: PageView;
+  isCenterButtonPressed: boolean;
   commenterPubKey?: string;
-}> = ({ selectedActionIndex, currentPage, commenterPubKey }) => {
+}> = ({ selectedActionIndex, currentPage, isCenterButtonPressed, commenterPubKey }) => {
+  // can use this to animate the current selection while center button is pressed
+  // console.log({isCenterButtonPressed})
+
   const filteredActions = getPageActions(currentPage);
   return (
     <div className="mx-auto mb-1 flex w-56 justify-around text-xs">

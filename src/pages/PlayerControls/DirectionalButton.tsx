@@ -1,5 +1,6 @@
 import { ActionHandler } from "@/lib/shared";
 import Button from "./Button";
+import { useState } from "react";
 
 const buttonInfoMap: Record<
   string,
@@ -35,10 +36,11 @@ const buttonInfoMap: Record<
 const DirectionalButton: React.FC<{
   direction: string;
   clickHandler: ActionHandler;
-}> = ({ direction, clickHandler }) => {
+  centerButtonPressedState?: ReturnType<typeof useState<boolean>>;
+}> = ({ direction, clickHandler, centerButtonPressedState }) => {
   const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction] || {};
   return (
-    <Button clickHandler={clickHandler} className={buttonClass}>
+    <Button buttonState={centerButtonPressedState} clickHandler={clickHandler} className={buttonClass}>
       <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </Button>
   );
