@@ -17,7 +17,7 @@ const Comment: React.FC<{ event: Event }> = ({
 const CommentsScreen: React.FC<{
   loading: boolean;
   comments: Event[];
-}> = ({ loading, comments }) => {
+}> = ({ loading, comments = [] }) => {
   const descriptionTags = comments
     .map(({ tags }) => {
       // grab the first tag that is a description

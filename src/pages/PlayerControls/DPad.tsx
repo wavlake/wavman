@@ -1,4 +1,4 @@
-import { DirectionalButton } from "./button";
+import DirectionalButton from "./DirectionalButton";
 
 const DPad: React.FC<{
   upHandler: () => void;

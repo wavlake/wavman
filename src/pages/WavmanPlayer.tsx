@@ -10,13 +10,13 @@ import {
 } from "../lib/shared";
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
-import { Button } from "./PlayerControls/button";
 import Screen from "./Screen/Screen";
 import { useRelay } from "@/nostr";
 import { getInvoice } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import Button from "./PlayerControls/Button";
 
 export interface Form {
   content: string;
