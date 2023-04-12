@@ -34,7 +34,7 @@ const randomSHA256String = (length: number) => {
 const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
-  const [randomChar, setRandomChar] = useState<string[]>(
+  const [randomChars, setRandomChars] = useState<string[]>(
     Array.from(randomSHA256String(30))
   );
 
@@ -44,7 +44,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const { data: tracks, loading: tracksLoading } = useListEvents([
     {
       kinds: [32123],
-      ...randomTrackFeatureFlag ? { ["#f"]: randomChar } : {},
+      ...randomTrackFeatureFlag ? { ["#f"]: randomChars } : {},
+      limit: 40,
     },
   ]);
 
@@ -63,10 +64,9 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [paymentRequest, setpaymentRequest] = useState("");
   const shouldSkipPaymentReceipt = !paymentRequest;
   // ZapReceipt Listener
-  const { lastEvent: paymentReceipt, loading: paymentReceiptLoading } =
+  const { allEvents: zapReceipts, loading: zapReceiptsLoading } =
     useEventSubscription(
-      [{ kinds: [9735], ["#bolt11"]: [paymentRequest] }],
-      shouldSkipPaymentReceipt
+      [{ kinds: [9735], ["#e"]: [nowPlayingTrack?.id || ""] }],
     );
   // Get track comments, skip till a track is ready
   const shouldSkipComments = !nowPlayingTrack;
@@ -191,7 +191,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 nowPlayingTrack={nowPlayingTrack}
                 isPlaying={isPlaying}
                 commentsLoading={commentsLoading}
-                comments={comments || []}
+                comments={zapReceipts || []}
                 currentPage={currentPage}
                 paymentRequest={paymentRequest}
                 selectedActionIndex={selectedActionIndex}
