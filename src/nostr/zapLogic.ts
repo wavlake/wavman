@@ -1,4 +1,11 @@
-import { Event, UnsignedEvent, generatePrivateKey, getEventHash, getPublicKey, signEvent } from "nostr-tools";
+import {
+  Event,
+  UnsignedEvent,
+  generatePrivateKey,
+  getEventHash,
+  getPublicKey,
+  signEvent,
+} from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
@@ -38,7 +45,7 @@ const signZapEvent = async ({
   lnurl,
   recepientPubKey,
   zappedEvent,
-  commenterPubKey
+  commenterPubKey,
 }: {
   content: string;
   amount: number;
@@ -63,7 +70,9 @@ const signZapEvent = async ({
       created_at: Math.floor(Date.now() / 1000),
     };
 
-    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent).catch((e: string) => console.log(e));
+    const signedEvent = await window.nostr
+      ?.signEvent?.(unsignedEvent)
+      .catch((e: string) => console.log(e));
     if (!signedEvent) {
       // use anonPrivKey
       return {
@@ -71,8 +80,8 @@ const signZapEvent = async ({
         id: getEventHash(unsignedEvent),
         sig: signEvent(unsignedEvent, anonPrivKey),
       };
-    };
-  
+    }
+
     return signedEvent;
   } catch (err) {
     console.log("error signing zap event", { err, lnurl, zappedEvent });
@@ -157,7 +166,9 @@ export const publishCommentEvent = async ({
       created_at: Math.floor(Date.now() / 1000),
       pubkey: commenterPubKey || anonPubKey,
     };
-    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent).catch((e: string) => console.log(e));
+    const signedEvent = await window.nostr
+      ?.signEvent?.(unsignedEvent)
+      .catch((e: string) => console.log(e));
     if (!signedEvent) {
       // use anonPrivKey
       const anonSignedEvent = {
@@ -166,7 +177,7 @@ export const publishCommentEvent = async ({
         sig: signEvent(unsignedEvent, anonPrivKey),
       };
       publishEvent(anonSignedEvent);
-    };
+    }
 
     publishEvent(signedEvent);
   } catch (err) {

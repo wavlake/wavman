@@ -32,10 +32,12 @@ const buttonInfoMap: Record<
   },
 };
 
-export const Button: React.FC<PropsWithChildren<{
-  clickHandler: ActionHandler;
-  className: string;
-}>> = ({ clickHandler, children, className }) => {
+export const Button: React.FC<
+  PropsWithChildren<{
+    clickHandler: ActionHandler;
+    className: string;
+  }>
+> = ({ clickHandler, children, className }) => {
   const [isPressed, setIsPressed] = useState<boolean>(false);
   return (
     <button
@@ -63,10 +65,7 @@ export const DirectionalButton: React.FC<{
 }> = ({ direction, clickHandler }) => {
   const { svgClass, buttonClass, svgSrc } = buttonInfoMap[direction];
   return (
-    <Button
-      clickHandler={clickHandler}
-      className={buttonClass}
-    >
+    <Button clickHandler={clickHandler} className={buttonClass}>
       <img className={svgClass} src={svgSrc} alt={`${direction} arrow`} />
     </Button>
   );

@@ -1,8 +1,4 @@
-import {
-  getPageActions,
-  PageView,
-  PLAYER_VIEW,
-} from "../../lib/shared";
+import { getPageActions, PageView, PLAYER_VIEW } from "../../lib/shared";
 
 const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {

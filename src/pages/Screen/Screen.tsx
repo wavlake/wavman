@@ -4,6 +4,7 @@ import NowPlayingScreen from "./NowPlayingScreen";
 import OnScreenActions from "./OnScreenActions";
 import QRScreen from "./QRScreen";
 import ZapAmountScreen from "./ZapAmountScreen";
+import ZapCommentScreen from "./ZapCommentScreen";
 import {
   COMMENTS_VIEW,
   PageView,
@@ -15,7 +16,6 @@ import {
 } from "@/lib/shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
-import ZapCommentScreen from "./ZapCommentScreen";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -101,15 +101,9 @@ const Screen: React.FC<{
                   case QR_VIEW:
                     return <QRScreen paymentRequest={paymentRequest} />;
                   case ZAP_COMMENT_VIEW:
-                    return (
-                      <ZapCommentScreen />
-                    );  
+                    return <ZapCommentScreen />;
                   case ZAP_AMOUNT_VIEW:
-                    return (
-                      <ZapAmountScreen
-                        zapError={zapError}
-                      />
-                    );
+                    return <ZapAmountScreen zapError={zapError} />;
                   case SPLASH_VIEW:
                     return <>splash</>;
                   default:

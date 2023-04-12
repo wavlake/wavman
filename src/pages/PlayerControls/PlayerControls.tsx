@@ -46,7 +46,7 @@ const PlayerControls: React.FC<{
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
 
-  const filteredActions = getPageActions(currentPage)
+  const filteredActions = getPageActions(currentPage);
 
   const calcMoveIndexRight = (index: number) =>
     index + 1 >= filteredActions.length ? index : index + 1;
