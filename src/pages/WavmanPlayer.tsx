@@ -210,7 +210,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 selectedActionIndex={selectedActionIndex}
                 commenterPubKey={commenterPubKey}
                 skipHandler={skipHandler}
-                isCenterButtonPressed={centerButtonPressedState[0]}
+                isCenterButtonPressed={centerButtonPressedState[0] || false}
               />
               <Logo />
               <PlayerControls
