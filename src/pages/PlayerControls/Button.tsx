@@ -7,21 +7,33 @@ const Button: React.FC<
     className: string;
     buttonState?: ReturnType<typeof useState<boolean>>;
   }>
-> = ({ clickHandler, children, className, buttonState = useState<boolean>(false) }) => {
-  const [isPressed, setIsPressed] = buttonState;
+> = ({ clickHandler, children, className, buttonState }) => {
+  const [isPressedFallback, setIsPressedFallback] = useState(false);
+  const [isPressed, setIsPressed] = buttonState || [];
   return (
     <button
       type="button"
       className={`${className} h-full w-full ${
-        isPressed ? "-translate-x-1 translate-y-1" : ""
+        (isPressed || isPressedFallback) ? "-translate-x-1 translate-y-1" : ""
       }`}
       onClick={clickHandler}
-      onMouseDown={() => setIsPressed(true)}
-      onMouseUp={() => setIsPressed(false)}
-      onMouseLeave={() => setIsPressed(false)}
+      onMouseDown={() => {
+        setIsPressed?.(true)
+        setIsPressedFallback(true)
+      }}
+      onMouseUp={() => {
+        setIsPressed?.(false)
+        setIsPressedFallback(false)
+      }}
+      onMouseLeave={() => {
+        setIsPressed?.(false)
+        setIsPressedFallback(false)
+      }}
       onTouchStart={() => {
-        setIsPressed(true);
-        setTimeout(() => setIsPressed(false), 300);
+        setIsPressed?.(true);
+        setTimeout(() => setIsPressed?.(false), 300);
+        setIsPressedFallback(true);
+        setTimeout(() => setIsPressedFallback(false), 300);
       }}
     >
       {children}
