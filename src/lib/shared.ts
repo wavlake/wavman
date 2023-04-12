@@ -49,6 +49,18 @@ const pageViewStartIndexMap: Record<PageView, number> = {
   [ZAP_VIEW]: 0,
   [SPLASH_VIEW]: 0,
 };
+
+export const getPageActions = (currentPage: PageView) => {
+  const actions = pageViewActionMap[currentPage];
+  if (!actions) {
+    console.log("no actions found for page", { currentPage });
+    return []
+  }
+  return actions;
+}
+
+// initially used to filter ZAP from action menu when not logged in
+// not needed due to anon zaps
 export const getFilteredPageActions = (
   currentPage: PageView,
   actionToFilter: Actions,

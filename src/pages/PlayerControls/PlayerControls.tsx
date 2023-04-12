@@ -4,7 +4,7 @@ import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
-  getFilteredPageActions,
+  getPageActions,
 } from "../../lib/shared";
 import DPad from "./DPad";
 import { Dispatch, SetStateAction } from "react";
@@ -43,11 +43,7 @@ const PlayerControls: React.FC<{
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
 
-  const filteredActions = getFilteredPageActions(
-    currentPage,
-    "ZAP",
-    commenterPublicKey
-  );
+  const filteredActions = getPageActions(currentPage)
 
   const calcMoveIndexRight = (index: number) =>
     index + 1 >= filteredActions.length ? index : index + 1;
