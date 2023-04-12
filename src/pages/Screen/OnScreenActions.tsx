@@ -22,8 +22,9 @@ const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   currentPage: PageView;
   isCenterButtonPressed: boolean;
+  isPlaying: boolean;
   commenterPubKey?: string;
-}> = ({ selectedActionIndex, currentPage, isCenterButtonPressed, commenterPubKey }) => {
+}> = ({ selectedActionIndex, currentPage, isCenterButtonPressed, isPlaying, commenterPubKey }) => {
   // can use this to animate the current selection while center button is pressed
   // console.log({isCenterButtonPressed})
 
@@ -32,7 +33,7 @@ const OnScreenActions: React.FC<{
     <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
         <Action
-          action={action}
+          action={action === "PLAY" ? (isPlaying ? "PAUSE" : "PLAY") : action}
           key={action}
           selected={selectedActionIndex === index}
           currentPage={currentPage}

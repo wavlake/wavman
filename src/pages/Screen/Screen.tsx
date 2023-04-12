@@ -117,6 +117,7 @@ const Screen: React.FC<{
                 currentPage={currentPage}
                 commenterPubKey={commenterPubKey}
                 isCenterButtonPressed={isCenterButtonPressed}
+                isPlaying={isPlaying}
               />
             </>
           );
