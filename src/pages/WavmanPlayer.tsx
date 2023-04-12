@@ -196,6 +196,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 paymentRequest={paymentRequest}
                 selectedActionIndex={selectedActionIndex}
                 commenterPubKey={commenterPubKey}
+                skipHandler={skipHandler}
               />
               <Logo />
               <PlayerControls

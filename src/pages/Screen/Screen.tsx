@@ -23,6 +23,7 @@ const Screen: React.FC<{
   selectedActionIndex: number;
   paymentRequest: string;
   zapError: string;
+  skipHandler: () => void;
   nowPlayingTrack?: Event;
   commenterPubKey?: string;
 }> = ({
@@ -33,6 +34,7 @@ const Screen: React.FC<{
   selectedActionIndex,
   paymentRequest,
   zapError,
+  skipHandler,
   nowPlayingTrack,
   commenterPubKey,
 }) => {
@@ -75,6 +77,7 @@ const Screen: React.FC<{
               <ReactPlayerWrapper
                 url={trackContent.enclosure}
                 isPlaying={isPlaying}
+                onEnded={skipHandler}
               />
               {(() => {
                 switch (currentPage) {
