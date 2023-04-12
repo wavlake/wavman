@@ -1,19 +1,73 @@
-import {
-  chopDecimal,
-  generateLNURLFromZapTag,
-  getAnonPubKey,
-  sats2millisats,
-  signZapEventNip07,
-  validateNostrPubKey,
-} from "./zapUtils";
-import {
-  Event,
-  UnsignedEvent,
-  getEventHash,
-  signEvent,
-  validateEvent,
-} from "nostr-tools";
+import { Event, UnsignedEvent } from "nostr-tools";
 
+const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
+
+const sats2millisats = (amount: number) => amount * 1000;
+const chopDecimal = (amount: number) => Math.floor(amount);
+const generateLNURLFromZapTag = (zapTag: string[]) => {
+  const [zap, zapAddress, lud] = zapTag;
+  const [username, domain] = zapAddress.split("@");
+  if (!username || !domain) return false;
+  return `${protocol}://${domain}/.well-known/lnurlp/${username}`;
+};
+const validateNostrPubKey = (nostrPubKey: string) => {
+  if (
+    nostrPubKey == null ||
+    nostrPubKey === undefined ||
+    typeof nostrPubKey !== "string"
+  ) {
+    return false;
+  }
+  const schnorrSignatureRegex = /^[a-fA-F0-9]{64}$/;
+  if (!schnorrSignatureRegex.test(nostrPubKey)) {
+    return false;
+  }
+
+  return true;
+};
+
+const signZapEvent = async ({
+  content,
+  amount,
+  lnurl,
+  recepientPubKey,
+  zappedEvent,
+}: {
+  content: string;
+  amount: number;
+  lnurl: string;
+  recepientPubKey: string;
+  zappedEvent: Event;
+}): Promise<Event | void> => {
+  const commenterPubKey = await window.nostr?.getPublicKey();
+
+  try {
+    if (!commenterPubKey) {
+      console.log("nip07 not initialized, unable to zap");
+      return;
+    }
+
+    const unsignedEvent: UnsignedEvent = {
+      kind: 9734,
+      content,
+      tags: [
+        ["relays", "wss://relay.wavlake.com/"],
+        ["amount", amount.toString()],
+        ["lnurl", lnurl],
+        ["p", recepientPubKey],
+        ["e", zappedEvent.id],
+      ],
+      pubkey: commenterPubKey,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+
+    const signedEvent = await window.nostr?.signEvent(unsignedEvent);
+    if (!signedEvent) return;
+    return signedEvent;
+  } catch (err) {
+    console.log("error signing zap event", { err, lnurl, zappedEvent });
+  }
+};
 export const getInvoice = async ({
   nowPlayingTrack,
   satAmount: amount,
@@ -51,90 +105,45 @@ export const getInvoice = async ({
     }
 
     const milliSatAmount = sats2millisats(chopDecimal(amount));
-    const nip07PubKey = await window.nostr?.getPublicKey();
-    if (nip07PubKey) {
-      const signedZapEvent = await signZapEventNip07({
-        content,
-        amount: milliSatAmount,
-        lnurl,
-        recepientPubKey: nostrPubKey,
-        zappedEvent: nowPlayingTrack,
-        pubkey: nip07PubKey,
-      });
-      const event = JSON.stringify(signedZapEvent);
-      const paymentRequestRes = await fetch(
-        `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
-      );
-      const { pr } = await paymentRequestRes.json();
-      return pr;
-    } else {
-      // anon zap
-      const { anonPubKey, anonPrivKey } = getAnonPubKey();
-      const unsignedEvent: UnsignedEvent = {
-        kind: 9734,
-        content,
-        pubkey: anonPubKey,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [
-          ["relays", "wss://relay.wavlake.com/"],
-          ["amount", amount.toString()],
-          ["lnurl", lnurl],
-          ["p", nostrPubKey],
-          ["e", nowPlayingTrack.id],
-        ],
-      };
-      const signedZapEvent = {
-        ...unsignedEvent,
-        id: getEventHash(unsignedEvent),
-        sig: signEvent(unsignedEvent, anonPrivKey),
-      };
-      const event = JSON.stringify(signedZapEvent);
-      const paymentRequestRes = await fetch(
-        `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
-      );
-      const { pr } = await paymentRequestRes.json();
-      return pr;
-    }
+    const zapEvent = await signZapEvent({
+      content,
+      amount: milliSatAmount,
+      lnurl,
+      recepientPubKey: nostrPubKey,
+      zappedEvent: nowPlayingTrack,
+    });
+
+    const event = encodeURI(JSON.stringify(zapEvent));
+    const paymentRequestRes = await fetch(
+      `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
+    );
+    const { pr } = await paymentRequestRes.json();
+    return pr;
   } catch (err) {
     console.log("error getting invoice", { err, nowPlayingTrack });
   }
 };
 
-// currently not in use
 export const publishCommentEvent = async ({
   content,
   nowPlayingTrack,
   publishEvent,
-  commenterPubKey,
 }: {
   content: string;
   nowPlayingTrack: Event;
   publishEvent: (event: Event) => void;
-  commenterPubKey?: string;
 }) => {
-  const { anonPubKey, anonPrivKey } = getAnonPubKey();
   try {
-    const unsignedEvent: UnsignedEvent = {
+    const commenterPubKey = await window.nostr?.getPublicKey() || "";
+    const unsigned: UnsignedEvent = {
       kind: 1,
       content,
       tags: [["e", nowPlayingTrack.id]],
       created_at: Math.floor(Date.now() / 1000),
-      pubkey: commenterPubKey || anonPubKey,
+      pubkey: commenterPubKey,
     };
-    const signedEvent = await window.nostr
-      ?.signEvent?.(unsignedEvent)
-      .catch((e: string) => console.log(e));
-    if (!signedEvent) {
-      // use anonPrivKey
-      const anonSignedEvent = {
-        ...unsignedEvent,
-        id: getEventHash(unsignedEvent),
-        sig: signEvent(unsignedEvent, anonPrivKey),
-      };
-      publishEvent(anonSignedEvent);
-    }
-
-    publishEvent(signedEvent);
+    const signedEvent = await window.nostr?.signEvent?.(unsigned);
+    signedEvent && publishEvent(signedEvent);
   } catch (err) {
     console.log("error publishing comment event", { err, nowPlayingTrack });
   }

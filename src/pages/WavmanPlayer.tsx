@@ -167,28 +167,30 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return;
     }
     if (!isFormValid()) return;
-    const invoice = await getInvoice({
-      nowPlayingTrack,
-      satAmount,
-      content,
-    });
-    if (!invoice) {
-      console.log("Error retrieving invoice");
-      setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
-      return;
-    }
-    const { enabled } = (await window.webln?.enable()) || {};
-    if (enabled) {
-      // use webLN to pay
-      try {
-        await window.webln?.sendPayment(invoice);
-      } catch (e) {
-        // failed to pay invoice, present QR code
+    if (satAmount && satAmount > 0) {
+      const invoice = await getInvoice({
+        nowPlayingTrack,
+        satAmount,
+        content,
+      });
+      if (!invoice) {
+        console.log("Error retrieving invoice");
+        setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
+        return;
+      }
+      const { enabled } = await window.webln?.enable() || {};
+      if (enabled) {
+        // use webLN to pay
+        try {
+          await window.webln?.sendPayment(invoice);
+        } catch (e) {
+          // failed to pay invoice, present QR code
+          setpaymentRequest(invoice);
+        }
+      } else {
+        // webLN not available? present QR code
         setpaymentRequest(invoice);
       }
-    } else {
-      // webLN not available? present QR code
-      setpaymentRequest(invoice);
     }
   };
 
