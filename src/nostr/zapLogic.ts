@@ -1,4 +1,4 @@
-import { Event, UnsignedEvent } from "nostr-tools";
+import { Event, UnsignedEvent, generatePrivateKey, getPublicKey } from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
@@ -39,14 +39,10 @@ const signZapEvent = async ({
   recepientPubKey: string;
   zappedEvent: Event;
 }): Promise<Event | void> => {
-  const commenterPubKey = await window.nostr?.getPublicKey();
-
+  const commenterPubKey = await window.nostr?.getPublicKey?.().catch((e: string) => console.log(e)) ;
+  const anonPrivateKey = generatePrivateKey();
+  const anonPubKey = getPublicKey(anonPrivateKey);
   try {
-    if (!commenterPubKey) {
-      console.log("nip07 not initialized, unable to zap");
-      return;
-    }
-
     const unsignedEvent: UnsignedEvent = {
       kind: 9734,
       content,
@@ -57,11 +53,11 @@ const signZapEvent = async ({
         ["p", recepientPubKey],
         ["e", zappedEvent.id],
       ],
-      pubkey: commenterPubKey,
+      pubkey: commenterPubKey || anonPubKey,
       created_at: Math.floor(Date.now() / 1000),
     };
 
-    const signedEvent = await window.nostr?.signEvent(unsignedEvent);
+    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent).catch((e: string) => console.log(e));
     if (!signedEvent) return;
     return signedEvent;
   } catch (err) {
@@ -134,7 +130,7 @@ export const publishCommentEvent = async ({
   publishEvent: (event: Event) => void;
 }) => {
   try {
-    const commenterPubKey = await window.nostr?.getPublicKey() || "";
+    const commenterPubKey = await window.nostr?.getPublicKey?.().catch((e: string) => console.log(e)) || "";
     const unsigned: UnsignedEvent = {
       kind: 1,
       content,
@@ -142,7 +138,7 @@ export const publishCommentEvent = async ({
       created_at: Math.floor(Date.now() / 1000),
       pubkey: commenterPubKey,
     };
-    const signedEvent = await window.nostr?.signEvent?.(unsigned);
+    const signedEvent = await window.nostr?.signEvent?.(unsigned).catch((e: string) => console.log(e));
     signedEvent && publishEvent(signedEvent);
   } catch (err) {
     console.log("error publishing comment event", { err, nowPlayingTrack });

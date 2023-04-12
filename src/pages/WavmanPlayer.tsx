@@ -125,8 +125,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const [zapError, setZapError] = useState("");
   const isFormValid = (): boolean => {
-    const zapScreenError = "Do at least one, please";
-    if (!satAmount && !content) {
+    const zapScreenError = "Must zap more than zero sats";
+    if (!satAmount || satAmount <= 0) {
       setZapError(zapScreenError);
       return false;
     } else {
@@ -137,7 +137,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
 
   const setThePubKey = () => {
-    window.nostr?.getPublicKey().then((pubKey) => setCommenterPubKey(pubKey));
+    window.nostr?.getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey)).catch((e: string) => console.log(e));
   };
   useEffect(() => {
     setThePubKey();
@@ -151,39 +151,28 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return;
     }
     if (!isFormValid()) return;
-
-    if (content) {
-      // publish kind 1 event comment, aka a reply
-      publishCommentEvent({
-        content,
-        nowPlayingTrack,
-        publishEvent,
-      });
+    const invoice = await getInvoice({
+      nowPlayingTrack,
+      satAmount,
+      content,
+    });
+    if (!invoice) {
+      console.log("Error retrieving invoice");
+      setPageViewAndResetSelectedAction(ZAP_VIEW);
+      return;
     }
-    if (satAmount && satAmount > 0) {
-      const invoice = await getInvoice({
-        nowPlayingTrack,
-        satAmount,
-        content,
-      });
-      if (!invoice) {
-        console.log("Error retrieving invoice");
-        setPageViewAndResetSelectedAction(ZAP_VIEW);
-        return;
-      }
-      const { enabled } = await window.webln?.enable() || {};
-      if (enabled) {
-        // use webLN to pay
-        try {
-          await window.webln?.sendPayment(invoice);
-        } catch (e) {
-          // failed to pay invoice, present QR code
-          setpaymentRequest(invoice);
-        }
-      } else {
-        // webLN not available? present QR code
+    const { enabled } = await window.webln?.enable() || {};
+    if (enabled) {
+      // use webLN to pay
+      try {
+        await window.webln?.sendPayment(invoice);
+      } catch (e) {
+        // failed to pay invoice, present QR code
         setpaymentRequest(invoice);
       }
+    } else {
+      // webLN not available? present QR code
+      setpaymentRequest(invoice);
     }
   };
 
