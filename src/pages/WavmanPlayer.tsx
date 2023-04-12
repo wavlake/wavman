@@ -5,14 +5,11 @@ import {
   SPLASH_VIEW,
   QR_VIEW,
   ZAP_VIEW,
-  COMMENTS_VIEW,
 } from "../lib/shared";
 import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
-import { useWebLN } from "@/lightning/useWebLN";
 import { useRelay } from "@/nostr";
-import { useNIP07Login } from "@/nostr/useNIP07Login";
 import { getInvoice, publishCommentEvent } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
@@ -137,38 +134,54 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       return true;
     }
   };
-  const nip07 = useNIP07Login();
-  const webLN = useWebLN();
+  const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
+
+  const setThePubKey = () => {
+    window.nostr?.getPublicKey().then((pubKey) => setCommenterPubKey(pubKey));
+  };
+  useEffect(() => {
+    setThePubKey();
+  }, [setCommenterPubKey]);
+
   const confirmZap = async () => {
+    setPageViewAndResetSelectedAction(QR_VIEW);
+
     if (!nowPlayingTrack) {
       console.log("No track is playing");
       return;
     }
     if (!isFormValid()) return;
 
-    if (content && nip07?.publicKey && nip07?.signEvent) {
+    if (content) {
       // publish kind 1 event comment, aka a reply
-      publishCommentEvent({ nip07, content, nowPlayingTrack, publishEvent });
-      setPageViewAndResetSelectedAction(COMMENTS_VIEW);
+      publishCommentEvent({
+        content,
+        nowPlayingTrack,
+        publishEvent,
+      });
     }
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
         nowPlayingTrack,
         satAmount,
         content,
-        nip07,
       });
       if (!invoice) {
         console.log("Error retrieving invoice");
         setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
-      if (webLN.isEnabled && webLN.sendPayment) {
+      const { enabled } = await window.webln?.enable() || {};
+      if (enabled) {
         // use webLN to pay
-        webLN.sendPayment(invoice);
+        try {
+          await window.webln?.sendPayment(invoice);
+        } catch (e) {
+          // failed to pay invoice, present QR code
+          setpaymentRequest(invoice);
+        }
       } else {
-        // else provide QR code to pay
-        setPageViewAndResetSelectedAction(QR_VIEW);
+        // webLN not available? present QR code
         setpaymentRequest(invoice);
       }
     }
@@ -177,7 +190,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   return (
     // Page Container
     <FormProvider {...methods}>
-      <form onSubmit={() => console.log("form submit")}>
+      <form>
         <div className="h-128 relative mx-auto mt-4 grid w-80 border-8 border-black bg-wavgray">
           <div className="mx-auto max-w-xs">
             <Screen
@@ -189,6 +202,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               currentPage={currentPage}
               paymentRequest={paymentRequest}
               selectedActionIndex={selectedActionIndex}
+              commenterPubKey={commenterPubKey}
             />
             <Logo />
             <PlayerControls
@@ -200,6 +214,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               playHandler={playHandler}
               toggleViewHandler={toggleViewHandler}
               confirmZap={confirmZap}
+              commenterPublicKey={commenterPubKey}
             />
           </div>
           {/* Player Border Lines & Cutouts */}

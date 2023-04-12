@@ -1,16 +1,17 @@
-import { useNIP07Login } from "@/nostr/useNIP07Login";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 
 const ZapScreen: React.FC<{
   zapError: string;
-}> = ({ zapError }) => {
-  const { publicKey } = useNIP07Login();
+  commenterPubKey?: string;
+}> = ({ zapError, commenterPubKey }) => {
+  useEffect;
   const methods = useFormContext();
 
   return (
     <div className="m-4 justify-self-center">
-      {publicKey && "Comment"}
-      {publicKey && (
+      {commenterPubKey && "Comment"}
+      {commenterPubKey && (
         <input {...methods?.register("content")} className="w-full" required />
       )}
       Zap Amount
