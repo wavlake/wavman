@@ -10,10 +10,11 @@ import Logo from "./Logo";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
 import { useRelay } from "@/nostr";
-import { getInvoice, publishCommentEvent } from "@/nostr/zapLogic";
+import { getInvoice } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { Button } from "./PlayerControls/button";
 
 export interface Form {
   content: string;
@@ -139,9 +140,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const setThePubKey = () => {
     window.nostr?.getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey)).catch((e: string) => console.log(e));
   };
-  useEffect(() => {
-    setThePubKey();
-  }, [setCommenterPubKey]);
 
   const confirmZap = async () => {
     setPageViewAndResetSelectedAction(QR_VIEW);
@@ -175,49 +173,53 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       setpaymentRequest(invoice);
     }
   };
+  const [isPressed, setIsPressed] = useState<boolean>(false);
 
   return (
     // Page Container
-    <FormProvider {...methods}>
-      <form>
-        <div className="h-128 relative mx-auto mt-4 grid w-80 border-8 border-black bg-wavgray">
-          <div className="mx-auto max-w-xs">
-            <Screen
-              zapError={zapError}
-              nowPlayingTrack={nowPlayingTrack}
-              isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
-              comments={comments || []}
-              currentPage={currentPage}
-              paymentRequest={paymentRequest}
-              selectedActionIndex={selectedActionIndex}
-              commenterPubKey={commenterPubKey}
-            />
-            <Logo />
-            <PlayerControls
-              currentPage={currentPage}
-              selectedActionIndex={selectedActionIndex}
-              setSelectedActionIndex={setSelectedActionIndex}
-              skipHandler={skipHandler}
-              zapHandler={zapHandler}
-              playHandler={playHandler}
-              toggleViewHandler={toggleViewHandler}
-              confirmZap={confirmZap}
-              commenterPublicKey={commenterPubKey}
-            />
+    <>
+      <FormProvider {...methods}>
+        <form>
+          <div className="h-max relative mt-4 grid w-80 border-8 border-black bg-wavgray">
+            <div className="mx-auto max-w-xs">
+              <Screen
+                zapError={zapError}
+                nowPlayingTrack={nowPlayingTrack}
+                isPlaying={isPlaying}
+                commentsLoading={commentsLoading}
+                comments={comments || []}
+                currentPage={currentPage}
+                paymentRequest={paymentRequest}
+                selectedActionIndex={selectedActionIndex}
+                commenterPubKey={commenterPubKey}
+              />
+              <Logo />
+              <PlayerControls
+                currentPage={currentPage}
+                selectedActionIndex={selectedActionIndex}
+                setSelectedActionIndex={setSelectedActionIndex}
+                skipHandler={skipHandler}
+                zapHandler={zapHandler}
+                playHandler={playHandler}
+                toggleViewHandler={toggleViewHandler}
+                confirmZap={confirmZap}
+                commenterPublicKey={commenterPubKey}
+              />
+            </div>
+            {/* Player Border Lines & Cutouts */}
+            <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
+            <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
+            <div className="absolute bottom-0 left-0 h-4 w-2 bg-black"></div>
+            <div className="absolute bottom-0 right-0 h-4 w-2 bg-black"></div>
+            <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -bottom-2 -left-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
           </div>
-          {/* Player Border Lines & Cutouts */}
-          <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
-          <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
-          <div className="absolute bottom-0 left-0 h-4 w-2 bg-black"></div>
-          <div className="absolute bottom-0 right-0 h-4 w-2 bg-black"></div>
-          <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -bottom-2 -left-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
-        </div>
-      </form>
-    </FormProvider>
+        </form>
+      </FormProvider>
+      <Button className="self-start bg-white w-28 mx-auto mt-4" clickHandler={setThePubKey}>Login</Button>
+    </>
   );
 };
 
