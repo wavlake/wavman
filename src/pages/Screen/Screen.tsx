@@ -3,17 +3,19 @@ import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
 import OnScreenActions from "./OnScreenActions";
 import QRScreen from "./QRScreen";
-import ZapScreen from "./ZapScreen";
+import ZapAmountScreen from "./ZapAmountScreen";
 import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
   QR_VIEW,
   SPLASH_VIEW,
-  ZAP_VIEW,
+  ZAP_AMOUNT_VIEW,
+  ZAP_COMMENT_VIEW,
 } from "@/lib/shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
+import ZapCommentScreen from "./ZapCommentScreen";
 
 const Screen: React.FC<{
   isPlaying: boolean;
@@ -44,7 +46,8 @@ const Screen: React.FC<{
         return "bg-wavgreen";
       case COMMENTS_VIEW:
       case QR_VIEW:
-      case ZAP_VIEW:
+      case ZAP_AMOUNT_VIEW:
+      case ZAP_COMMENT_VIEW:
         return "bg-wavpurple";
       case SPLASH_VIEW:
       default:
@@ -97,11 +100,14 @@ const Screen: React.FC<{
                     );
                   case QR_VIEW:
                     return <QRScreen paymentRequest={paymentRequest} />;
-                  case ZAP_VIEW:
+                  case ZAP_COMMENT_VIEW:
                     return (
-                      <ZapScreen
+                      <ZapCommentScreen />
+                    );  
+                  case ZAP_AMOUNT_VIEW:
+                    return (
+                      <ZapAmountScreen
                         zapError={zapError}
-                        commenterPubKey={commenterPubKey}
                       />
                     );
                   case SPLASH_VIEW:

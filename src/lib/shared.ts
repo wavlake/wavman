@@ -3,13 +3,15 @@ import { Dispatch, SetStateAction } from "react";
 export const COMMENTS_VIEW = "comments";
 export const PLAYER_VIEW = "player";
 export const QR_VIEW = "qr_code";
-export const ZAP_VIEW = "zap";
+export const ZAP_AMOUNT_VIEW = "zap_amount";
+export const ZAP_COMMENT_VIEW = "zap_comment";
 export const SPLASH_VIEW = "splash";
 export type PageView =
   | typeof COMMENTS_VIEW
   | typeof PLAYER_VIEW
   | typeof QR_VIEW
-  | typeof ZAP_VIEW
+  | typeof ZAP_AMOUNT_VIEW
+  | typeof ZAP_COMMENT_VIEW
   | typeof SPLASH_VIEW;
 export type Actions =
   | "PLAY"
@@ -18,7 +20,8 @@ export type Actions =
   | "NEXT"
   | ">"
   | "<"
-  | "CONFIRM"
+  | "CONFIRM_COMMENT"
+  | "CONFIRM_AMOUNT"
   | "COMMENTS";
 type ToggleViewHandler = (pageView: PageView) => void;
 export type ActionHandler = () => void | ToggleViewHandler;
@@ -27,15 +30,17 @@ export type ActionHandler = () => void | ToggleViewHandler;
 // (not an issue now due to same action count)
 const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
 const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
-const zapViewActions: Actions[] = ["<", "CONFIRM"];
-const qrViewActions: Actions[] = ["<", "COMMENTS"];
+const zapAmountViewActions: Actions[] = ["<", "CONFIRM_AMOUNT"];
+const zapCommentViewActions: Actions[] = ["<", "CONFIRM_COMMENT"];
+const qrViewActions: Actions[] = ["<"];
 const splashViewActions: Actions[] = [];
 type PageViewActionMap = Record<PageView, Actions[]>;
 export const pageViewActionMap: PageViewActionMap = {
   [PLAYER_VIEW]: pageViewActions,
   [COMMENTS_VIEW]: commentViewActions,
   [QR_VIEW]: qrViewActions,
-  [ZAP_VIEW]: zapViewActions,
+  [ZAP_AMOUNT_VIEW]: zapAmountViewActions,
+  [ZAP_COMMENT_VIEW]: zapCommentViewActions,
   [SPLASH_VIEW]: splashViewActions,
 };
 // need to implement this based on the available actions
@@ -46,7 +51,8 @@ const pageViewStartIndexMap: Record<PageView, number> = {
   [PLAYER_VIEW]: 0,
   [COMMENTS_VIEW]: 0,
   [QR_VIEW]: 0,
-  [ZAP_VIEW]: 0,
+  [ZAP_AMOUNT_VIEW]: 0,
+  [ZAP_COMMENT_VIEW]: 0,
   [SPLASH_VIEW]: 0,
 };
 

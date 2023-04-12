@@ -4,7 +4,8 @@ import {
   resetSelectionOnPageChange,
   SPLASH_VIEW,
   QR_VIEW,
-  ZAP_VIEW,
+  ZAP_AMOUNT_VIEW,
+  ZAP_COMMENT_VIEW,
   coerceEnvVarToBool,
 } from "../lib/shared";
 import Logo from "./Logo";
@@ -101,7 +102,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const zapHandler = async () => {
     setZapError("");
-    setPageViewAndResetSelectedAction(ZAP_VIEW);
+    setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
   };
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -141,11 +142,18 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
 
-  const setThePubKey = () => {
+  const setUserPubKey = () => {
     window.nostr?.getPublicKey?.().then((pubKey) => setCommenterPubKey(pubKey)).catch((e: string) => console.log(e));
   };
 
-  const confirmZap = async () => {
+  const confirmZapAmount = () => {
+    setPageViewAndResetSelectedAction(ZAP_COMMENT_VIEW);
+  }
+  const confirmZapComment = async () => {
+    processZap();
+  };
+
+  const processZap = async () => {
     setPageViewAndResetSelectedAction(QR_VIEW);
 
     if (!nowPlayingTrack) {
@@ -160,7 +168,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     });
     if (!invoice) {
       console.log("Error retrieving invoice");
-      setPageViewAndResetSelectedAction(ZAP_VIEW);
+      setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
       return;
     }
     const { enabled } = await window.webln?.enable() || {};
@@ -177,7 +185,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       setpaymentRequest(invoice);
     }
   };
-  const [isPressed, setIsPressed] = useState<boolean>(false);
 
   return (
     // Page Container
@@ -207,7 +214,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
                 zapHandler={zapHandler}
                 playHandler={playHandler}
                 toggleViewHandler={toggleViewHandler}
-                confirmZap={confirmZap}
+                confirmZapAmount={confirmZapAmount}
+                confirmZapComment={confirmZapComment}
                 commenterPublicKey={commenterPubKey}
               />
             </div>
@@ -223,7 +231,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           </div>
         </form>
       </FormProvider>
-      <Button className="self-start bg-white w-28 mx-auto mt-4" clickHandler={setThePubKey}>Login</Button>
+      <Button className="self-start bg-white w-28 mx-auto mt-4" clickHandler={setUserPubKey}>Login</Button>
     </>
   );
 };
