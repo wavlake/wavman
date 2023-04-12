@@ -24,7 +24,13 @@ const OnScreenActions: React.FC<{
   isCenterButtonPressed: boolean;
   isPlaying: boolean;
   commenterPubKey?: string;
-}> = ({ selectedActionIndex, currentPage, isCenterButtonPressed, isPlaying, commenterPubKey }) => {
+}> = ({
+  selectedActionIndex,
+  currentPage,
+  isCenterButtonPressed,
+  isPlaying,
+  commenterPubKey,
+}) => {
   // can use this to animate the current selection while center button is pressed
   // console.log({isCenterButtonPressed})
 

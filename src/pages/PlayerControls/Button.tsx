@@ -14,20 +14,20 @@ const Button: React.FC<
     <button
       type="button"
       className={`${className} h-full w-full ${
-        (isPressed || isPressedFallback) ? "-translate-x-1 translate-y-1" : ""
+        isPressed || isPressedFallback ? "-translate-x-1 translate-y-1" : ""
       }`}
       onClick={clickHandler}
       onMouseDown={() => {
-        setIsPressed?.(true)
-        setIsPressedFallback(true)
+        setIsPressed?.(true);
+        setIsPressedFallback(true);
       }}
       onMouseUp={() => {
-        setIsPressed?.(false)
-        setIsPressedFallback(false)
+        setIsPressed?.(false);
+        setIsPressedFallback(false);
       }}
       onMouseLeave={() => {
-        setIsPressed?.(false)
-        setIsPressedFallback(false)
+        setIsPressed?.(false);
+        setIsPressedFallback(false);
       }}
       onTouchStart={() => {
         setIsPressed?.(true);
