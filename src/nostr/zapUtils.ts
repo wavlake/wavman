@@ -48,39 +48,36 @@ export const signZapEventNip07 = async ({
   zappedEvent: Event;
   pubkey: string;
 }): Promise<Event> => {
-  try {
-    const unsignedEvent: UnsignedEvent = {
-      kind: 9734,
-      content,
-      pubkey,
-      created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ["relays", "wss://relay.wavlake.com/"],
-        ["amount", amount.toString()],
-        ["lnurl", lnurl],
-        ["p", recepientPubKey],
-        ["e", zappedEvent.id],
-      ],
-    };
+  const unsignedEvent: UnsignedEvent = {
+    kind: 9734,
+    content,
+    pubkey,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [
+      ["relays", "wss://relay.wavlake.com/"],
+      ["amount", amount.toString()],
+      ["lnurl", lnurl],
+      ["p", recepientPubKey],
+      ["e", zappedEvent.id],
+    ],
+  };
 
-    const signedEvent: Event | undefined = await window.nostr?.signEvent?.(
+  try {
+    const signedEvent = await window.nostr?.signEvent?.(
       unsignedEvent
     );
-    if (!signedEvent) {
-      // fallback and return an anon zap
-      // should this move to the catch block?
-      return signAnonZapEvent({
-        content,
-        amount,
-        lnurl,
-        recepientPubKey,
-        zappedEvent,
-      });
-    }
     return signedEvent;
-  } catch (err) {
-    console.error({ err, lnurl, zappedEvent });
-    throw "Error signing event with NIP-07";
+  } catch {
+    console.log("Unable to sign event with NIP-07 extension, falling back to an anon zap");
+    // if user rejects prompt, fallback to anon
+    const signedEvent = signAnonZapEvent({
+      content,
+      amount,
+      lnurl,
+      recepientPubKey,
+      zappedEvent,
+    });
+    return signedEvent;
   }
 };
 

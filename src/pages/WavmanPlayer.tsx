@@ -196,6 +196,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   const processZap = async () => {
+    setpaymentRequest("");
     setPageViewAndResetSelectedAction(QR_VIEW);
 
     if (!kind1NowPlaying) {
