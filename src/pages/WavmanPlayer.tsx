@@ -7,6 +7,7 @@ import {
   ZAP_AMOUNT_VIEW,
   ZAP_COMMENT_VIEW,
   coerceEnvVarToBool,
+  COMMENTS_VIEW,
 } from "../lib/shared";
 import Logo from "./Logo";
 import Button from "./PlayerControls/Button";
@@ -86,7 +87,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   // ZapReceipt Listener
   const skipZapReceipts = !kind1NowPlaying?.id
-  const { allEvents: zapReceipts, loading: zapReceiptsLoading } =
+  const { allEvents: zapReceipts, lastEvent: lastZapReceipt, loading: zapReceiptsLoading } =
     useEventSubscription([
       { kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ''] },
     ], skipZapReceipts);
@@ -201,21 +202,23 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
         return;
       }
-      const { enabled } = await window.webln?.enable() || {};
-      if (enabled) {
-        // use webLN to pay
-        try {
-          await window.webln?.sendPayment(invoice);
-        } catch (e) {
-          // failed to pay invoice, present QR code
-          setpaymentRequest(invoice);
-        }
-      } else {
-        // webLN not available? present QR code
-        setpaymentRequest(invoice);
+      setpaymentRequest(invoice);
+      try {
+        await window.webln?.sendPayment(invoice);
+      } catch (e) {
+        console.log("Error paying via webln:", e);
       }
     }
   };
+
+  useEffect(() => {
+    const [bolt11, lastPaymentRequest] = lastZapReceipt?.tags.find(([tagName]) => tagName === "bolt11") || [];
+    // If user is on the QR_VIEW and a zap receipt is received for the current payment request
+    if (currentPage === QR_VIEW && paymentRequest === lastPaymentRequest) {
+      setPageViewAndResetSelectedAction(COMMENTS_VIEW);
+    }
+  }, [lastZapReceipt, paymentRequest]);
+
   const [nowPlayingTrackContent] = kind32123NowPlaying || [];
   return (
     // Page Container
