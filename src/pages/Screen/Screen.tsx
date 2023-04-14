@@ -60,7 +60,7 @@ const Screen: React.FC<{
   return (
     <div className="relative mx-4 my-4 border-8 border-black p-2">
       <div
-        className={`flex h-56 w-56 flex-col place-content-between ${getScreenColor()}`}
+        className={`flex h-56 w-72 flex-col place-content-between ${getScreenColor()}`}
       >
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         {(() => {

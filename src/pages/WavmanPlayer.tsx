@@ -46,7 +46,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
-  const wavlakePubKey = "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58"
+  const wavlakePubKey =
+    "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58";
   // Get a batch of kind 1 events
   const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
     {
@@ -70,40 +71,48 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
 
   // 32123 event listener
-  const [tagName, kind1ATag] = kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
+  const [tagName, kind1ATag] =
+    kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
   const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
   const skipKind32123 = !kind32123DTag;
   // get the kind 1's replaceable 32123 event
-  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } = useListEvents([
-    {
-      kinds: [32123],
-      ["#d"]: [kind32123DTag],
-      limit: 40,
-    },
-  ], skipKind32123);
+  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
+    useListEvents(
+      [
+        {
+          kinds: [32123],
+          ["#d"]: [kind32123DTag],
+          limit: 40,
+        },
+      ],
+      skipKind32123
+    );
 
   const [paymentRequest, setpaymentRequest] = useState("");
 
   // ZapReceipt Listener
-  const skipZapReceipts = !kind1NowPlaying?.id
+  const skipZapReceipts = !kind1NowPlaying?.id;
   const { allEvents: zapReceipts, loading: zapReceiptsLoading } =
-    useEventSubscription([
-      { kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ''] },
-    ], skipZapReceipts);
+    useEventSubscription(
+      [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
+      skipZapReceipts
+    );
 
   // Get track comments, skip till a track is ready
   const skipComments = !kind1NowPlaying;
   const { allEvents: comments, loading: commentsLoading } =
-  useEventSubscription(
-    [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
-    skipComments
+    useEventSubscription(
+      [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
+      skipComments
     );
 
   ///////// UI /////////
   const pickRandomTrack = (kind1Tracks: Event[]) => {
     setKind1NowPlaying(kind1Tracks[trackIndex]);
     if (randomTrackFeatureFlag) {
-      setKind1NowPlaying(kind1Tracks[Math.floor(Math.random() * kind1Tracks.length)]);
+      setKind1NowPlaying(
+        kind1Tracks[Math.floor(Math.random() * kind1Tracks.length)]
+      );
     } else {
       setTrackIndex(trackIndex + 1);
     }
@@ -201,7 +210,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
         return;
       }
-      const { enabled } = await window.webln?.enable() || {};
+      const { enabled } = (await window.webln?.enable()) || {};
       if (enabled) {
         // use webLN to pay
         try {
@@ -222,36 +231,34 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     <>
       <FormProvider {...methods}>
         <form>
-          <div className="relative mt-4 grid h-max w-80 border-8 border-black bg-wavgray">
-            <div className="mx-auto max-w-xs">
-              <Screen
-                zapError={zapError}
-                nowPlayingTrackContent={nowPlayingTrackContent}
-                isPlaying={isPlaying}
-                commentsLoading={commentsLoading}
-                comments={zapReceipts || []}
-                currentPage={currentPage}
-                paymentRequest={paymentRequest}
-                selectedActionIndex={selectedActionIndex}
-                commenterPubKey={commenterPubKey}
-                skipHandler={skipHandler}
-                isCenterButtonPressed={centerButtonPressedState[0] || false}
-              />
-              <Logo />
-              <PlayerControls
-                currentPage={currentPage}
-                selectedActionIndex={selectedActionIndex}
-                setSelectedActionIndex={setSelectedActionIndex}
-                skipHandler={skipHandler}
-                zapHandler={zapHandler}
-                playHandler={playHandler}
-                toggleViewHandler={toggleViewHandler}
-                confirmZapAmount={confirmZapAmount}
-                confirmZapComment={confirmZapComment}
-                centerButtonPressedState={centerButtonPressedState}
-                commenterPublicKey={commenterPubKey}
-              />
-            </div>
+          <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray">
+            <Screen
+              zapError={zapError}
+              nowPlayingTrackContent={nowPlayingTrackContent}
+              isPlaying={isPlaying}
+              commentsLoading={commentsLoading}
+              comments={zapReceipts || []}
+              currentPage={currentPage}
+              paymentRequest={paymentRequest}
+              selectedActionIndex={selectedActionIndex}
+              commenterPubKey={commenterPubKey}
+              skipHandler={skipHandler}
+              isCenterButtonPressed={centerButtonPressedState[0] || false}
+            />
+            <Logo />
+            <PlayerControls
+              currentPage={currentPage}
+              selectedActionIndex={selectedActionIndex}
+              setSelectedActionIndex={setSelectedActionIndex}
+              skipHandler={skipHandler}
+              zapHandler={zapHandler}
+              playHandler={playHandler}
+              toggleViewHandler={toggleViewHandler}
+              confirmZapAmount={confirmZapAmount}
+              confirmZapComment={confirmZapComment}
+              centerButtonPressedState={centerButtonPressedState}
+              commenterPublicKey={commenterPubKey}
+            />
             {/* Player Border Lines & Cutouts */}
             <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
             <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
