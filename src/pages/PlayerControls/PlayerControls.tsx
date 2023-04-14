@@ -4,10 +4,10 @@ import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
-  getFilteredPageActions,
+  getPageActions,
 } from "../../lib/shared";
 import DPad from "./DPad";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 const PlayerControls: React.FC<{
   currentPage: PageView;
@@ -16,8 +16,10 @@ const PlayerControls: React.FC<{
   playHandler: () => void;
   skipHandler: () => void;
   zapHandler: () => void;
-  confirmZap: () => void;
+  confirmZapAmount: () => void;
+  confirmZapComment: () => void;
   toggleViewHandler: (currentPage: PageView) => void;
+  centerButtonPressedState: ReturnType<typeof useState<boolean>>;
   commenterPublicKey?: string;
 }> = ({
   currentPage,
@@ -27,7 +29,9 @@ const PlayerControls: React.FC<{
   skipHandler,
   zapHandler,
   toggleViewHandler,
-  confirmZap,
+  confirmZapAmount,
+  confirmZapComment,
+  centerButtonPressedState,
   commenterPublicKey,
 }) => {
   const actionHandlerMap: Record<Actions, ActionHandler> = {
@@ -37,17 +41,14 @@ const PlayerControls: React.FC<{
     NEXT: skipHandler,
     ">": () => toggleViewHandler(COMMENTS_VIEW),
     "<": () => toggleViewHandler(PLAYER_VIEW),
-    CONFIRM: confirmZap,
+    CONFIRM_AMOUNT: confirmZapAmount,
+    CONFIRM_COMMENT: confirmZapComment,
     COMMENTS: () => toggleViewHandler(COMMENTS_VIEW),
     // ON: () => toggleViewHandler(PLAYER_VIEW),
     // OFF: () => toggleViewHandler(OFF_VIEW),
   };
 
-  const filteredActions = getFilteredPageActions(
-    currentPage,
-    "ZAP",
-    commenterPublicKey
-  );
+  const filteredActions = getPageActions(currentPage);
 
   const calcMoveIndexRight = (index: number) =>
     index + 1 >= filteredActions.length ? index : index + 1;
@@ -82,6 +83,7 @@ const PlayerControls: React.FC<{
         centerHandler={centerHandler}
         rightHandler={rightHandler}
         downHandler={downHandler}
+        centerButtonPressedState={centerButtonPressedState}
       />
       {/* Controls Border Cutouts */}
       <div className="absolute -left-2 -top-2 h-2 w-2 bg-wavgray"></div>

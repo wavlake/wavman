@@ -1,8 +1,4 @@
-import {
-  getFilteredPageActions,
-  PageView,
-  PLAYER_VIEW,
-} from "../../lib/shared";
+import { getPageActions, PageView, PLAYER_VIEW } from "../../lib/shared";
 
 const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {
@@ -25,15 +21,25 @@ const Action: React.FC<{
 const OnScreenActions: React.FC<{
   selectedActionIndex: number;
   currentPage: PageView;
+  isCenterButtonPressed: boolean;
+  isPlaying: boolean;
   commenterPubKey?: string;
-}> = ({ selectedActionIndex, currentPage, commenterPubKey }) => {
-  const filteredActions =
-    getFilteredPageActions(currentPage, "ZAP", commenterPubKey) || [];
+}> = ({
+  selectedActionIndex,
+  currentPage,
+  isCenterButtonPressed,
+  isPlaying,
+  commenterPubKey,
+}) => {
+  // can use this to animate the current selection while center button is pressed
+  // console.log({isCenterButtonPressed})
+
+  const filteredActions = getPageActions(currentPage);
   return (
     <div className="mx-auto mb-2 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
         <Action
-          action={action}
+          action={action === "PLAY" ? (isPlaying ? "PAUSE" : "PLAY") : action}
           key={action}
           selected={selectedActionIndex === index}
           currentPage={currentPage}

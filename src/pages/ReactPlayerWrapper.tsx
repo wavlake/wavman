@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import ReactPlayer from "react-player";
+import ReactPlayer, { ReactPlayerProps } from "react-player";
 
-const ReactPlayerWrapper: React.FC<{
-  isPlaying: boolean;
-  url: string;
-}> = ({ isPlaying, url }) => {
+const ReactPlayerWrapper: React.FC<
+  {
+    isPlaying: boolean;
+    url: string;
+  } & ReactPlayerProps
+> = ({ isPlaying, url, ...props }) => {
   const [hasWindow, setHasWindow] = useState(false);
   useEffect(() => {
     if (typeof window != "undefined") {
@@ -21,6 +23,7 @@ const ReactPlayerWrapper: React.FC<{
           playing={isPlaying}
           height="0"
           width="0"
+          {...props}
         />
       )}
     </>
