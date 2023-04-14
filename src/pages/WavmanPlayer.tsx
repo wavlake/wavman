@@ -92,11 +92,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [paymentRequest, setpaymentRequest] = useState("");
 
   // ZapReceipt Listener
-  const skipZapReceipts = !kind1NowPlaying?.id
-  const { allEvents: zapReceipts, lastEvent: lastZapReceipt, loading: zapReceiptsLoading } =
-    useEventSubscription([
-      { kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ''] },
-    ], skipZapReceipts);
+  const skipZapReceipts = !kind1NowPlaying?.id;
+  const {
+    allEvents: zapReceipts,
+    lastEvent: lastZapReceipt,
+    loading: zapReceiptsLoading,
+  } = useEventSubscription(
+    [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
+    skipZapReceipts
+  );
 
   // Get track comments, skip till a track is ready
   const skipComments = !kind1NowPlaying;
@@ -220,7 +224,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   useEffect(() => {
-    const [bolt11, lastPaymentRequest] = lastZapReceipt?.tags.find(([tagName]) => tagName === "bolt11") || [];
+    const [bolt11, lastPaymentRequest] =
+      lastZapReceipt?.tags.find(([tagName]) => tagName === "bolt11") || [];
     // If user is on the QR_VIEW and a zap receipt is received for the current payment request
     if (currentPage === QR_VIEW && paymentRequest === lastPaymentRequest) {
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);

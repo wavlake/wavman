@@ -133,7 +133,7 @@ export const publishCommentEvent = async ({
   publishEvent: (event: Event) => void;
 }) => {
   try {
-    const commenterPubKey = await window.nostr?.getPublicKey() || "";
+    const commenterPubKey = (await window.nostr?.getPublicKey()) || "";
     const unsigned: UnsignedEvent = {
       kind: 1,
       content,
