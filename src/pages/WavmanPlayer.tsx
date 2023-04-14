@@ -27,6 +27,8 @@ export interface Form {
 const randomTrackFeatureFlag = coerceEnvVarToBool(
   process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
 );
+const trackPubKey = process.env.NEXT_PUBLIC_TRACK_EVENT_PUBKEY || "";
+
 const randomSHA256String = (length: number) => {
   const alphanumericString = Array.from(Array(length + 30), () =>
     Math.floor(Math.random() * 36).toString(36)
@@ -47,14 +49,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
-  const wavlakePubKey =
-    "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58";
   // Get a batch of kind 1 events
   const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
     {
       kinds: [1],
       ...(randomTrackFeatureFlag ? { ["#f"]: randomChars } : {}),
-      ["#p"]: [wavlakePubKey],
+      ["#p"]: [trackPubKey],
       limit: 40,
     },
   ]);
@@ -205,12 +205,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     if (!isFormValid()) return;
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
-        kind1NowPlaying,
+        nowPlayingTrack: kind1NowPlaying,
         satAmount,
         content,
       });
       if (!invoice) {
-        console.log("Error retrieving invoice");
         setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
         return;
       }
