@@ -3,14 +3,16 @@ import CommentsScreen from "./CommentsScreen";
 import NowPlayingScreen from "./NowPlayingScreen";
 import OnScreenActions from "./OnScreenActions";
 import QRScreen from "./QRScreen";
-import ZapScreen from "./ZapScreen";
+import ZapAmountScreen from "./ZapAmountScreen";
+import ZapCommentScreen from "./ZapCommentScreen";
 import {
   COMMENTS_VIEW,
   PageView,
   PLAYER_VIEW,
   QR_VIEW,
   SPLASH_VIEW,
-  ZAP_VIEW,
+  ZAP_AMOUNT_VIEW,
+  ZAP_COMMENT_VIEW,
 } from "@/lib/shared";
 import { WavlakeEventContent } from "@/nostr";
 import { Event } from "nostr-tools";
@@ -23,7 +25,9 @@ const Screen: React.FC<{
   selectedActionIndex: number;
   paymentRequest: string;
   zapError: string;
-  nowPlayingTrack?: Event;
+  skipHandler: () => void;
+  isCenterButtonPressed: boolean;
+  nowPlayingTrackContent?: Event;
   commenterPubKey?: string;
 }> = ({
   isPlaying,
@@ -33,7 +37,9 @@ const Screen: React.FC<{
   selectedActionIndex,
   paymentRequest,
   zapError,
-  nowPlayingTrack,
+  skipHandler,
+  isCenterButtonPressed,
+  nowPlayingTrackContent,
   commenterPubKey,
 }) => {
   const getScreenColor = () => {
@@ -42,7 +48,8 @@ const Screen: React.FC<{
         return "bg-wavgreen";
       case COMMENTS_VIEW:
       case QR_VIEW:
-      case ZAP_VIEW:
+      case ZAP_AMOUNT_VIEW:
+      case ZAP_COMMENT_VIEW:
         return "bg-wavpurple";
       case SPLASH_VIEW:
       default:
@@ -57,7 +64,7 @@ const Screen: React.FC<{
       >
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         {(() => {
-          if (!nowPlayingTrack)
+          if (!nowPlayingTrackContent)
             return (
               <div>
                 <img
@@ -67,7 +74,7 @@ const Screen: React.FC<{
               </div>
             );
           const trackContent: WavlakeEventContent = JSON.parse(
-            nowPlayingTrack?.content
+            nowPlayingTrackContent?.content
           );
 
           return (
@@ -75,6 +82,7 @@ const Screen: React.FC<{
               <ReactPlayerWrapper
                 url={trackContent.enclosure}
                 isPlaying={isPlaying}
+                onEnded={skipHandler}
               />
               {(() => {
                 switch (currentPage) {
@@ -94,13 +102,10 @@ const Screen: React.FC<{
                     );
                   case QR_VIEW:
                     return <QRScreen paymentRequest={paymentRequest} />;
-                  case ZAP_VIEW:
-                    return (
-                      <ZapScreen
-                        zapError={zapError}
-                        commenterPubKey={commenterPubKey}
-                      />
-                    );
+                  case ZAP_COMMENT_VIEW:
+                    return <ZapCommentScreen />;
+                  case ZAP_AMOUNT_VIEW:
+                    return <ZapAmountScreen zapError={zapError} />;
                   case SPLASH_VIEW:
                     return <>splash</>;
                   default:
@@ -111,6 +116,8 @@ const Screen: React.FC<{
                 selectedActionIndex={selectedActionIndex}
                 currentPage={currentPage}
                 commenterPubKey={commenterPubKey}
+                isCenterButtonPressed={isCenterButtonPressed}
+                isPlaying={isPlaying}
               />
             </>
           );

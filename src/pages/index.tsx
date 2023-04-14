@@ -14,10 +14,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <link href="/output.css" rel="stylesheet" />
       </Head>
-      <main className="grid h-screen bg-wavpink">
-        <RelayProvider url={relayUrl}>
-          <WavmanPlayer />
-        </RelayProvider>
+      <main className="h-screen bg-wavpink">
+        <div className="grid justify-center">
+          <RelayProvider url={relayUrl}>
+            <WavmanPlayer />
+          </RelayProvider>
+        </div>
       </main>
     </>
   );

@@ -4,13 +4,16 @@ import {
   resetSelectionOnPageChange,
   SPLASH_VIEW,
   QR_VIEW,
-  ZAP_VIEW,
+  ZAP_AMOUNT_VIEW,
+  ZAP_COMMENT_VIEW,
+  coerceEnvVarToBool,
 } from "../lib/shared";
 import Logo from "./Logo";
+import Button from "./PlayerControls/Button";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
 import { useRelay } from "@/nostr";
-import { getInvoice, publishCommentEvent } from "@/nostr/zapLogic";
+import { getInvoice } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -20,6 +23,9 @@ export interface Form {
   satAmount: number;
 }
 
+const randomTrackFeatureFlag = coerceEnvVarToBool(
+  process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
+);
 const randomSHA256String = (length: number) => {
   const alphanumericString = Array.from(Array(length + 30), () =>
     Math.floor(Math.random() * 36).toString(36)
@@ -31,19 +37,26 @@ const randomSHA256String = (length: number) => {
 const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
-  const [randomChar, setRandomChar] = useState<string[]>(
+  const [randomChars, setRandomChars] = useState<string[]>(
     Array.from(randomSHA256String(30))
   );
 
   ///////// NOSTR /////////
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
 
-  // Get a batch of tracks
-  const { data: tracks, loading: tracksLoading } = useListEvents([
-    { kinds: [32123], ["#f"]: randomChar },
+  // this should be switched to querying for a tags, but a tag values are different for each track
+  // add a new tag to the track to make it easier to query for?
+  const wavlakePubKey = "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58"
+  // Get a batch of kind 1 events
+  const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
+    {
+      kinds: [1],
+      ...(randomTrackFeatureFlag ? { ["#f"]: randomChars } : {}),
+      ["#p"]: [wavlakePubKey],
+      limit: 40,
+    },
   ]);
-
-  // Post a comment mutation
+  // Post a comment mutation (not used at the moment)
   const [
     publishEvent,
     {
@@ -54,28 +67,46 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   ] = usePublishEvent();
   const [trackIndex, setTrackIndex] = useState(0);
 
-  const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+  const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
+
+  // 32123 event listener
+  const [tagName, kind1ATag] = kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
+  const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
+  const skipKind32123 = !kind32123DTag;
+  // get the kind 1's replaceable 32123 event
+  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } = useListEvents([
+    {
+      kinds: [32123],
+      ["#d"]: [kind32123DTag],
+      limit: 40,
+    },
+  ], skipKind32123);
+
   const [paymentRequest, setpaymentRequest] = useState("");
-  const shouldSkipPaymentReceipt = !paymentRequest;
+
   // ZapReceipt Listener
-  const { lastEvent: paymentReceipt, loading: paymentReceiptLoading } =
-    useEventSubscription(
-      [{ kinds: [9735], ["#bolt11"]: [paymentRequest] }],
-      shouldSkipPaymentReceipt
-    );
+  const skipZapReceipts = !kind1NowPlaying?.id
+  const { allEvents: zapReceipts, loading: zapReceiptsLoading } =
+    useEventSubscription([
+      { kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ''] },
+    ], skipZapReceipts);
+
   // Get track comments, skip till a track is ready
-  const shouldSkipComments = !nowPlayingTrack;
+  const skipComments = !kind1NowPlaying;
   const { allEvents: comments, loading: commentsLoading } =
-    useEventSubscription(
-      [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
-      shouldSkipComments
+  useEventSubscription(
+    [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
+    skipComments
     );
 
   ///////// UI /////////
-  const pickRandomTrack = (tracks: Event[]) => {
-    setNowPlayingTrack(tracks[trackIndex]);
-    setTrackIndex(trackIndex + 1);
-    // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
+  const pickRandomTrack = (kind1Tracks: Event[]) => {
+    setKind1NowPlaying(kind1Tracks[trackIndex]);
+    if (randomTrackFeatureFlag) {
+      setKind1NowPlaying(kind1Tracks[Math.floor(Math.random() * kind1Tracks.length)]);
+    } else {
+      setTrackIndex(trackIndex + 1);
+    }
   };
   const turnOnPlayer = () => {
     setCurrentPage(PLAYER_VIEW);
@@ -84,19 +115,19 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // The player currently auto turns on when tracks are loaded
   // Tracks load automatically when the page loads
   useEffect(() => {
-    if (tracks?.length) {
-      pickRandomTrack(tracks);
+    if (kind1Tracks?.length) {
+      pickRandomTrack(kind1Tracks);
       turnOnPlayer();
     }
-  }, [tracks]);
+  }, [kind1Tracks]);
 
   const skipHandler = () => {
-    if (tracks?.length) pickRandomTrack(tracks);
+    if (kind1Tracks?.length) pickRandomTrack(kind1Tracks);
   };
 
   const zapHandler = async () => {
     setZapError("");
-    setPageViewAndResetSelectedAction(ZAP_VIEW);
+    setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
   };
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -124,9 +155,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const satAmount = methods.watch("satAmount");
 
   const [zapError, setZapError] = useState("");
+  const centerButtonPressedState = useState<boolean | undefined>(false);
   const isFormValid = (): boolean => {
-    const zapScreenError = "Do at least one, please";
-    if (!satAmount && !content) {
+    const zapScreenError = "Must zap more than zero sats";
+    if (!satAmount || satAmount <= 0) {
       setZapError(zapScreenError);
       return false;
     } else {
@@ -136,39 +168,37 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
 
-  const setThePubKey = () => {
-    window.nostr?.getPublicKey().then((pubKey) => setCommenterPubKey(pubKey));
+  const setUserPubKey = () => {
+    window.nostr
+      ?.getPublicKey?.()
+      .then((pubKey) => setCommenterPubKey(pubKey))
+      .catch((e: string) => console.log(e));
   };
-  useEffect(() => {
-    setThePubKey();
-  }, [setCommenterPubKey]);
 
-  const confirmZap = async () => {
+  const confirmZapAmount = () => {
+    setPageViewAndResetSelectedAction(ZAP_COMMENT_VIEW);
+  };
+  const confirmZapComment = async () => {
+    processZap();
+  };
+
+  const processZap = async () => {
     setPageViewAndResetSelectedAction(QR_VIEW);
 
-    if (!nowPlayingTrack) {
+    if (!kind1NowPlaying) {
       console.log("No track is playing");
       return;
     }
     if (!isFormValid()) return;
-
-    if (content) {
-      // publish kind 1 event comment, aka a reply
-      publishCommentEvent({
-        content,
-        nowPlayingTrack,
-        publishEvent,
-      });
-    }
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
-        nowPlayingTrack,
+        kind1NowPlaying,
         satAmount,
         content,
       });
       if (!invoice) {
         console.log("Error retrieving invoice");
-        setPageViewAndResetSelectedAction(ZAP_VIEW);
+        setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
         return;
       }
       const { enabled } = await window.webln?.enable() || {};
@@ -186,49 +216,61 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       }
     }
   };
-
+  const [nowPlayingTrackContent] = kind32123NowPlaying || [];
   return (
     // Page Container
-    <FormProvider {...methods}>
-      <form>
-        <div className="h-128 relative mx-auto mt-4 grid w-80 border-8 border-black bg-wavgray">
-          <div className="mx-auto max-w-xs">
-            <Screen
-              zapError={zapError}
-              nowPlayingTrack={nowPlayingTrack}
-              isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
-              comments={comments || []}
-              currentPage={currentPage}
-              paymentRequest={paymentRequest}
-              selectedActionIndex={selectedActionIndex}
-              commenterPubKey={commenterPubKey}
-            />
-            <Logo />
-            <PlayerControls
-              currentPage={currentPage}
-              selectedActionIndex={selectedActionIndex}
-              setSelectedActionIndex={setSelectedActionIndex}
-              skipHandler={skipHandler}
-              zapHandler={zapHandler}
-              playHandler={playHandler}
-              toggleViewHandler={toggleViewHandler}
-              confirmZap={confirmZap}
-              commenterPublicKey={commenterPubKey}
-            />
+    <>
+      <FormProvider {...methods}>
+        <form>
+          <div className="relative mt-4 grid h-max w-80 border-8 border-black bg-wavgray">
+            <div className="mx-auto max-w-xs">
+              <Screen
+                zapError={zapError}
+                nowPlayingTrackContent={nowPlayingTrackContent}
+                isPlaying={isPlaying}
+                commentsLoading={commentsLoading}
+                comments={zapReceipts || []}
+                currentPage={currentPage}
+                paymentRequest={paymentRequest}
+                selectedActionIndex={selectedActionIndex}
+                commenterPubKey={commenterPubKey}
+                skipHandler={skipHandler}
+                isCenterButtonPressed={centerButtonPressedState[0] || false}
+              />
+              <Logo />
+              <PlayerControls
+                currentPage={currentPage}
+                selectedActionIndex={selectedActionIndex}
+                setSelectedActionIndex={setSelectedActionIndex}
+                skipHandler={skipHandler}
+                zapHandler={zapHandler}
+                playHandler={playHandler}
+                toggleViewHandler={toggleViewHandler}
+                confirmZapAmount={confirmZapAmount}
+                confirmZapComment={confirmZapComment}
+                centerButtonPressedState={centerButtonPressedState}
+                commenterPublicKey={commenterPubKey}
+              />
+            </div>
+            {/* Player Border Lines & Cutouts */}
+            <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
+            <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
+            <div className="absolute bottom-0 left-0 h-4 w-2 bg-black"></div>
+            <div className="absolute bottom-0 right-0 h-4 w-2 bg-black"></div>
+            <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -bottom-2 -left-2 h-6 w-2 bg-wavpink"></div>
+            <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
           </div>
-          {/* Player Border Lines & Cutouts */}
-          <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
-          <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>
-          <div className="absolute bottom-0 left-0 h-4 w-2 bg-black"></div>
-          <div className="absolute bottom-0 right-0 h-4 w-2 bg-black"></div>
-          <div className="absolute -left-2 -top-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -right-2 -top-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -bottom-2 -left-2 h-6 w-2 bg-wavpink"></div>
-          <div className="absolute -bottom-2 -right-2 h-6 w-2 bg-wavpink"></div>
-        </div>
-      </form>
-    </FormProvider>
+        </form>
+      </FormProvider>
+      <Button
+        className="mx-auto mt-4 w-28 self-start bg-white"
+        clickHandler={setUserPubKey}
+      >
+        Login
+      </Button>
+    </>
   );
 };
 
