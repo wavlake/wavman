@@ -69,16 +69,16 @@ const signZapEvent = async ({
   }
 };
 export const getInvoice = async ({
-  nowPlayingTrack,
+  kind1NowPlaying,
   satAmount: amount,
   content,
 }: {
-  nowPlayingTrack: Event;
+  kind1NowPlaying: Event;
   satAmount: number;
   content: string;
 }): Promise<string | undefined> => {
   try {
-    const zapTag = nowPlayingTrack.tags.find((tag) => tag[0] === "zap");
+    const zapTag = kind1NowPlaying.tags.find((tag) => tag[0] === "zap");
     const lnurl = zapTag && generateLNURLFromZapTag(zapTag);
     if (!lnurl) {
       console.log(`failed to parse lnurl from event's zap tag`, { zapTag });
@@ -110,9 +110,8 @@ export const getInvoice = async ({
       amount: milliSatAmount,
       lnurl,
       recepientPubKey: nostrPubKey,
-      zappedEvent: nowPlayingTrack,
+      zappedEvent: kind1NowPlaying,
     });
-
     const event = encodeURI(JSON.stringify(zapEvent));
     const paymentRequestRes = await fetch(
       `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
@@ -120,7 +119,7 @@ export const getInvoice = async ({
     const { pr } = await paymentRequestRes.json();
     return pr;
   } catch (err) {
-    console.log("error getting invoice", { err, nowPlayingTrack });
+    console.log("error getting invoice", { err, kind1NowPlaying });
   }
 };
 

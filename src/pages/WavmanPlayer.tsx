@@ -43,16 +43,20 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   ///////// NOSTR /////////
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
-  // Get a batch of tracks
-  const { data: tracks, loading: tracksLoading } = useListEvents([
+
+  // this should be switched to querying for a tags, but a tag values are different for each track
+  // add a new tag to the track to make it easier to query for?
+  const wavlakePubKey = "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58"
+  // Get a batch of kind 1 events
+  const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
     {
-      kinds: [32123],
+      kinds: [1],
       ...(randomTrackFeatureFlag ? { ["#f"]: randomChars } : {}),
+      ["#p"]: [wavlakePubKey],
       limit: 40,
     },
   ]);
-
-  // Post a comment mutation
+  // Post a comment mutation (not used at the moment)
   const [
     publishEvent,
     {
@@ -63,27 +67,46 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   ] = usePublishEvent();
   const [trackIndex, setTrackIndex] = useState(0);
 
-  const [nowPlayingTrack, setNowPlayingTrack] = useState<Event>();
+  const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
+
+  // 32123 event listener
+  const [tagName, kind1ATag] = kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
+  const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
+  const skipKind32123 = !kind32123DTag;
+  // get the kind 1's replaceable 32123 event
+  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } = useListEvents([
+    {
+      kinds: [32123],
+      ["#d"]: [kind32123DTag],
+      limit: 40,
+    },
+  ], skipKind32123);
+
   const [paymentRequest, setpaymentRequest] = useState("");
-  const shouldSkipPaymentReceipt = !paymentRequest;
+
   // ZapReceipt Listener
+  const skipZapReceipts = !kind1NowPlaying?.id
   const { allEvents: zapReceipts, loading: zapReceiptsLoading } =
     useEventSubscription([
-      { kinds: [9735], ["#e"]: [nowPlayingTrack?.id || ""] },
-    ]);
+      { kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ''] },
+    ], skipZapReceipts);
+
   // Get track comments, skip till a track is ready
-  const shouldSkipComments = !nowPlayingTrack;
+  const skipComments = !kind1NowPlaying;
   const { allEvents: comments, loading: commentsLoading } =
-    useEventSubscription(
-      [{ ["#e"]: [nowPlayingTrack?.id || ""], limit: 20 }],
-      shouldSkipComments
+  useEventSubscription(
+    [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
+    skipComments
     );
 
   ///////// UI /////////
-  const pickRandomTrack = (tracks: Event[]) => {
-    setNowPlayingTrack(tracks[trackIndex]);
-    setTrackIndex(trackIndex + 1);
-    // setNowPlayingTrack(tracks[Math.floor(Math.random() * tracks.length)]);
+  const pickRandomTrack = (kind1Tracks: Event[]) => {
+    setKind1NowPlaying(kind1Tracks[trackIndex]);
+    if (randomTrackFeatureFlag) {
+      setKind1NowPlaying(kind1Tracks[Math.floor(Math.random() * kind1Tracks.length)]);
+    } else {
+      setTrackIndex(trackIndex + 1);
+    }
   };
   const turnOnPlayer = () => {
     setCurrentPage(PLAYER_VIEW);
@@ -92,14 +115,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // The player currently auto turns on when tracks are loaded
   // Tracks load automatically when the page loads
   useEffect(() => {
-    if (tracks?.length) {
-      pickRandomTrack(tracks);
+    if (kind1Tracks?.length) {
+      pickRandomTrack(kind1Tracks);
       turnOnPlayer();
     }
-  }, [tracks]);
+  }, [kind1Tracks]);
 
   const skipHandler = () => {
-    if (tracks?.length) pickRandomTrack(tracks);
+    if (kind1Tracks?.length) pickRandomTrack(kind1Tracks);
   };
 
   const zapHandler = async () => {
@@ -162,14 +185,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const processZap = async () => {
     setPageViewAndResetSelectedAction(QR_VIEW);
 
-    if (!nowPlayingTrack) {
+    if (!kind1NowPlaying) {
       console.log("No track is playing");
       return;
     }
     if (!isFormValid()) return;
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
-        nowPlayingTrack,
+        kind1NowPlaying,
         satAmount,
         content,
       });
@@ -193,7 +216,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       }
     }
   };
-
+  const [nowPlayingTrackContent] = kind32123NowPlaying || [];
   return (
     // Page Container
     <>
@@ -203,7 +226,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
             <div className="mx-auto max-w-xs">
               <Screen
                 zapError={zapError}
-                nowPlayingTrack={nowPlayingTrack}
+                nowPlayingTrackContent={nowPlayingTrackContent}
                 isPlaying={isPlaying}
                 commentsLoading={commentsLoading}
                 comments={zapReceipts || []}

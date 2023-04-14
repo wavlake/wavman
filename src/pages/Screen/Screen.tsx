@@ -27,7 +27,7 @@ const Screen: React.FC<{
   zapError: string;
   skipHandler: () => void;
   isCenterButtonPressed: boolean;
-  nowPlayingTrack?: Event;
+  nowPlayingTrackContent?: Event;
   commenterPubKey?: string;
 }> = ({
   isPlaying,
@@ -39,7 +39,7 @@ const Screen: React.FC<{
   zapError,
   skipHandler,
   isCenterButtonPressed,
-  nowPlayingTrack,
+  nowPlayingTrackContent,
   commenterPubKey,
 }) => {
   const getScreenColor = () => {
@@ -64,7 +64,7 @@ const Screen: React.FC<{
       >
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         {(() => {
-          if (!nowPlayingTrack)
+          if (!nowPlayingTrackContent)
             return (
               <div>
                 <img
@@ -74,7 +74,7 @@ const Screen: React.FC<{
               </div>
             );
           const trackContent: WavlakeEventContent = JSON.parse(
-            nowPlayingTrack?.content
+            nowPlayingTrackContent?.content
           );
 
           return (
