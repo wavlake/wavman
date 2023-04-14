@@ -171,7 +171,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         setPageViewAndResetSelectedAction(ZAP_VIEW);
         return;
       }
-      const { enabled } = await window.webln?.enable() || {};
+      const { enabled } = (await window.webln?.enable()) || {};
       if (enabled) {
         // use webLN to pay
         try {
@@ -191,32 +191,31 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // Page Container
     <FormProvider {...methods}>
       <form>
-        <div className="h-128 relative mx-auto mt-4 grid w-80 border-8 border-black bg-wavgray">
-          <div className="mx-auto max-w-xs">
-            <Screen
-              zapError={zapError}
-              nowPlayingTrack={nowPlayingTrack}
-              isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
-              comments={comments || []}
-              currentPage={currentPage}
-              paymentRequest={paymentRequest}
-              selectedActionIndex={selectedActionIndex}
-              commenterPubKey={commenterPubKey}
-            />
-            <Logo />
-            <PlayerControls
-              currentPage={currentPage}
-              selectedActionIndex={selectedActionIndex}
-              setSelectedActionIndex={setSelectedActionIndex}
-              skipHandler={skipHandler}
-              zapHandler={zapHandler}
-              playHandler={playHandler}
-              toggleViewHandler={toggleViewHandler}
-              confirmZap={confirmZap}
-              commenterPublicKey={commenterPubKey}
-            />
-          </div>
+        <div className="relative mx-auto mt-4 grid h-[34rem] w-[23rem] justify-center border-8 border-black bg-wavgray">
+          <Screen
+            zapError={zapError}
+            nowPlayingTrack={nowPlayingTrack}
+            isPlaying={isPlaying}
+            commentsLoading={commentsLoading}
+            comments={comments || []}
+            currentPage={currentPage}
+            paymentRequest={paymentRequest}
+            selectedActionIndex={selectedActionIndex}
+            commenterPubKey={commenterPubKey}
+          />
+          <Logo />
+          <PlayerControls
+            currentPage={currentPage}
+            selectedActionIndex={selectedActionIndex}
+            setSelectedActionIndex={setSelectedActionIndex}
+            skipHandler={skipHandler}
+            zapHandler={zapHandler}
+            playHandler={playHandler}
+            toggleViewHandler={toggleViewHandler}
+            confirmZap={confirmZap}
+            commenterPublicKey={commenterPubKey}
+          />
+
           {/* Player Border Lines & Cutouts */}
           <div className="absolute left-0 top-0 h-4 w-2 bg-black"></div>
           <div className="absolute right-0 top-0 h-4 w-2 bg-black"></div>

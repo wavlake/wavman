@@ -30,7 +30,7 @@ const OnScreenActions: React.FC<{
   const filteredActions =
     getFilteredPageActions(currentPage, "ZAP", commenterPubKey) || [];
   return (
-    <div className="mx-auto mb-1 flex w-56 justify-around text-xs">
+    <div className="mx-auto mb-2 flex w-56 justify-around text-xs">
       {filteredActions.map((action, index) => (
         <Action
           action={action}
