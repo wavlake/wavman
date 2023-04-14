@@ -215,10 +215,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         return;
       }
       setpaymentRequest(invoice);
-      try {
-        await window.webln?.sendPayment(invoice);
-      } catch (e) {
-        console.log("Error paying via webln:", e);
+      const { enabled } = (await window.webln?.enable()) || {};
+      // use webLN to pay
+      if (enabled) {
+        try {
+          await window.webln?.sendPayment(invoice);
+        } catch (e) {
+          console.log("Error paying via webln:", e);
+        }
       }
     }
   };
