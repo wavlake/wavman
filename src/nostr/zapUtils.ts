@@ -67,8 +67,15 @@ export const signZapEventNip07 = async ({
       unsignedEvent
     );
     if (!signedEvent) {
-      // TODO implement a fall back route to sign anon
-      throw "No signed event";
+      // fallback and return an anon zap
+      // should this move to the catch block?
+      return signAnonZapEvent({
+        content,
+        amount,
+        lnurl,
+        recepientPubKey,
+        zappedEvent,
+      });
     }
     return signedEvent;
   } catch (err) {
