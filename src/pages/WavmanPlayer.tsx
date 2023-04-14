@@ -191,7 +191,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // Page Container
     <FormProvider {...methods}>
       <form>
-        <div className="relative mx-auto mt-4 grid h-[34rem] w-[23rem] justify-center border-8 border-black bg-wavgray">
+        <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray">
           <Screen
             zapError={zapError}
             nowPlayingTrack={nowPlayingTrack}
