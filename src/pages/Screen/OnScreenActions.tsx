@@ -3,8 +3,8 @@ import { getPageActions, PageView, PLAYER_VIEW } from "../../lib/shared";
 const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {
     return currentPage === PLAYER_VIEW
-      ? "bg-black text-wavgreen"
-      : "bg-black text-violet-400";
+      ? "bg-black text-wavgreen px-1 py-1"
+      : "bg-black text-violet-400 px-1 py-1";
   } else {
     return "bg-transparent";
   }
@@ -36,7 +36,7 @@ const OnScreenActions: React.FC<{
 
   const filteredActions = getPageActions(currentPage);
   return (
-    <div className="mx-auto mb-2 flex w-56 justify-around text-xs">
+    <div className="mx-auto flex w-56 items-center justify-around text-xs">
       {filteredActions.map((action, index) => (
         <Action
           action={action === "PLAY" ? (isPlaying ? "PAUSE" : "PLAY") : action}

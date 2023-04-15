@@ -283,10 +283,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         </form>
       </FormProvider>
       <Button
-        className="mx-auto mt-4 w-28 self-start bg-white"
+        className="mx-auto mt-4 w-28 self-start bg-wavgray"
         clickHandler={setUserPubKey}
       >
-        Login
+        NIP-07 LOGIN
       </Button>
     </>
   );

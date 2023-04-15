@@ -59,9 +59,7 @@ const Screen: React.FC<{
 
   return (
     <div className="relative mx-4 my-4 border-8 border-black p-2">
-      <div
-        className={`flex h-56 w-72 flex-col place-content-between ${getScreenColor()}`}
-      >
+      <div className={`flex h-56 w-72 flex-col ${getScreenColor()}`}>
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         {(() => {
           if (!nowPlayingTrackContent)
@@ -78,30 +76,39 @@ const Screen: React.FC<{
           );
 
           return (
-            <>
+            <div className="flex flex-col">
               <ReactPlayerWrapper
                 url={trackContent.enclosure}
                 isPlaying={isPlaying}
                 onEnded={skipHandler}
               />
+
               {(() => {
                 switch (currentPage) {
                   case COMMENTS_VIEW:
                     return (
-                      <CommentsScreen
-                        loading={commentsLoading}
-                        comments={comments || []}
-                      />
+                      <div className="mt-1 flex">
+                        <CommentsScreen
+                          loading={commentsLoading}
+                          comments={comments || []}
+                        />
+                      </div>
                     );
                   case PLAYER_VIEW:
                     return (
-                      <NowPlayingScreen
-                        trackContent={trackContent}
-                        isPlaying={isPlaying}
-                      />
+                      <div className="flex pt-4">
+                        <NowPlayingScreen
+                          trackContent={trackContent}
+                          isPlaying={isPlaying}
+                        />
+                      </div>
                     );
                   case QR_VIEW:
-                    return <QRScreen paymentRequest={paymentRequest} />;
+                    return (
+                      <div className="">
+                        <QRScreen paymentRequest={paymentRequest} />
+                      </div>
+                    );
                   case ZAP_COMMENT_VIEW:
                     return <ZapCommentScreen />;
                   case ZAP_AMOUNT_VIEW:
@@ -112,14 +119,16 @@ const Screen: React.FC<{
                     return <>default</>;
                 }
               })()}
-              <OnScreenActions
-                selectedActionIndex={selectedActionIndex}
-                currentPage={currentPage}
-                commenterPubKey={commenterPubKey}
-                isCenterButtonPressed={isCenterButtonPressed}
-                isPlaying={isPlaying}
-              />
-            </>
+              <div className="mt-4 flex">
+                <OnScreenActions
+                  selectedActionIndex={selectedActionIndex}
+                  currentPage={currentPage}
+                  commenterPubKey={commenterPubKey}
+                  isCenterButtonPressed={isCenterButtonPressed}
+                  isPlaying={isPlaying}
+                />
+              </div>
+            </div>
           );
         })()}
       </div>

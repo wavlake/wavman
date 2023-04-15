@@ -28,7 +28,7 @@ export type ActionHandler = () => void | ToggleViewHandler;
 
 // will need to handle a view navigation when index is out of bounds for the next view
 // (not an issue now due to same action count)
-const commentViewActions: Actions[] = ["<", "PLAY", "ZAP", "NEXT"];
+const commentViewActions: Actions[] = ["<"];
 const pageViewActions: Actions[] = ["PLAY", "ZAP", "NEXT", ">"];
 const zapAmountViewActions: Actions[] = ["<", "CONFIRM_AMOUNT"];
 const zapCommentViewActions: Actions[] = ["<", "CONFIRM_COMMENT"];

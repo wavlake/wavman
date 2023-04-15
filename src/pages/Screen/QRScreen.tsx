@@ -17,12 +17,12 @@ const QRScreen: React.FC<{
   };
 
   return (
-    <div className="m-4 justify-self-center">
+    <div className="mt-1 flex place-content-center">
       {paymentRequest.length ? (
         <img
           src={qrImage}
-          height={300}
-          width={300}
+          height={180}
+          width={180}
           onClick={clickHandler}
           onTouchStart={clickHandler}
         />
