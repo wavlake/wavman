@@ -35,14 +35,15 @@ const randomSHA256String = (length: number) => {
     Math.floor(Math.random() * 36).toString(36)
   ).join("");
   const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  return alphanumericString.replace(SHA256Regex, "").slice(0, length);
+  const filteredChars = alphanumericString.replace(SHA256Regex, "").slice(0, length);
+  return new Set(filteredChars);
 };
 
 const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChars, setRandomChars] = useState<string[]>(
-    Array.from(randomSHA256String(30))
+    Array.from(randomSHA256String(randomTrackFeatureFlag ? 4 : 200))
   );
 
   ///////// NOSTR /////////
@@ -54,7 +55,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
     {
       kinds: [1],
-      ...(randomTrackFeatureFlag ? { ["#f"]: randomChars } : {}),
+      ["#f"]: randomChars,
       ["#p"]: [trackPubKey],
       limit: 40,
     },
