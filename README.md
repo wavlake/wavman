@@ -1,3 +1,7 @@
+# WAVMAN
+
+Wavman is an open-source Nostr client built to showcase the possibilities of interacting with music over relays. The client has been designed to interact with a specific type of Nostr event containing a standard document ([Nostr Open Media document, or NOM](https://github.com/wavlake/nom-spec)) in the content field.
+
 ## Getting Started
 
 Clone this repo with the following command:
@@ -24,4 +28,4 @@ npm run dev
 yarn dev
 ```
 
-Open up [http://localhost:3003](http://localhost:3000) with your browser to start jamming out!
+Open up [http://localhost:3003](http://localhost:3003) with your browser to start jamming out!

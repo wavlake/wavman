@@ -1,7 +1,7 @@
 {
   "name": "wavman",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "dev": "PORT=3003 next dev",
     "build": "next build",
