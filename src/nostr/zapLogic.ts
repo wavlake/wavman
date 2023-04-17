@@ -1,7 +1,5 @@
 import {
-  chopDecimal,
   getLNURLFromEvent,
-  sats2millisats,
   signZapEventNip07,
   fetchLNURLInfo,
   signAnonZapEvent,
