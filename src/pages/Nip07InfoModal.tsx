@@ -1,6 +1,7 @@
 import { Dispatch, MouseEventHandler, useState, SetStateAction } from 'react'
 import { Dialog } from '@headlessui/react'
 import Button from './PlayerControls/Button';
+import Link from 'next/link'
 
 const Nip07InfoModal: React.FC<{
   setCommenterPubKey: Dispatch<SetStateAction<string | undefined>>;
@@ -36,10 +37,10 @@ const Nip07InfoModal: React.FC<{
       <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
         <div className="fixed inset-0 bg-black/30" aria-hidden="true">
           <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="mx-auto max-w-sm rounded bg-white">
-              <Dialog.Title>NIP-07</Dialog.Title>
-              <Dialog.Description>
-                Looks like you don't have a NIP-07 extension installed. On mobile? Try this on a desktop browser with a extension like Alby installed. Read more about NIP-07 here https://github.com/nostr-protocol/nips/blob/master/07.md
+            <Dialog.Panel className="p-2 mx-auto max-w-md rounded bg-white">
+              <Dialog.Title className="pb-4 text-center">NIP-07</Dialog.Title>
+              <Dialog.Description className="text-xs">
+                Looks like you don't have a NIP-07 extension installed. On mobile? Try this on a desktop browser with a extension like Alby installed. <Link href='https://github.com/nostr-protocol/nips/blob/master/07.md'>Click here</Link> to read more about NIP-07.
               </Dialog.Description>
               <Button
                 className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
