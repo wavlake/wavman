@@ -243,7 +243,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  const [nowPlayingTrackContent] = kind32123NowPlaying || [];
+  if (!kind32123NowPlaying.length) {
+    console.error("No associated 32123 event found for this track:", kind1NowPlaying);
+    skipHandler();
+  };
+  const [nowPlayingTrackContent] = kind32123NowPlaying;
+
   return (
     // Page Container
     <>
