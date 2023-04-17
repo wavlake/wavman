@@ -7,10 +7,10 @@ const TrackInfo: React.FC<{
   artist: string;
   link: string;
 }> = ({ title, artist, link }) => (
-  <div className="group mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
+  <div className="group mx-auto grid items-center justify-center overflow-hidden text-lg font-bold">
     <div
       className={`${
-        artist?.length > 20
+        artist?.length > 13
           ? "w-full animate-marquee whitespace-nowrap"
           : "whitespace w-64 justify-center"
       } group flex place-self-center text-center no-scrollbar`}
@@ -43,17 +43,17 @@ const MusicNotes: React.FC<{
         isPlaying ? "animate-dance animation-delay-400" : ""
       } col-span-1 col-start-2 text-4xl`}
     >
-      <img className="h-12" src={"note.svg"} />
+      <img className="h-14" src={"note.svg"} />
     </div>
     <div className={` ${isPlaying ? "animate-dance" : ""} col-span-1 text-4xl`}>
-      <img className="h-12" src={"note.svg"} />
+      <img className="h-14" src={"note.svg"} />
     </div>
     <div
       className={` ${
         isPlaying ? "animate-dance animation-delay-800" : ""
       } col-span-1 text-4xl`}
     >
-      <img className="h-12" src={"note.svg"} />
+      <img className="h-14" src={"note.svg"} />
     </div>
   </div>
 );
@@ -63,7 +63,7 @@ const NowPlayingScreen: React.FC<{
   trackContent: WavlakeEventContent;
 }> = ({ trackContent, isPlaying }) => {
   return (
-    <div className="h-40 w-72">
+    <div className="h-36 w-72">
       <TrackInfo
         title={trackContent?.title}
         artist={trackContent?.creator}

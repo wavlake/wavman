@@ -45,10 +45,10 @@ const CommentsScreen: React.FC<{
   if (loading) return <div>Comments Loading Screen</div>;
 
   return (
-    <div className="h-44 w-72 overflow-y-auto no-scrollbar">
+    <div className="h-36 w-72 overflow-y-auto no-scrollbar">
       <div className="space-y-2 ">
         {!comments.length ? (
-          <div className="text-center mt-4">No comments yet...</div>
+          <div className="mt-2 text-center">No comments or zaps yet...</div>
         ) : (
           parsedZapRequests.map((event) => (
             <Comment event={event} key={event.id} />

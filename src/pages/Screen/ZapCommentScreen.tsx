@@ -6,7 +6,7 @@ const ZapCommentScreen: React.FC<{}> = ({}) => {
   const methods = useFormContext();
 
   return (
-    <div className="m-4 h-32 justify-self-center">
+    <div className="mx-4 h-32 justify-self-center">
       Comment
       <input {...methods?.register("content")} className="w-full" />
     </div>
