@@ -9,7 +9,9 @@ const QRScreen: React.FC<{
   useEffect(() => {
     if (paymentRequest.length === 0) return;
     // same color value as wavgreen, which is set in tailwind.config.js
-    QRCode.toDataURL(`lightning:${paymentRequest}`, { color: { dark: "#000000", light: "#96f9d4" } })
+    QRCode.toDataURL(`lightning:${paymentRequest}`, {
+      color: { dark: "#000000", light: "#96f9d4" },
+    })
       .then((img) => setQrImage(img))
       .catch((e) => console.log(`${e}`));
   }, [paymentRequest]);
@@ -19,14 +21,14 @@ const QRScreen: React.FC<{
   };
 
   return (
-    <div className="mt-1 flex h-44 place-content-center">
+    <div className="flex h-36 place-content-center">
       {qrImage ? (
         <div className="mx-auto hover:cursor-pointer hover:opacity-70">
           {qrImage && (
             <Image
               src={qrImage}
-              height={180}
-              width={180}
+              height={160}
+              width={160}
               onClick={clickHandler}
               onTouchStart={clickHandler}
               alt={`QR Code for ${paymentRequest}`}

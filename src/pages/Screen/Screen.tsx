@@ -81,12 +81,23 @@ const Screen: React.FC<{
                 isPlaying={isPlaying}
                 onEnded={skipHandler}
               />
-
+              <div className="flex h-8 justify-end p-2">
+                <a
+                  href={`https://wavlake.com`}
+                  target={"_blank"}
+                  rel={"noreferrer"}
+                >
+                  <img
+                    className="h-4 opacity-80 hover:opacity-30"
+                    src={"wavlake.svg"}
+                  />
+                </a>
+              </div>
               {(() => {
                 switch (currentPage) {
                   case COMMENTS_VIEW:
                     return (
-                      <div className="mt-1 flex">
+                      <div className="flex">
                         <CommentsScreen
                           loading={commentsLoading}
                           comments={comments || []}
@@ -95,7 +106,7 @@ const Screen: React.FC<{
                     );
                   case PLAYER_VIEW:
                     return (
-                      <div className="flex pt-4">
+                      <div className="flex">
                         <NowPlayingScreen
                           trackContent={trackContent}
                           isPlaying={isPlaying}
@@ -103,11 +114,7 @@ const Screen: React.FC<{
                       </div>
                     );
                   case QR_VIEW:
-                    return (
-                      <div className="">
-                        <QRScreen paymentRequest={paymentRequest} />
-                      </div>
-                    );
+                    return <QRScreen paymentRequest={paymentRequest} />;
                   case ZAP_COMMENT_VIEW:
                     return <ZapCommentScreen />;
                   case ZAP_AMOUNT_VIEW:

@@ -55,14 +55,15 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
   // Get a batch of kind 1 events
-  const { allEvents: kind1Tracks, loading: tracksLoading } = useEventSubscription([
-    {
-      kinds: [1],
-      ["#f"]: randomChars,
-      ["#p"]: [trackPubKey],
-      limit: 40,
-    },
-  ]);
+  const { allEvents: kind1Tracks, loading: tracksLoading } =
+    useEventSubscription([
+      {
+        kinds: [1],
+        ["#f"]: randomChars,
+        ["#p"]: [trackPubKey],
+        limit: 40,
+      },
+    ]);
 
   // Post a comment mutation (not used at the moment)
   const [
@@ -84,17 +85,19 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const skipKind32123 = !kind32123DTag;
   // get the kind 1's replaceable 32123 event
   // TODO implement replaceability and test to make sure the most recent is consumed here
-  const { allEvents: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
-    useEventSubscription(
-      [
-        {
-          kinds: [32123],
-          ["#d"]: [kind32123DTag],
-          limit: 4,
-        },
-      ],
-      skipKind32123
-    );
+  const {
+    allEvents: kind32123NowPlaying,
+    loading: kind32123NowPlayingLoading,
+  } = useEventSubscription(
+    [
+      {
+        kinds: [32123],
+        ["#d"]: [kind32123DTag],
+        limit: 4,
+      },
+    ],
+    skipKind32123
+  );
 
   const [paymentRequest, setpaymentRequest] = useState("");
 
@@ -244,7 +247,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     <>
       <FormProvider {...methods}>
         <form>
-          <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray">
+          <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray md:mt-20">
             <Screen
               zapError={zapError}
               nowPlayingTrackContent={nowPlayingTrackContent}
