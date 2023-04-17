@@ -9,9 +9,9 @@ import {
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
-export const sats2millisats = (amount: number) => amount * 1000;
-export const millisats2sats = (amount: number) => amount / 1000;
-export const chopDecimal = (amount: number) => Math.floor(amount);
+const chopDecimal = (amount: number) => Math.floor(amount);
+export const sats2millisats = (amount: number) => chopDecimal(amount) * 1000;
+export const millisats2sats = (amount: number) => chopDecimal(amount) / 1000;
 export const validateNostrPubKey = (nostrPubKey: string) => {
   if (
     nostrPubKey == null ||
@@ -56,7 +56,7 @@ export const signZapEventNip07 = async ({
     created_at: Math.floor(Date.now() / 1000),
     tags: [
       ["relays", "wss://relay.wavlake.com/"],
-      ["amount", amount.toString()],
+      ["amount", sats2millisats(amount).toString()],
       ["lnurl", lnurl],
       ["p", recepientPubKey],
       ["e", zappedEvent.id],
@@ -104,7 +104,7 @@ export const signAnonZapEvent = async ({
     created_at: Math.floor(Date.now() / 1000),
     tags: [
       ["relays", "wss://relay.wavlake.com/"],
-      ["amount", amount.toString()],
+      ["amount", sats2millisats(amount).toString()],
       ["lnurl", lnurl],
       ["p", recepientPubKey],
       ["e", zappedEvent.id],
@@ -165,17 +165,18 @@ export const fetchLNURLInfo = async (
 export const sendZapRequestReceivePaymentRequest = async ({
   signedZapEvent,
   callback,
-  milliSatAmount,
+  amount,
   lnurl,
 }: {
   signedZapEvent: Event;
   callback: string;
-  milliSatAmount: number;
+  // in satoshis
+  amount: number;
   lnurl: string;
 }): Promise<string | undefined> => {
   const event = JSON.stringify(signedZapEvent);
   const paymentRequestRes = await fetch(
-    `${callback}?amount=${milliSatAmount}&nostr=${event}&lnurl=${lnurl}`
+    `${callback}?amount=${sats2millisats(amount)}&nostr=${event}&lnurl=${lnurl}`
   );
   const { pr } = await paymentRequestRes.json();
 
