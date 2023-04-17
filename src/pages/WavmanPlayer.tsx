@@ -11,6 +11,7 @@ import {
 } from "../lib/shared";
 import Links from "./Links";
 import Logo from "./Logo";
+import Nip07InfoModal from "./Nip07InfoModal";
 import Button from "./PlayerControls/Button";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
@@ -35,7 +36,9 @@ const randomSHA256String = (length: number) => {
     Math.floor(Math.random() * 36).toString(36)
   ).join("");
   const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  const filteredChars = alphanumericString.replace(SHA256Regex, "").slice(0, length);
+  const filteredChars = alphanumericString
+    .replace(SHA256Regex, "")
+    .slice(0, length);
   return new Set(filteredChars);
 };
 
@@ -52,7 +55,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
   // Get a batch of kind 1 events
-  const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
+  const { allEvents: kind1Tracks, loading: tracksLoading } = useEventSubscription([
     {
       kinds: [1],
       ["#f"]: randomChars,
@@ -60,6 +63,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       limit: 40,
     },
   ]);
+
   // Post a comment mutation (not used at the moment)
   const [
     publishEvent,
@@ -79,13 +83,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
   const skipKind32123 = !kind32123DTag;
   // get the kind 1's replaceable 32123 event
-  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
-    useListEvents(
+  // TODO implement replaceability and test to make sure the most recent is consumed here
+  const { allEvents: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
+    useEventSubscription(
       [
         {
           kinds: [32123],
           ["#d"]: [kind32123DTag],
-          limit: 40,
+          limit: 4,
         },
       ],
       skipKind32123
@@ -93,7 +98,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const [paymentRequest, setpaymentRequest] = useState("");
 
-  // ZapReceipt Listener
+  // ZapReceipt Listener (aka zap comments)
   const skipZapReceipts = !kind1NowPlaying?.id;
   const {
     allEvents: zapReceipts,
@@ -105,12 +110,13 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   );
 
   // Get track comments, skip till a track is ready
-  const skipComments = !kind1NowPlaying;
-  const { allEvents: comments, loading: commentsLoading } =
-    useEventSubscription(
-      [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
-      skipComments
-    );
+  // kind1 comments are currently not used
+  // const skipComments = !kind1NowPlaying;
+  // const { allEvents: comments, loading: commentsLoading } =
+  //   useEventSubscription(
+  //     [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
+  //     skipComments
+  //   );
 
   ///////// UI /////////
   const pickRandomTrack = (kind1Tracks: Event[]) => {
@@ -130,11 +136,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // The player currently auto turns on when tracks are loaded
   // Tracks load automatically when the page loads
   useEffect(() => {
-    if (kind1Tracks?.length) {
+    if (kind1Tracks?.length && !tracksLoading) {
       pickRandomTrack(kind1Tracks);
       turnOnPlayer();
     }
-  }, [kind1Tracks]);
+  }, [kind1Tracks, tracksLoading]);
 
   const skipHandler = () => {
     if (kind1Tracks?.length) pickRandomTrack(kind1Tracks);
@@ -182,13 +188,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   };
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
-
-  const setUserPubKey = () => {
-    window.nostr
-      ?.getPublicKey?.()
-      .then((pubKey) => setCommenterPubKey(pubKey))
-      .catch((e: string) => console.log(e));
-  };
 
   const confirmZapAmount = () => {
     setPageViewAndResetSelectedAction(ZAP_COMMENT_VIEW);
@@ -238,7 +237,8 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  const [nowPlayingTrackContent] = kind32123NowPlaying || [];
+  const [nowPlayingTrackContent] = kind32123NowPlaying;
+
   return (
     // Page Container
     <>
@@ -249,7 +249,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               zapError={zapError}
               nowPlayingTrackContent={nowPlayingTrackContent}
               isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
+              commentsLoading={zapReceiptsLoading}
               comments={zapReceipts || []}
               currentPage={currentPage}
               paymentRequest={paymentRequest}
@@ -284,12 +284,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           </div>
         </form>
       </FormProvider>
-      <Button
-        className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
-        clickHandler={setUserPubKey}
-      >
-        NIP-07 LOGIN
-      </Button>
+      <Nip07InfoModal
+        setCommenterPubKey={setCommenterPubKey}
+        commenterPubKey={commenterPubKey}
+      />
       <div className="mx-auto mt-8 flex">
         <Links />
       </div>
