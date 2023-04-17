@@ -5,23 +5,31 @@ import { WavlakeEventContent } from "@/nostr";
 const TrackInfo: React.FC<{
   title: string;
   artist: string;
-}> = ({ title, artist }) => (
-  <div className="mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
+  link: string;
+}> = ({ title, artist, link }) => (
+  <div className="group mx-auto grid items-center justify-center overflow-hidden text-base font-bold">
     <div
       className={`${
         artist?.length > 20
           ? "w-full animate-marquee whitespace-nowrap"
           : "whitespace w-64 justify-center"
-      } flex place-self-center text-center no-scrollbar`}
+      } group flex place-self-center text-center no-scrollbar`}
     >
       <p>{artist}</p>
     </div>
+
     <div
       className={`${
         title?.length > 10 ? `animate-marquee` : `justify-center`
-      } flex h-12 w-full whitespace-nowrap no-scrollbar`}
+      } group flex h-12 w-full whitespace-nowrap no-scrollbar group-hover:animate-blink`}
     >
-      <p>{`"${title}"`}</p>
+      <p>
+        <a
+          href={`${link}`}
+          target={"_blank"}
+          rel={"noreferrer"}
+        >{`"${title}"`}</a>
+      </p>
     </div>
   </div>
 );
@@ -56,7 +64,11 @@ const NowPlayingScreen: React.FC<{
 }> = ({ trackContent, isPlaying }) => {
   return (
     <div className="h-40 w-72">
-      <TrackInfo title={trackContent?.title} artist={trackContent?.creator} />
+      <TrackInfo
+        title={trackContent?.title}
+        artist={trackContent?.creator}
+        link={trackContent?.link}
+      />
       <MusicNotes isPlaying={isPlaying} />
     </div>
   );

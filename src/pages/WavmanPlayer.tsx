@@ -9,6 +9,7 @@ import {
   coerceEnvVarToBool,
   COMMENTS_VIEW,
 } from "../lib/shared";
+import Links from "./Links";
 import Logo from "./Logo";
 import Button from "./PlayerControls/Button";
 import PlayerControls from "./PlayerControls/PlayerControls";
@@ -283,11 +284,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         </form>
       </FormProvider>
       <Button
-        className="mx-auto mt-4 w-28 self-start bg-white"
+        className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
         clickHandler={setUserPubKey}
       >
-        Login
+        NIP-07 LOGIN
       </Button>
+      <div className="mx-auto mt-8 flex">
+        <Links />
+      </div>
     </>
   );
 };

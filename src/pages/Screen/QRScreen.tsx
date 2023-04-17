@@ -1,3 +1,4 @@
+import Image from "next/image";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
 
@@ -17,15 +18,21 @@ const QRScreen: React.FC<{
   };
 
   return (
-    <div className="m-4 justify-self-center">
-      {paymentRequest.length ? (
-        <img
-          src={qrImage}
-          height={300}
-          width={300}
-          onClick={clickHandler}
-          onTouchStart={clickHandler}
-        />
+    <div className="mt-1 flex h-44 place-content-center">
+      {qrImage ? (
+        <div className="mx-auto hover:cursor-pointer hover:opacity-70">
+          {qrImage && (
+            <Image
+              src={qrImage}
+              height={180}
+              width={180}
+              onClick={clickHandler}
+              onTouchStart={clickHandler}
+              alt={`QR Code for ${paymentRequest}`}
+            />
+          )}
+          <div className="mx-auto flex justify-center text-xs">Tap to copy</div>
+        </div>
       ) : (
         "Loading QR Code..."
       )}

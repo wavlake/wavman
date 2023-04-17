@@ -13,7 +13,8 @@ module.exports = {
   theme: {
     extend: {
       animation: {
-        dance: "dance 2s linear infinite",
+        blink: "blink 1.5s infinite",
+        dance: "dance 0.5s linear infinite",
         fadein: "fadein 1.5s linear",
         marquee: "marquee 7s linear infinite",
       },
@@ -48,6 +49,20 @@ module.exports = {
         },
       },
       keyframes: {
+        blink: {
+          "0%": {
+            opacity: "0",
+            animationTimingFunction: "steps(2, jump-end)",
+          },
+          "20%": {
+            opacity: "1",
+            animationTimingFunction: "steps(2, jump-end)",
+          },
+          "100%": {
+            opacity: "1",
+            animationTimingFunction: "steps(1, jump-end)",
+          },
+        },
         dance: {
           "0%": {
             transform: "translateY(0%)",

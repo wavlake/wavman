@@ -1,3 +1,4 @@
+import { millisats2sats } from "@/nostr/zapUtils";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 
@@ -6,10 +7,11 @@ const Comment: React.FC<{ event: Event }> = ({
 }) => {
   const [tagType, amount] = tags.find(([tag]) => tag === "amount") || [];
   return (
-    <div className="flex">
-      <div>{pubkey.slice(0, 4)},</div>
-      <div>{amount},</div>
-      <div>{content}</div>
+    <div className="flex break-all text-xs">
+      {/* <div>{pubkey.slice(0, 4)},</div> */}
+      <img className="h-6" src="PIXELBOLT.svg" alt="logo" />
+      <div>{millisats2sats(parseInt(amount))}</div>
+      <div className="ml-2 ">{content}</div>
     </div>
   );
 };
@@ -43,14 +45,16 @@ const CommentsScreen: React.FC<{
   if (loading) return <div>Comments Loading Screen</div>;
 
   return (
-    <div className="flex-col justify-start">
-      {!comments ? (
-        <div>No comments yet...</div>
-      ) : (
-        parsedZapRequests.map((event) => (
-          <Comment event={event} key={event.id} />
-        ))
-      )}
+    <div className="h-44 w-72 overflow-y-auto no-scrollbar">
+      <div className="space-y-2 ">
+        {!comments ? (
+          <div>No comments yet...</div>
+        ) : (
+          parsedZapRequests.map((event) => (
+            <Comment event={event} key={event.id} />
+          ))
+        )}
+      </div>
     </div>
   );
 };

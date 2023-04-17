@@ -14,7 +14,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
         <link href="/output.css" rel="stylesheet" />
       </Head>
-      <main className="h-screen bg-wavpink">
+      <main className="h-auto bg-wavpink pb-64">
         <div className="grid justify-center">
           <RelayProvider url={relayUrl}>
             <WavmanPlayer />

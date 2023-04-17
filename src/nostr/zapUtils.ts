@@ -10,6 +10,7 @@ import {
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
 export const sats2millisats = (amount: number) => amount * 1000;
+export const millisats2sats = (amount: number) => amount / 1000;
 export const chopDecimal = (amount: number) => Math.floor(amount);
 export const validateNostrPubKey = (nostrPubKey: string) => {
   if (
@@ -63,12 +64,12 @@ export const signZapEventNip07 = async ({
   };
 
   try {
-    const signedEvent = await window.nostr?.signEvent?.(
-      unsignedEvent
-    );
+    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent);
     return signedEvent;
   } catch {
-    console.log("Unable to sign event with NIP-07 extension, falling back to an anon zap");
+    console.log(
+      "Unable to sign event with NIP-07 extension, falling back to an anon zap"
+    );
     // if user rejects prompt, fallback to anon
     const signedEvent = signAnonZapEvent({
       content,
