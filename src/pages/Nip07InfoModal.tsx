@@ -40,9 +40,9 @@ const Nip07InfoModal: React.FC<{
             <Dialog.Panel className="mx-auto max-w-md rounded bg-white p-2">
               <Dialog.Title className="pb-4 text-center">NIP-07</Dialog.Title>
               <Dialog.Description className="text-xs">
-                Looks like you don't have a NIP-07 extension installed. On
+                {`Looks like you don't have a NIP-07 extension installed. On
                 mobile? Try this on a desktop browser with a NIP-07 extension
-                (like Alby) installed.{" "}
+                (like Alby) installed.`}
                 <Link href="https://github.com/nostr-protocol/nips/blob/master/07.md">
                   Click here
                 </Link>{" "}
