@@ -52,7 +52,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
   // Get a batch of kind 1 events
-  const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
+  const { allEvents: kind1Tracks, loading: tracksLoading } = useEventSubscription([
     {
       kinds: [1],
       ["#f"]: randomChars,
@@ -60,6 +60,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
       limit: 40,
     },
   ]);
+
   // Post a comment mutation (not used at the moment)
   const [
     publishEvent,
@@ -78,14 +79,17 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
   const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
   const skipKind32123 = !kind32123DTag;
+
+  if (skipKind32123) console.error("D tag not found for the current track:", kind1NowPlaying);
   // get the kind 1's replaceable 32123 event
-  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
-    useListEvents(
+  // TODO implement replaceability and test to make sure the most recent is consumed here
+  const { allEvents: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
+    useEventSubscription(
       [
         {
           kinds: [32123],
           ["#d"]: [kind32123DTag],
-          limit: 40,
+          limit: 4,
         },
       ],
       skipKind32123
@@ -93,7 +97,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
 
   const [paymentRequest, setpaymentRequest] = useState("");
 
-  // ZapReceipt Listener
+  // ZapReceipt Listener (aka zap comments)
   const skipZapReceipts = !kind1NowPlaying?.id;
   const {
     allEvents: zapReceipts,
@@ -105,12 +109,13 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   );
 
   // Get track comments, skip till a track is ready
-  const skipComments = !kind1NowPlaying;
-  const { allEvents: comments, loading: commentsLoading } =
-    useEventSubscription(
-      [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
-      skipComments
-    );
+  // kind1 comments are currently not used
+  // const skipComments = !kind1NowPlaying;
+  // const { allEvents: comments, loading: commentsLoading } =
+  //   useEventSubscription(
+  //     [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
+  //     skipComments
+  //   );
 
   ///////// UI /////////
   const pickRandomTrack = (kind1Tracks: Event[]) => {
@@ -130,11 +135,11 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // The player currently auto turns on when tracks are loaded
   // Tracks load automatically when the page loads
   useEffect(() => {
-    if (kind1Tracks?.length) {
+    if (kind1Tracks?.length && !tracksLoading) {
       pickRandomTrack(kind1Tracks);
       turnOnPlayer();
     }
-  }, [kind1Tracks]);
+  }, [kind1Tracks, tracksLoading]);
 
   const skipHandler = () => {
     if (kind1Tracks?.length) pickRandomTrack(kind1Tracks);
@@ -249,7 +254,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
               zapError={zapError}
               nowPlayingTrackContent={nowPlayingTrackContent}
               isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
+              commentsLoading={zapReceiptsLoading}
               comments={zapReceipts || []}
               currentPage={currentPage}
               paymentRequest={paymentRequest}
