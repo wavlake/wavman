@@ -14,7 +14,7 @@ module.exports = {
     extend: {
       animation: {
         blink: "blink 1.5s infinite",
-        dance: "dance 0.5s linear infinite",
+        dance: "dance 2s linear infinite",
         fadein: "fadein 1.5s linear",
         marquee: "marquee 7s linear infinite",
       },
