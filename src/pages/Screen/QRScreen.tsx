@@ -21,13 +21,16 @@ const QRScreen: React.FC<{
     <div className="mt-1 flex h-44 place-content-center">
       {paymentRequest.length ? (
         <div className="mx-auto hover:cursor-pointer hover:opacity-70">
-          <img
-            src={qrImage}
-            height={180}
-            width={180}
-            onClick={clickHandler}
-            onTouchStart={clickHandler}
-          />
+          {qrImage && (
+            <Image
+              src={qrImage}
+              height={180}
+              width={180}
+              onClick={clickHandler}
+              onTouchStart={clickHandler}
+              alt={`QR Code for ${paymentRequest}`}
+            />
+          )}
           <div className="mx-auto flex justify-center text-xs">Tap to copy</div>
         </div>
       ) : (
