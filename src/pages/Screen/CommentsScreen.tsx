@@ -47,8 +47,8 @@ const CommentsScreen: React.FC<{
   return (
     <div className="h-44 w-72 overflow-y-auto no-scrollbar">
       <div className="space-y-2 ">
-        {!comments ? (
-          <div>No comments yet...</div>
+        {!comments.length ? (
+          <div className="text-center mt-4">No comments yet...</div>
         ) : (
           parsedZapRequests.map((event) => (
             <Comment event={event} key={event.id} />
