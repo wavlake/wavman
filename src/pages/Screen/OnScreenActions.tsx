@@ -2,9 +2,7 @@ import { getPageActions, PageView, PLAYER_VIEW } from "../../lib/shared";
 
 const buttonColorCalc = (selected: boolean, currentPage: PageView) => {
   if (selected) {
-    return currentPage === PLAYER_VIEW
-      ? "bg-black text-wavgreen px-1 py-1"
-      : "bg-black text-violet-400 px-1 py-1";
+    return "bg-black text-wavgreen px-1 py-1"
   } else {
     return "bg-transparent";
   }

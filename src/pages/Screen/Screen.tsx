@@ -45,12 +45,11 @@ const Screen: React.FC<{
   const getScreenColor = () => {
     switch (currentPage) {
       case PLAYER_VIEW:
-        return "bg-wavgreen";
       case COMMENTS_VIEW:
       case QR_VIEW:
       case ZAP_AMOUNT_VIEW:
       case ZAP_COMMENT_VIEW:
-        return "bg-wavpurple";
+        return "bg-wavgreen";
       case SPLASH_VIEW:
       default:
         return "bg-wavdarkgreen";
