@@ -79,8 +79,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
   const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
   const skipKind32123 = !kind32123DTag;
-
-  if (skipKind32123) console.error("D tag not found for the current track:", kind1NowPlaying);
   // get the kind 1's replaceable 32123 event
   // TODO implement replaceability and test to make sure the most recent is consumed here
   const { allEvents: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
@@ -243,10 +241,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  if (!kind32123NowPlaying.length) {
-    console.error("No associated 32123 event found for this track:", kind1NowPlaying);
-    skipHandler();
-  };
   const [nowPlayingTrackContent] = kind32123NowPlaying;
 
   return (
