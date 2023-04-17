@@ -36,7 +36,7 @@ const OnScreenActions: React.FC<{
 
   const filteredActions = getPageActions(currentPage);
   return (
-    <div className="mx-auto flex w-56 items-center justify-around text-xs">
+    <div className="mx-auto flex w-56 items-center justify-between text-xs">
       {filteredActions.map((action, index) => (
         <Action
           action={action === "PLAY" ? (isPlaying ? "PAUSE" : "PLAY") : action}
