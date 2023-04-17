@@ -5,9 +5,7 @@ import {
   signAnonZapEvent,
   sendZapRequestReceivePaymentRequest,
 } from "./zapUtils";
-import {
-  Event,
-} from "nostr-tools";
+import { Event } from "nostr-tools";
 
 export const getInvoice = async ({
   nowPlayingTrack,
@@ -42,8 +40,8 @@ export const getInvoice = async ({
           recepientPubKey: nostrPubKey,
           zappedEvent: nowPlayingTrack,
           pubkey: nip07PubKey,
-        })
-        
+        });
+
         return sendZapRequestReceivePaymentRequest({
           signedZapEvent,
           callback,
@@ -55,7 +53,9 @@ export const getInvoice = async ({
       }
     } catch (e) {
       console.error(e);
-      console.log("Unable to sign event with NIP-07, falling back to an anon zap");
+      console.log(
+        "Unable to sign event with NIP-07, falling back to an anon zap"
+      );
       const signedZapEvent = await signAnonZapEvent({
         content,
         amount,

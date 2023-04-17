@@ -11,6 +11,7 @@ import {
 } from "../lib/shared";
 import Links from "./Links";
 import Logo from "./Logo";
+import Nip07InfoModal from "./Nip07InfoModal";
 import Button from "./PlayerControls/Button";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
@@ -35,7 +36,9 @@ const randomSHA256String = (length: number) => {
     Math.floor(Math.random() * 36).toString(36)
   ).join("");
   const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  const filteredChars = alphanumericString.replace(SHA256Regex, "").slice(0, length);
+  const filteredChars = alphanumericString
+    .replace(SHA256Regex, "")
+    .slice(0, length);
   return new Set(filteredChars);
 };
 
@@ -186,13 +189,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
 
-  const setUserPubKey = () => {
-    window.nostr
-      ?.getPublicKey?.()
-      .then((pubKey) => setCommenterPubKey(pubKey))
-      .catch((e: string) => console.log(e));
-  };
-
   const confirmZapAmount = () => {
     setPageViewAndResetSelectedAction(ZAP_COMMENT_VIEW);
   };
@@ -288,12 +284,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           </div>
         </form>
       </FormProvider>
-      <Button
-        className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
-        clickHandler={setUserPubKey}
-      >
-        NIP-07 LOGIN
-      </Button>
+      <Nip07InfoModal
+        setCommenterPubKey={setCommenterPubKey}
+        commenterPubKey={commenterPubKey}
+      />
       <div className="mx-auto mt-8 flex">
         <Links />
       </div>

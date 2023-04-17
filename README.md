@@ -1,11 +1,13 @@
 ## Getting Started
 
 Clone this repo with the following command:
+
 ```bash
 git clone https://github.com/wavlake/wavman.git
 ```
 
 Once inside the newly cloned repo folder (`cd wavman`) install dependencies:
+
 ```bash
 npm install
 # or

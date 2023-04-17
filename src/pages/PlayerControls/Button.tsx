@@ -1,9 +1,9 @@
 import { ActionHandler } from "@/lib/shared";
-import { PropsWithChildren, useState } from "react";
+import { MouseEventHandler, PropsWithChildren, useState } from "react";
 
 const Button: React.FC<
   PropsWithChildren<{
-    clickHandler: ActionHandler;
+    clickHandler?: ActionHandler | MouseEventHandler<HTMLButtonElement>;
     className: string;
     buttonState?: ReturnType<typeof useState<boolean>>;
   }>
