@@ -6,7 +6,7 @@ import { Dispatch, MouseEventHandler, useState, SetStateAction, PropsWithChildre
 const BorderButton: React.FC<PropsWithChildren<{
   clickHandler: MouseEventHandler<HTMLButtonElement>;
 }>> = ({ children }) => (
-  <div className="mx-auto mt-4 w-80 relative grid border-8 border-black">
+  <div className="mx-auto mt-4 w-[22rem] h-14 relative grid border-8 border-black">
     <Button className="p-1 self-start bg-wavgray hover:tracking-wider">
       {children}
     </Button>
