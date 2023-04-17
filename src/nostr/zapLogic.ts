@@ -34,13 +34,12 @@ export const getInvoice = async ({
       return;
     }
 
-    const milliSatAmount = sats2millisats(chopDecimal(amount));
     try {
       const nip07PubKey = await window.nostr?.getPublicKey();
       if (nip07PubKey) {
         const signedZapEvent = await signZapEventNip07({
           content,
-          amount: milliSatAmount,
+          amount,
           lnurl,
           recepientPubKey: nostrPubKey,
           zappedEvent: nowPlayingTrack,
@@ -50,7 +49,7 @@ export const getInvoice = async ({
         return sendZapRequestReceivePaymentRequest({
           signedZapEvent,
           callback,
-          milliSatAmount,
+          amount,
           lnurl,
         });
       } else {
@@ -70,7 +69,7 @@ export const getInvoice = async ({
       return sendZapRequestReceivePaymentRequest({
         signedZapEvent,
         callback,
-        milliSatAmount,
+        amount,
         lnurl,
       });
     }
