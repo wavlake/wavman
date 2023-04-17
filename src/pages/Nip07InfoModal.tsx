@@ -15,11 +15,12 @@ const Nip07InfoModal: React.FC<{
         setCommenterPubKey(pubKey);
         return;
       }
+      // show modal if pubKey code above is undefined
+      setIsOpen(!isOpen)
     } catch (e) {
+      // don't show modal if user rejects the NIP-07 extension's prompt
       console.error(e)
     }
-
-    setIsOpen(!isOpen)
   }
 
   // if (commenterPubKey) return <></>;
@@ -33,18 +34,22 @@ const Nip07InfoModal: React.FC<{
         {commenterPubKey ? "LOGGED IN" : "NIP-07 LOGIN"}
       </Button>
       <Dialog open={isOpen} onClose={() => setIsOpen(false)}>
-        <Dialog.Panel>
-          <Dialog.Title>NIP-07</Dialog.Title>
-          <Dialog.Description>
-            Looks like you don't have a NIP-07 extension installed. On mobile? Try this on a desktop browser with a extension like Alby installed. Read more about NIP-07 here https://github.com/nostr-protocol/nips/blob/master/07.md
-            <Button
-              className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
-              clickHandler={() => setIsOpen(false)}
-            >
-              OK
-            </Button>
-          </Dialog.Description>
-        </Dialog.Panel>
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true">
+          <div className="fixed inset-0 flex items-center justify-center p-4">
+            <Dialog.Panel className="mx-auto max-w-sm rounded bg-white">
+              <Dialog.Title>NIP-07</Dialog.Title>
+              <Dialog.Description>
+                Looks like you don't have a NIP-07 extension installed. On mobile? Try this on a desktop browser with a extension like Alby installed. Read more about NIP-07 here https://github.com/nostr-protocol/nips/blob/master/07.md
+              </Dialog.Description>
+              <Button
+                className="mx-auto mt-4 w-28 self-start bg-wavgray hover:tracking-wider"
+                clickHandler={() => setIsOpen(false)}
+              >
+                OK
+              </Button>
+            </Dialog.Panel>
+          </div>
+        </div>
       </Dialog>
     </>
   )
