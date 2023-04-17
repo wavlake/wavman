@@ -19,7 +19,7 @@ const QRScreen: React.FC<{
 
   return (
     <div className="mt-1 flex h-44 place-content-center">
-      {paymentRequest.length ? (
+      {qrImage ? (
         <div className="mx-auto hover:cursor-pointer hover:opacity-70">
           {qrImage && (
             <Image
