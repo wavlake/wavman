@@ -36,7 +36,9 @@ const randomSHA256String = (length: number) => {
     Math.floor(Math.random() * 36).toString(36)
   ).join("");
   const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  const filteredChars = alphanumericString.replace(SHA256Regex, "").slice(0, length);
+  const filteredChars = alphanumericString
+    .replace(SHA256Regex, "")
+    .slice(0, length);
   return new Set(filteredChars);
 };
 
@@ -278,7 +280,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           </div>
         </form>
       </FormProvider>
-      <Nip07InfoModal setCommenterPubKey={setCommenterPubKey} commenterPubKey={commenterPubKey} /> 
+      <Nip07InfoModal
+        setCommenterPubKey={setCommenterPubKey}
+        commenterPubKey={commenterPubKey}
+      />
       <div className="mx-auto mt-8 flex">
         <Links />
       </div>
