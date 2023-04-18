@@ -175,9 +175,9 @@ export const sendZapRequestReceivePaymentRequest = async ({
   lnurl: string;
 }): Promise<string | undefined> => {
   const event = JSON.stringify(signedZapEvent);
-  const paymentRequestRes = await fetch(
-    `${callback}?amount=${sats2millisats(amount)}&nostr=${event}&lnurl=${lnurl}`
-  );
+  const encodedEvent = encodeURIComponent(event);
+  const url = encodeURI(`${callback}?amount=${sats2millisats(amount)}&nostr=${encodedEvent}&lnurl=${lnurl}`);
+  const paymentRequestRes = await fetch(url);
   const { pr } = await paymentRequestRes.json();
 
   if (!pr) {
