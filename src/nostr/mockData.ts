@@ -14,7 +14,7 @@ const wavlakeEventContent: WavlakeEventContent = {
   type: "audio/mpeg",
   guid: "87c0d2f9-909f-48ce-8b02-3986aa9b0013",
   creator: "Official DETOX Music",
-  pubDate: "Sat, 04 Mar 2023 20:35:29 GMT",
+  published_at: "Sat, 04 Mar 2023 20:35:29 GMT",
   enclosure:
     "https://d12wklypp119aj.cloudfront.net/track/87c0d2f9-909f-48ce-8b02-3986aa9b0013.mp3",
   duration: "00:04:03",
