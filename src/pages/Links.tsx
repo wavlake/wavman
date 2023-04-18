@@ -21,8 +21,8 @@ const Links: React.FC<{}> = () => {
   const links: LinkProps[] = [
     { href: "https://zine.wavlake.com/introducing-wavman/", text: "What is this?" },
     { href: "https://github.com/wavlake/wavman", text: "Github" },
-    { href: "https://wavlake.com", text: "A Wavlake Production" },
     { href: "https://snort.social/p/npub1yfg0d955c2jrj2080ew7pa4xrtj7x7s7umt28wh0zurwmxgpyj9shwv6vg", text: "Nostr" },
+    { href: "https://wavlake.com", text: "A Wavlake Production" },
   ];
 
   return (
