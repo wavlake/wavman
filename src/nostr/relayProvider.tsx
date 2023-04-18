@@ -13,12 +13,21 @@ export const RelayContext = createContext<{
   usePublishEvent: UsePublishEvent;
   useListEvents: UseListEvents;
   useEventSubscription: UseEventSubscription;
+  reconnect: () => Promise<void>;
 }>({
   relay: null,
   usePublishEvent,
   useListEvents,
   useEventSubscription,
+  reconnect: async () => {},
 });
+
+export enum RelayStatus {
+  Connecting = 0,
+  Open = 1,
+  Closing = 2,
+  Closed = 3,
+};
 
 const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   children,
@@ -34,12 +43,19 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   });
 
   useEffect(() => {
+    console.log(`connecting to ${relay.url}`);
     relay.connect();
-
     return () => {
+      console.log(`closing connection to ${relay.url}`);
       relay.close();
     };
   }, [relay]);
+
+  const reconnect = async () => {
+    console.log(`reconnecting to ${relay.url}`)
+    await relay.connect();
+    return;
+  };
 
   return (
     <RelayContext.Provider
@@ -48,6 +64,7 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
         usePublishEvent,
         useEventSubscription,
         useListEvents,
+        reconnect,
       }}
     >
       {children}
