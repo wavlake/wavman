@@ -6,6 +6,7 @@ const QRScreen: React.FC<{
   paymentRequest: string;
 }> = ({ paymentRequest = "" }) => {
   const [qrImage, setQrImage] = useState<string | undefined>();
+  const [isCopied, setIsCopied] = useState(false);
   useEffect(() => {
     if (paymentRequest.length === 0) return;
     // same color value as wavgreen, which is set in tailwind.config.js
@@ -17,6 +18,7 @@ const QRScreen: React.FC<{
   }, [paymentRequest]);
 
   const clickHandler = () => {
+    setIsCopied(true);
     navigator.clipboard.writeText(paymentRequest);
   };
 
@@ -34,7 +36,7 @@ const QRScreen: React.FC<{
               alt={`QR Code for ${paymentRequest}`}
             />
           )}
-          <div className="mx-auto flex justify-center text-xs">Tap to copy</div>
+          <div className="mx-auto flex justify-center text-xs">{isCopied ? "Copied" : "Tap to copy"}</div>
         </div>
       ) : (
         "Loading QR Code..."
