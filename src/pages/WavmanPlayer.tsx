@@ -31,11 +31,12 @@ const randomTrackFeatureFlag = coerceEnvVarToBool(
 );
 const trackPubKey = process.env.NEXT_PUBLIC_TRACK_EVENT_PUBKEY || "";
 
+const hexChars = '0123456789abcdefABCDEF';
 const getHexCharacters = (length: number): string[] => {
   // all possible hex characters
-  const hexChars = '0123456789abcdef';
   const outputSet = new Set<string>();
-  while (outputSet.size < length) {
+  const cappedLength = Math.min(length, hexChars.length);
+  while (outputSet.size < cappedLength) {
     outputSet.add(hexChars.charAt(Math.floor(Math.random() * hexChars.length)));
   }
   return Array.from(outputSet);
@@ -44,7 +45,7 @@ const getHexCharacters = (length: number): string[] => {
 const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
-  const [randomChars, setRandomChars] = useState<string[]>(getHexCharacters(randomTrackFeatureFlag ? 4 : 200));
+  const [randomChars, setRandomChars] = useState<string[]>(getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length));
 
   ///////// NOSTR /////////
   const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
