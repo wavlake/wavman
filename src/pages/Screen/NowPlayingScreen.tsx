@@ -43,17 +43,17 @@ const MusicNotes: React.FC<{
         isPlaying ? "animate-dance animation-delay-400" : ""
       } col-span-1 col-start-2 text-4xl`}
     >
-      <img className="h-14" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
     <div className={` ${isPlaying ? "animate-dance" : ""} col-span-1 text-4xl`}>
-      <img className="h-14" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
     <div
       className={` ${
         isPlaying ? "animate-dance animation-delay-800" : ""
       } col-span-1 text-4xl`}
     >
-      <img className="h-14" src={"note.svg"} />
+      <img className="h-12" src={"note.svg"} />
     </div>
   </div>
 );

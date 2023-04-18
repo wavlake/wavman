@@ -46,7 +46,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChars, setRandomChars] = useState<string[]>(
-    Array.from(randomSHA256String(randomTrackFeatureFlag ? 4 : 200))
+    Array.from(randomSHA256String(randomTrackFeatureFlag ? 9 : 200))
   );
 
   ///////// NOSTR /////////

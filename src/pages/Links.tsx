@@ -1,7 +1,11 @@
 const Links: React.FC<{}> = () => (
   <div className="tracking-tightest mx-auto flex flex-col items-center space-y-4 text-xs">
     <div className="hover:tracking-wider">
-      <a href={`https://blog.wavlake.com`} target={"_blank"} rel={"noreferrer"}>
+      <a
+        href={`https://zine.wavlake.com/introducing-wavman/`}
+        target={"_blank"}
+        rel={"noreferrer"}
+      >
         What is this?
       </a>
     </div>

@@ -13,7 +13,7 @@ export interface WavlakeEventContent {
   type: string; // MIME type
   guid: string;
   creator: string;
-  pubDate: string;
+  published_at: string;
   enclosure: string;
   duration: string;
   version: string;
