@@ -48,7 +48,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   const [randomChars, setRandomChars] = useState<string[]>(getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length));
 
   ///////// NOSTR /////////
-  const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
+  const { useListEvents, useEventSubscription, usePublishEvent, reconnect } = useRelay();
 
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
@@ -106,8 +106,10 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     lastEvent: lastZapReceipt,
     loading: zapReceiptsLoading,
   } = useEventSubscription(
-    [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
-    skipZapReceipts
+    [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""]}],
+    skipZapReceipts,
+    undefined,
+    paymentRequest,
   );
 
   // Get track comments, skip till a track is ready
@@ -217,14 +219,14 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
         return;
       }
       setpaymentRequest(invoice);
-      const { enabled } = (await window.webln?.enable()) || {};
-      // use webLN to pay
-      if (enabled) {
-        try {
+      try {
+        // use webLN to pay
+        const { enabled } = (await window.webln?.enable()) || {};
+        if (enabled) {
           await window.webln?.sendPayment(invoice);
-        } catch (e) {
-          console.log("Error paying via webln:", e);
         }
+      } catch (e) {
+        console.log("Error paying via webln:", e);
       }
     }
   };
@@ -235,11 +237,12 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // If user is on the QR_VIEW and a zap receipt is received for the current payment request
     if (currentPage === QR_VIEW && paymentRequest === lastPaymentRequest) {
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);
+      // reset payment request so that the payment request listener will know to reconnect next time
+      setpaymentRequest("");
     }
   }, [lastZapReceipt, paymentRequest]);
 
   const [nowPlayingTrackContent] = kind32123NowPlaying;
-
   return (
     // Page Container
     <>

@@ -52,8 +52,10 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   }, [relay]);
 
   const reconnect = async () => {
-    console.log(`reconnecting to ${relay.url}`)
-    await relay.connect();
+    if(relay.status === RelayStatus.Closed) {
+      console.log(`reconnecting to ${relay.url}`)
+      await relay.connect();
+    }
     return;
   };
 
