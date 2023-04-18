@@ -32,7 +32,7 @@ export default function Home() {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <main className="h-auto bg-wavpink pb-96">
+      <main className="h-[100vh] bg-wavpink pb-96">
         <div className="grid justify-center">
           <RelayProvider url={relayUrl}>
             <WavmanPlayer />
