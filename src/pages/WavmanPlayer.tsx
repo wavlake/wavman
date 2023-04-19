@@ -33,7 +33,6 @@ const randomTrackFeatureFlag = coerceEnvVarToBool(
 
 const WavmanPlayer: React.FC<{
   kind1NowPlaying?: Event;
-  kind1UnSeen: Event[];
   pickRandomTrack: () => void;
   zapReceipts: Event[];
   lastZapReceipt?: Event;
@@ -42,7 +41,6 @@ const WavmanPlayer: React.FC<{
   setPaymentRequest: (paymentRequest: string) => void;
 }> = ({
   kind1NowPlaying,
-  kind1UnSeen,
   pickRandomTrack,
   zapReceipts,
   lastZapReceipt,
@@ -52,11 +50,10 @@ const WavmanPlayer: React.FC<{
 }) => {
   useEffect(() => {
     // runs only on startup
-    if (currentPage === SPLASH_VIEW && kind1UnSeen.length > 0) {
-      pickRandomTrack();
+    if (currentPage === SPLASH_VIEW && kind1NowPlaying) {
       setCurrentPage(PLAYER_VIEW);
     }
-  }, [kind1UnSeen]);
+  }, [kind1NowPlaying]);
 
   const skipHandler = () => {
     pickRandomTrack();

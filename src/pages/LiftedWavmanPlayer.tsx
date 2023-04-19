@@ -10,6 +10,8 @@ export interface Form {
   satAmount: number;
 }
 
+const KIND1_LIMIT = 10;
+const RANDOM_CHAR_FILTER_AMOUNT = 10;
 const randomTrackFeatureFlag = coerceEnvVarToBool(
   process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
 );
@@ -26,14 +28,25 @@ const getHexCharacters = (length: number): string[] => {
   return Array.from(outputSet);
 };
 
+const shuffleArray: <T>(array: T[]) => T[] = (array) => {
+  const shuffledArray = [...array];
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [
+      shuffledArray[j],
+      shuffledArray[i],
+    ];
+  }
+  return shuffledArray;
+};
+
 const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChars, setRandomChars] = useState<string[]>(
-    getHexCharacters(randomTrackFeatureFlag ? 10 : hexChars.length)
+    getHexCharacters(randomTrackFeatureFlag ? RANDOM_CHAR_FILTER_AMOUNT : hexChars.length)
   );
-  const [batchOfKind1Events, setBatchOfKind1Events] = useState<Event[]>([]);
-  const [kind1UnSeen, setKind1UnSeen] = useState<Event[]>([]);
+  const [kind1Events, setKind1Events] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const { relay, useEventSubscription } = useRelay();
 
@@ -46,13 +59,18 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
         kinds: [1],
         ["#f"]: randomChars,
         ["#p"]: [trackPubKey],
-        limit: 100,
+        limit: KIND1_LIMIT,
       },
     ];
     if (relay) {
       setLoadingEvents(true);
       listEvents(relay, kind1Filter).then((events) => {
-        events && setBatchOfKind1Events(events);
+        if (randomTrackFeatureFlag) {
+          const shuffledArray = shuffleArray(events ?? []);
+          setKind1Events(prev => [...prev, ...shuffledArray]);
+        } else {
+          setKind1Events(prev => [...prev, ...events ?? []]);
+        }
         setLoadingEvents(false);
       }).catch((err) => {
         console.error(err);
@@ -63,39 +81,28 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
 
   const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
   const [paymentRequest, setPaymentRequest] = useState("");
-  const [trackIndex, setTrackIndex] = useState(0);
+
+  // start at index 1
+  // index 0 is programmatically consumed below in the useEffect
+  const [trackIndex, setTrackIndex] = useState(1);
 
   const pickRandomTrack = () => {
-    if (randomTrackFeatureFlag) {
-      const nextTrackIndex = Math.floor(Math.random() * kind1UnSeen.length);
-      setKind1NowPlaying(kind1UnSeen[nextTrackIndex]);
-      // remove the last track from the unSeen list
-      setKind1UnSeen((prev) => {
-        const newUnSeen = [...prev];
-        newUnSeen.splice(nextTrackIndex, 1);
-        return newUnSeen;
-      });
-    } else {
-      // eventually this will reach the end of the list
-      // this is only meant to be used in development
-      setKind1NowPlaying(kind1UnSeen[trackIndex + 1]);
-      setTrackIndex(trackIndex + 1);
-    }
+    setKind1NowPlaying(kind1Events[trackIndex]);
+    setTrackIndex((prev) => prev + 1);
   };
 
   useEffect(() => {
-    // when a new batch of kind 1 events is ready, add to unSeenList
-    setKind1UnSeen(prev => [...prev, ...batchOfKind1Events]);
-  }, [batchOfKind1Events]);
-
-  useEffect(() => {
-    if (kind1UnSeen.length === 0 && !loadingEvents) {
+    if (trackIndex === 1 && kind1Events[0]) {
+      // set the first track as the now playing track
+      setKind1NowPlaying(kind1Events[0]);
+    }
+    if (trackIndex > (kind1Events.length - 1) && kind1NowPlaying) {
       console.log(`you've listend to all the TextTrackList, please refresh the page to grab more :)`);
-      // TODO
+      // TODO pre-emptively grab more tracks when user is near end of list
       // we've seen all the tracks, make a call to grab another batch
       // setRandomChars(getHexCharacters(4));
     }
-  }, [kind1UnSeen]);
+  }, [trackIndex, kind1Events]);
 
   // ZapReceipt Listener (aka zap comments)
   const {
@@ -104,12 +111,11 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     loading: zapReceiptsLoading,
   } = useEventSubscription(
     [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
-    !batchOfKind1Events.length
+    !kind1Events.length
   );
 
   return (
     <WavmanPlayer
-      kind1UnSeen={kind1UnSeen}
       kind1NowPlaying={kind1NowPlaying}
       pickRandomTrack={pickRandomTrack}
       zapReceipts={zapReceipts}
