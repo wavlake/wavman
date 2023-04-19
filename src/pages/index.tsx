@@ -1,4 +1,4 @@
-import WavmanPlayer from "./WavmanPlayer";
+import LiftedWavmanPlayer from "./LiftedWavmanPlayer";
 import RelayProvider from "@/nostr/relayProvider";
 import Head from "next/head";
 
@@ -35,7 +35,7 @@ export default function Home() {
       <main className="h-auto bg-wavpink pb-96">
         <div className="grid justify-center">
           <RelayProvider url={relayUrl}>
-            <WavmanPlayer />
+            <LiftedWavmanPlayer />
           </RelayProvider>
         </div>
       </main>

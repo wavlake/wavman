@@ -5,6 +5,9 @@ import {
   Event,
   getEventHash,
   signEvent,
+  Relay,
+  Filter,
+  SubscriptionOptions,
 } from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
@@ -176,7 +179,11 @@ export const sendZapRequestReceivePaymentRequest = async ({
 }): Promise<string | undefined> => {
   const event = JSON.stringify(signedZapEvent);
   const encodedEvent = encodeURIComponent(event);
-  const url = encodeURI(`${callback}?amount=${sats2millisats(amount)}&nostr=${encodedEvent}&lnurl=${lnurl}`);
+  const url = encodeURI(
+    `${callback}?amount=${sats2millisats(
+      amount
+    )}&nostr=${encodedEvent}&lnurl=${lnurl}`
+  );
   const paymentRequestRes = await fetch(url);
   const { pr } = await paymentRequestRes.json();
 
@@ -185,4 +192,22 @@ export const sendZapRequestReceivePaymentRequest = async ({
     throw "Error fetching payment request";
   }
   return pr;
+};
+
+export const getDTagFromEvent = (event?: Event): string => {
+  const [tagType, aTag] =
+    event?.tags?.find(([tagType]) => tagType === "a") || [];
+  return aTag?.replace("32123:", "")?.split(":")?.[1] || "";
+};
+
+export const listEvents = async (
+  relay: Relay,
+  filter: Filter[],
+  opts?: SubscriptionOptions
+) => {
+  if (relay) {
+    if (relay.status === 3) await relay.connect();
+    const events = await relay.list(filter, opts);
+    return events;
+  }
 };

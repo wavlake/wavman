@@ -36,7 +36,9 @@ const QRScreen: React.FC<{
               alt={`QR Code for ${paymentRequest}`}
             />
           )}
-          <div className="mx-auto flex justify-center text-xs">{isCopied ? "Copied" : "Tap to copy"}</div>
+          <div className="mx-auto flex justify-center text-xs">
+            {isCopied ? "Copied" : "Tap to copy"}
+          </div>
         </div>
       ) : (
         "Loading QR Code..."
