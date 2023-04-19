@@ -1,7 +1,9 @@
 import { coerceEnvVarToBool } from "../lib/shared";
 import { useRelay } from "@/nostr";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WavmanPlayer from "./WavmanPlayer";
+import { Event } from "nostr-tools";
+import { listEvents } from "@/nostr/zapUtils";
 
 export interface Form {
   content: string;
@@ -28,48 +30,66 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChars, setRandomChars] = useState<string[]>(getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length));
-
-  ///////// NOSTR /////////
-  const { useListEvents, useEventSubscription, usePublishEvent, reconnect } = useRelay();
+  const [kind1Events, setKind1Events] = useState<Event[]>([]);
+  const { relay, useListEvents, useEventSubscription } = useRelay();
 
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
   // Get a batch of kind 1 events
-  const { data: kind1Events, loading: tracksLoading } =
-    useListEvents([
-      {
-        kinds: [1],
-        ["#f"]: randomChars,
-        ["#p"]: [trackPubKey],
-        limit: 10,
-      },
-    ]);
+  useEffect(() => {
+    const kind1Filter = [{
+      kinds: [1],
+      ["#f"]: randomChars,
+      ["#p"]: [trackPubKey],
+      limit: 40,
+    }];
+    if (relay) {
+      listEvents(relay, kind1Filter).then((events) => {
+        events && setKind1Events(prev => [...prev, ...events]);
+      });
+    };
+  }, [randomChars, trackPubKey, relay]);
 
-  const kind1NowPlaying = kind1Events?.[0];
   // 32123 event listener
-  const allkind32123DTags = kind1Events?.map((track) => {
-    const [tagName, kind1ATag] =
-      track.tags?.find(([tagType]) => tagType === "a") || [];
-    return kind1ATag?.replace("32123:", "")?.split(":")?.[1];
-  });
+  const getDTagFromEvent = (event: Event) => {
+    const [tagType, aTag] =
+      event.tags?.find(([tagType]) => tagType === "a") || [];
+    return aTag?.replace("32123:", "")?.split(":")?.[1];
+  }
+  const allkind32123DTags = kind1Events?.map(getDTagFromEvent);
   // get the kind 1's replaceable 32123 event
   // TODO implement replaceability and test to make sure the most recent is consumed here
-  const {
-    data: kind32123Events,
-    loading: kind32123EventsLoading,
-  } = useListEvents(
-    [
-      {
-        kinds: [32123],
-        ["#d"]: allkind32123DTags ?? [],
-        // limit: 4,
-      },
-    ],
-    tracksLoading,
-  );
+  // const {
+  //   data: kind32123Events,
+  //   loading: kind32123EventsLoading,
+  // } = useListEvents(
+  //   [
+  //     {
+  //       kinds: [32123],
+  //       ["#d"]: allkind32123DTags ?? [],
+  //       limit: 4,
+  //     },
+  //   ],
+  //   tracksLoading,
+  // );
 
+  const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
   const [paymentRequest, setPaymentRequest] = useState("");
-
+  const [trackIndex, setTrackIndex] = useState(0);
+  const pickRandomTrack = () => {
+    if (!kind1NowPlaying) return;
+    if (randomTrackFeatureFlag) {
+      setKind1NowPlaying(
+        kind1Events[Math.floor(Math.random() * kind1Events.length)]
+      );
+    } else {
+      setKind1NowPlaying(kind1Events[trackIndex + 1]);
+      setTrackIndex(trackIndex + 1);
+    }
+  };
+  useEffect(() => {
+    setKind1NowPlaying(kind1Events[0]);
+  }, [kind1Events]);
   // ZapReceipt Listener (aka zap comments)
   const {
     allEvents: zapReceipts,
@@ -77,23 +97,16 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     loading: zapReceiptsLoading,
   } = useEventSubscription(
     [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""]}],
-    tracksLoading,
+    !kind1Events.length
   );
-
-  console.log({ kind1Events, kind32123Events, zapReceiptsLoading });
-  const [current] = kind32123Events || [];
-  
-  const kind32123NowPlaying = kind32123Events?.[0];
-  if (!kind1Events?.length || !kind32123NowPlaying) return <>loading</>
 
   return (
     <WavmanPlayer
-      kind1Events={kind1Events}
-      kind32123NowPlaying={kind32123NowPlaying}
+      kind1NowPlaying={kind1NowPlaying}
+      pickRandomTrack={pickRandomTrack}
       zapReceipts={zapReceipts}
       lastZapReceipt={lastZapReceipt}
       zapReceiptsLoading={zapReceiptsLoading}
-      tracksLoading={tracksLoading}
       paymentRequest={paymentRequest}
       setPaymentRequest={setPaymentRequest}
     />

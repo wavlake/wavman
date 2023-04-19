@@ -12,15 +12,15 @@ import {
 import Links from "./Links";
 import Logo from "./Logo";
 import Nip07InfoModal from "./Nip07InfoModal";
-import Button from "./PlayerControls/Button";
 import PlayerControls from "./PlayerControls/PlayerControls";
 import Screen from "./Screen/Screen";
-import { WavlakeEventContent } from "@/nostr";
+import { WavlakeEventContent, useRelay } from "@/nostr";
 import { getInvoice } from "@/nostr/zapLogic";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import ReactPlayerWrapper from "./ReactPlayerWrapper";
+import { getDTagFromEvent, listEvents } from "@/nostr/zapUtils";
 
 export interface Form {
   content: string;
@@ -30,53 +30,31 @@ export interface Form {
 const randomTrackFeatureFlag = coerceEnvVarToBool(process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS);
 
 const WavmanPlayer: React.FC<{
-  kind1Events: Event[];
-  kind32123NowPlaying: Event;
+  kind1NowPlaying?: Event;
+  pickRandomTrack: () => void;
   zapReceipts: Event[];
   lastZapReceipt?: Event;
   zapReceiptsLoading: boolean;
-  tracksLoading: boolean;
   paymentRequest: string;
   setPaymentRequest: (paymentRequest: string) => void;
 }> = ({
-  kind1Events,
-  kind32123NowPlaying: contentNowPlaying,
+  kind1NowPlaying,
+  pickRandomTrack,
   zapReceipts,
   lastZapReceipt,
   zapReceiptsLoading,
-  tracksLoading,
   paymentRequest,
   setPaymentRequest,
 }) => {
-  const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
-  const [trackIndex, setTrackIndex] = useState(0);
-
-  ///////// UI /////////
-  const pickRandomTrack = (kind1Events: Event[]) => {
-    if (randomTrackFeatureFlag) {
-      setKind1NowPlaying(
-        kind1Events[Math.floor(Math.random() * kind1Events.length)]
-      );
-    } else {
-      setKind1NowPlaying(kind1Events[trackIndex + 1]);
-      setTrackIndex(trackIndex + 1);
-    }
-  };
-  const turnOnPlayer = () => {
-    setCurrentPage(PLAYER_VIEW);
-  };
-
-  // The player currently auto turns on when tracks are loaded
-  // Tracks load automatically when the page loads
   useEffect(() => {
-    if (kind1Events?.length && !tracksLoading) {
-      pickRandomTrack(kind1Events);
-      turnOnPlayer();
+    // runs only on startup
+    if (currentPage === SPLASH_VIEW && kind1NowPlaying) {
+      setCurrentPage(PLAYER_VIEW);
     }
-  }, [kind1Events, tracksLoading]);
+  }, [kind1NowPlaying]);
 
   const skipHandler = () => {
-    if (kind1Events?.length) pickRandomTrack(kind1Events);
+    pickRandomTrack();
   };
 
   const zapHandler = async () => {
@@ -89,7 +67,6 @@ const WavmanPlayer: React.FC<{
     setIsPlaying(!isPlaying);
   };
 
-  ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState<PageView>(SPLASH_VIEW);
   const setPageViewAndResetSelectedAction = (pageView: PageView) => {
@@ -172,9 +149,28 @@ const WavmanPlayer: React.FC<{
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  const trackContent: WavlakeEventContent = JSON.parse(
-    contentNowPlaying?.content || "{}"
-  );
+  
+  const [kind32123Events, setKind32123Events] = useState<Event[]>([]);
+  
+  const { relay } = useRelay();
+  useEffect(() => {
+    const kind32123Filter = [
+      {
+        kinds: [32123],
+        ["#d"]: [getDTagFromEvent(kind1NowPlaying)],
+        limit: 4,
+      },
+    ];
+    if (relay && kind1NowPlaying) {
+      listEvents(relay, kind32123Filter).then((events) => {
+        events && setKind32123Events(events);
+      });
+    };
+  }, [kind1NowPlaying, relay]);
+
+  const [kind32123NowPlaying] = kind32123Events || [];
+  const trackContent: WavlakeEventContent = JSON.parse(kind32123NowPlaying?.content || "{}");
+
   return (
     // Page Container
     <>
