@@ -170,8 +170,14 @@ const WavmanPlayer: React.FC<{
   }, [kind1NowPlaying, relay]);
 
   const [kind32123NowPlaying] = kind32123Events || [];
+  const defaultTrackInfo: Partial<WavlakeEventContent> = {
+    title: "",
+    enclosure: "",
+    creator: "",
+    link: "",
+  }
   const trackContent: WavlakeEventContent = JSON.parse(
-    kind32123NowPlaying?.content || "{}"
+    kind32123NowPlaying?.content || JSON.stringify(defaultTrackInfo)
   );
 
   return (
