@@ -32,12 +32,10 @@ export default function Home() {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <main className="h-auto bg-wavpink pb-96">
-        <div className="grid justify-center">
-          <RelayProvider url={relayUrl}>
-            <LiftedWavmanPlayer />
-          </RelayProvider>
-        </div>
+      <main className="py-4 md:py8">
+        <RelayProvider url={relayUrl}>
+          <LiftedWavmanPlayer />
+        </RelayProvider>
       </main>
     </>
   );
