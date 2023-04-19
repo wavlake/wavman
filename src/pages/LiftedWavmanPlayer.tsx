@@ -10,11 +10,11 @@ export interface Form {
   satAmount: number;
 }
 
-const KIND1_LIMIT = 10;
 const RANDOM_CHAR_FILTER_AMOUNT = 10;
 const randomTrackFeatureFlag = coerceEnvVarToBool(
   process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
-);
+  );
+const KIND1_LIMIT = randomTrackFeatureFlag ? 100 : 10;
 const trackPubKey = process.env.NEXT_PUBLIC_TRACK_EVENT_PUBKEY || "";
 
 const hexChars = "0123456789abcdef";
@@ -97,7 +97,7 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
       setKind1NowPlaying(kind1Events[0]);
     }
     if (trackIndex > (kind1Events.length - 1) && kind1NowPlaying) {
-      console.log(`you've listend to all the TextTrackList, please refresh the page to grab more :)`);
+      console.log(`you've listend to all of the tracks that were loaded, please refresh the page to load more :)`);
       // TODO pre-emptively grab more tracks when user is near end of list
       // we've seen all the tracks, make a call to grab another batch
       // setRandomChars(getHexCharacters(4));
