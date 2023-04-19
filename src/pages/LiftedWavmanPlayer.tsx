@@ -32,9 +32,10 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   const [randomChars, setRandomChars] = useState<string[]>(
     getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length)
   );
-  const [kind1Events, setKind1Events] = useState<Event[]>([]);
-  const [loadingEvents, setLoadingEvents] = useState(false);
-  const { relay, useListEvents, useEventSubscription } = useRelay();
+  const [batchOfKind1Events, setBatchOfKind1Events] = useState<Event[]>([]);
+  const [kind1UnSeen, setKind1UnSeen] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const { relay, useEventSubscription } = useRelay();
 
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
@@ -51,7 +52,7 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     if (relay) {
       setLoadingEvents(true);
       listEvents(relay, kind1Filter).then((events) => {
-        events && setKind1Events((prev) => [...prev, ...events]);
+        events && setBatchOfKind1Events(events);
         setLoadingEvents(false);
       }).catch((err) => {
         console.error(err);
@@ -66,18 +67,35 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
 
   const pickRandomTrack = () => {
     if (randomTrackFeatureFlag) {
-      setKind1NowPlaying(
-        kind1Events[Math.floor(Math.random() * kind1Events.length)]
-      );
+      const nextTrackIndex = Math.floor(Math.random() * kind1UnSeen.length);
+      setKind1NowPlaying(kind1UnSeen[nextTrackIndex]);
+      // remove the last track from the unSeen list
+      setKind1UnSeen((prev) => {
+        const newUnSeen = [...prev];
+        newUnSeen.splice(nextTrackIndex, 1);
+        return newUnSeen;
+      });
     } else {
-      setKind1NowPlaying(kind1Events[trackIndex + 1]);
+      // eventually this will reach the end of the list
+      // this is only meant to be used in development
+      setKind1NowPlaying(kind1UnSeen[trackIndex + 1]);
       setTrackIndex(trackIndex + 1);
     }
   };
+
   useEffect(() => {
-    if (loadingEvents) return;
-    pickRandomTrack();
-  }, [loadingEvents]);
+    // when a new batch of kind 1 events is ready, add to unSeenList
+    setKind1UnSeen(prev => [...prev, ...batchOfKind1Events]);
+  }, [batchOfKind1Events]);
+
+  useEffect(() => {
+    if (kind1UnSeen.length === 0 && !loadingEvents) {
+      console.log(`you've listend to all the TextTrackList, please refresh the page to grab more :)`);
+      // TODO
+      // we've seen all the tracks, make a call to grab another batch
+      // setRandomChars(getHexCharacters(4));
+    }
+  }, [kind1UnSeen]);
 
   // ZapReceipt Listener (aka zap comments)
   const {
@@ -86,11 +104,12 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     loading: zapReceiptsLoading,
   } = useEventSubscription(
     [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
-    !kind1Events.length
+    !batchOfKind1Events.length
   );
 
   return (
     <WavmanPlayer
+      kind1UnSeen={kind1UnSeen}
       kind1NowPlaying={kind1NowPlaying}
       pickRandomTrack={pickRandomTrack}
       zapReceipts={zapReceipts}
