@@ -1,25 +1,6 @@
-import {
-  PageView,
-  PLAYER_VIEW,
-  resetSelectionOnPageChange,
-  SPLASH_VIEW,
-  QR_VIEW,
-  ZAP_AMOUNT_VIEW,
-  ZAP_COMMENT_VIEW,
-  coerceEnvVarToBool,
-  COMMENTS_VIEW,
-} from "../lib/shared";
-import Links from "./Links";
-import Logo from "./Logo";
-import Nip07InfoModal from "./Nip07InfoModal";
-import Button from "./PlayerControls/Button";
-import PlayerControls from "./PlayerControls/PlayerControls";
-import Screen from "./Screen/Screen";
+import { coerceEnvVarToBool } from "../lib/shared";
 import { useRelay } from "@/nostr";
-import { getInvoice } from "@/nostr/zapLogic";
-import { Event } from "nostr-tools";
-import { useEffect, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useState } from "react";
 import WavmanPlayer from "./WavmanPlayer";
 
 export interface Form {
@@ -54,60 +35,61 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   // this should be switched to querying for a tags, but a tag values are different for each track
   // add a new tag to the track to make it easier to query for?
   // Get a batch of kind 1 events
-  const { allEvents: kind1Tracks, loading: tracksLoading } =
-    useEventSubscription([
+  const { data: kind1Events, loading: tracksLoading } =
+    useListEvents([
       {
         kinds: [1],
         ["#f"]: randomChars,
         ["#p"]: [trackPubKey],
-        limit: 100,
+        limit: 10,
       },
     ]);
 
-  const kind1NowPlaying = kind1Tracks[0];
+  const kind1NowPlaying = kind1Events?.[0];
   // 32123 event listener
-  const [tagName, kind1ATag] =
-    kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
-
-  const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
-  const skipKind32123 = !kind32123DTag;
+  const allkind32123DTags = kind1Events?.map((track) => {
+    const [tagName, kind1ATag] =
+      track.tags?.find(([tagType]) => tagType === "a") || [];
+    return kind1ATag?.replace("32123:", "")?.split(":")?.[1];
+  });
   // get the kind 1's replaceable 32123 event
   // TODO implement replaceability and test to make sure the most recent is consumed here
   const {
-    allEvents: kind32123NowPlaying,
-    loading: kind32123NowPlayingLoading,
-  } = useEventSubscription(
+    data: kind32123Events,
+    loading: kind32123EventsLoading,
+  } = useListEvents(
     [
       {
         kinds: [32123],
-        ["#d"]: [kind32123DTag],
-        limit: 4,
+        ["#d"]: allkind32123DTags ?? [],
+        // limit: 4,
       },
     ],
-    skipKind32123
+    tracksLoading,
   );
 
   const [paymentRequest, setPaymentRequest] = useState("");
 
   // ZapReceipt Listener (aka zap comments)
-  const skipZapReceipts = !kind1NowPlaying?.id;
   const {
     allEvents: zapReceipts,
     lastEvent: lastZapReceipt,
     loading: zapReceiptsLoading,
   } = useEventSubscription(
     [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""]}],
-    skipZapReceipts,
-    undefined,
-    paymentRequest,
+    tracksLoading,
   );
 
-  const [current] = kind32123NowPlaying
+  console.log({ kind1Events, kind32123Events, zapReceiptsLoading });
+  const [current] = kind32123Events || [];
+  
+  const kind32123NowPlaying = kind32123Events?.[0];
+  if (!kind1Events?.length || !kind32123NowPlaying) return <>loading</>
 
   return (
     <WavmanPlayer
-      kind1Tracks={kind1Tracks}
-      kind32123NowPlaying={current}
+      kind1Events={kind1Events}
+      kind32123NowPlaying={kind32123NowPlaying}
       zapReceipts={zapReceipts}
       lastZapReceipt={lastZapReceipt}
       zapReceiptsLoading={zapReceiptsLoading}
