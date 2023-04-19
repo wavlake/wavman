@@ -32,7 +32,7 @@ export default function Home() {
         />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <main>
+      <main className="py-4 md:py8">
         <RelayProvider url={relayUrl}>
           <LiftedWavmanPlayer />
         </RelayProvider>
