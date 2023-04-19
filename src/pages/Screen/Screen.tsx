@@ -59,16 +59,18 @@ const Screen: React.FC<{
         {/* <img className="absolute h-64 opacity-20" src={"SCREENDOOR.svg"} /> */}
         <div className="flex flex-col">
           <div className="flex h-8 justify-end p-2">
-            {currentPage !== SPLASH_VIEW && <a
-              href={`https://wavlake.com`}
-              target={"_blank"}
-              rel={"noreferrer"}
-            >
-              <img
-                className="h-4 opacity-80 hover:opacity-30"
-                src={"wavlake.svg"}
-              />
-            </a>}
+            {currentPage !== SPLASH_VIEW && (
+              <a
+                href={`https://wavlake.com`}
+                target={"_blank"}
+                rel={"noreferrer"}
+              >
+                <img
+                  className="h-4 opacity-80 hover:opacity-30"
+                  src={"wavlake.svg"}
+                />
+              </a>
+            )}
           </div>
           {(() => {
             switch (currentPage) {
@@ -97,7 +99,12 @@ const Screen: React.FC<{
               case ZAP_AMOUNT_VIEW:
                 return <ZapAmountScreen zapError={zapError} />;
               case SPLASH_VIEW:
-                return <img className="mx-auto mt-10 h-20 animate-fadein" src={"wavlake.svg"} />;
+                return (
+                  <img
+                    className="mx-auto mt-10 h-20 animate-fadein"
+                    src={"wavlake.svg"}
+                  />
+                );
               default:
                 return <>default</>;
             }

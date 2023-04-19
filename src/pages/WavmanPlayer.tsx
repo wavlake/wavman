@@ -13,21 +13,23 @@ import Links from "./Links";
 import Logo from "./Logo";
 import Nip07InfoModal from "./Nip07InfoModal";
 import PlayerControls from "./PlayerControls/PlayerControls";
+import ReactPlayerWrapper from "./ReactPlayerWrapper";
 import Screen from "./Screen/Screen";
 import { WavlakeEventContent, useRelay } from "@/nostr";
 import { getInvoice } from "@/nostr/zapLogic";
+import { getDTagFromEvent, listEvents } from "@/nostr/zapUtils";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import ReactPlayerWrapper from "./ReactPlayerWrapper";
-import { getDTagFromEvent, listEvents } from "@/nostr/zapUtils";
 
 export interface Form {
   content: string;
   satAmount: number;
 }
 
-const randomTrackFeatureFlag = coerceEnvVarToBool(process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS);
+const randomTrackFeatureFlag = coerceEnvVarToBool(
+  process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
+);
 
 const WavmanPlayer: React.FC<{
   kind1NowPlaying?: Event;
@@ -149,9 +151,8 @@ const WavmanPlayer: React.FC<{
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  
   const [kind32123Events, setKind32123Events] = useState<Event[]>([]);
-  
+
   const { relay } = useRelay();
   useEffect(() => {
     const kind32123Filter = [
@@ -165,11 +166,13 @@ const WavmanPlayer: React.FC<{
       listEvents(relay, kind32123Filter).then((events) => {
         events && setKind32123Events(events);
       });
-    };
+    }
   }, [kind1NowPlaying, relay]);
 
   const [kind32123NowPlaying] = kind32123Events || [];
-  const trackContent: WavlakeEventContent = JSON.parse(kind32123NowPlaying?.content || "{}");
+  const trackContent: WavlakeEventContent = JSON.parse(
+    kind32123NowPlaying?.content || "{}"
+  );
 
   return (
     // Page Container

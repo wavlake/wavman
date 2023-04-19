@@ -27,7 +27,7 @@ export enum RelayStatus {
   Open = 1,
   Closing = 2,
   Closed = 3,
-};
+}
 
 const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   children,
@@ -52,8 +52,8 @@ const RelayProvider: React.FC<PropsWithChildren & { url: string }> = ({
   }, [relay]);
 
   const reconnect = async () => {
-    if(relay.status === RelayStatus.Closed) {
-      console.log(`reconnecting to ${relay.url}`)
+    if (relay.status === RelayStatus.Closed) {
+      console.log(`reconnecting to ${relay.url}`);
       await relay.connect();
     }
     return;
