@@ -171,7 +171,12 @@ const WavmanPlayer: React.FC<{
 
   const [kind32123NowPlaying] = kind32123Events || [];
   const trackContent: WavlakeEventContent = JSON.parse(
-    kind32123NowPlaying?.content || "{}"
+    kind32123NowPlaying?.content || JSON.stringify({
+      title: "",
+      enclosure: "",
+      artist: "",
+      link: "",
+    })
   );
 
   return (
