@@ -33,11 +33,9 @@ export default function Home() {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
       <main>
-        <div className="grid justify-cente">
-          <RelayProvider url={relayUrl}>
-            <LiftedWavmanPlayer />
-          </RelayProvider>
-        </div>
+        <RelayProvider url={relayUrl}>
+          <LiftedWavmanPlayer />
+        </RelayProvider>
       </main>
     </>
   );
