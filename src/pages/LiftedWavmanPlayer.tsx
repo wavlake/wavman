@@ -30,7 +30,7 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   // 4 characters returns ~90-130 tracks
   // will need to re-randomize this filter once the user reaches the end of the list
   const [randomChars, setRandomChars] = useState<string[]>(
-    getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length)
+    getHexCharacters(randomTrackFeatureFlag ? 10 : hexChars.length)
   );
   const [batchOfKind1Events, setBatchOfKind1Events] = useState<Event[]>([]);
   const [kind1UnSeen, setKind1UnSeen] = useState<Event[]>([]);
