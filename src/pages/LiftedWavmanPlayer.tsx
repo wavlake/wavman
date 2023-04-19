@@ -33,6 +33,7 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     getHexCharacters(randomTrackFeatureFlag ? 4 : hexChars.length)
   );
   const [kind1Events, setKind1Events] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const { relay, useListEvents, useEventSubscription } = useRelay();
 
   // this should be switched to querying for a tags, but a tag values are different for each track
@@ -48,8 +49,13 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
       },
     ];
     if (relay) {
+      setLoadingEvents(true);
       listEvents(relay, kind1Filter).then((events) => {
         events && setKind1Events((prev) => [...prev, ...events]);
+        setLoadingEvents(false);
+      }).catch((err) => {
+        console.error(err);
+        setLoadingEvents(false);
       });
     }
   }, [randomChars, trackPubKey, relay]);
@@ -59,7 +65,6 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
   const [trackIndex, setTrackIndex] = useState(0);
 
   const pickRandomTrack = () => {
-    if (!kind1NowPlaying) return;
     if (randomTrackFeatureFlag) {
       setKind1NowPlaying(
         kind1Events[Math.floor(Math.random() * kind1Events.length)]
@@ -70,8 +75,9 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
     }
   };
   useEffect(() => {
-    setKind1NowPlaying(kind1Events[0]);
-  }, [kind1Events]);
+    if (loadingEvents) return;
+    pickRandomTrack();
+  }, [loadingEvents]);
 
   // ZapReceipt Listener (aka zap comments)
   const {
