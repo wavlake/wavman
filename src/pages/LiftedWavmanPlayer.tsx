@@ -15,7 +15,7 @@ const randomTrackFeatureFlag = coerceEnvVarToBool(
 );
 const trackPubKey = process.env.NEXT_PUBLIC_TRACK_EVENT_PUBKEY || "";
 
-const hexChars = "0123456789abcdefABCDEF";
+const hexChars = "0123456789abcdef";
 const getHexCharacters = (length: number): string[] => {
   // all possible hex characters
   const outputSet = new Set<string>();
