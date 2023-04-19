@@ -7,3 +7,9 @@
     font-family: QuinqueFive, system-ui, sans-serif;
   }
 }
+
+body {
+  height: 100%;
+  width: 100%;
+  background-color: #f19ab6;
+}
