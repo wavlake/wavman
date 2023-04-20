@@ -16,7 +16,7 @@ const DPad: React.FC<{
   downHandler,
   centerButtonPressedState,
 }) => (
-  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center gap-4">
+  <div className="grid h-36 w-36 grid-cols-3 grid-rows-3 items-center gap-1">
     <DirectionalButton direction="left" clickHandler={leftHandler} />
     <DirectionalButton
       direction="center"

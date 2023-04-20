@@ -3,18 +3,18 @@ import {
   generatePrivateKey,
   getPublicKey,
   Event,
+  getEventHash,
+  signEvent,
+  Relay,
+  Filter,
+  SubscriptionOptions,
 } from "nostr-tools";
 
 const protocol = process.env.NEXT_PUBLIC_LNURL_PROTOCOL;
 
-export const sats2millisats = (amount: number) => amount * 1000;
-export const chopDecimal = (amount: number) => Math.floor(amount);
-export const generateLNURLFromZapTag = (zapTag: string[]) => {
-  const [zap, zapAddress, lud] = zapTag;
-  const [username, domain] = zapAddress.split("@");
-  if (!username || !domain) return false;
-  return `${protocol}://${domain}/.well-known/lnurlp/${username}`;
-};
+const chopDecimal = (amount: number) => Math.floor(amount);
+export const sats2millisats = (amount: number) => chopDecimal(amount) * 1000;
+export const millisats2sats = (amount: number) => chopDecimal(amount) / 1000;
 export const validateNostrPubKey = (nostrPubKey: string) => {
   if (
     nostrPubKey == null ||
@@ -51,27 +51,163 @@ export const signZapEventNip07 = async ({
   recepientPubKey: string;
   zappedEvent: Event;
   pubkey: string;
-}): Promise<Event | void> => {
-  try {
-    const unsignedEvent: UnsignedEvent = {
-      kind: 9734,
-      content,
-      pubkey,
-      created_at: Math.floor(Date.now() / 1000),
-      tags: [
-        ["relays", "wss://relay.wavlake.com/"],
-        ["amount", amount.toString()],
-        ["lnurl", lnurl],
-        ["p", recepientPubKey],
-        ["e", zappedEvent.id],
-      ],
-    };
+}): Promise<Event> => {
+  const unsignedEvent: UnsignedEvent = {
+    kind: 9734,
+    content,
+    pubkey,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [
+      ["relays", "wss://relay.wavlake.com/"],
+      ["amount", sats2millisats(amount).toString()],
+      ["lnurl", lnurl],
+      ["p", recepientPubKey],
+      ["e", zappedEvent.id],
+    ],
+  };
 
-    const signedEvent: Event | undefined = await window.nostr?.signEvent?.(
-      unsignedEvent
-    );
+  try {
+    const signedEvent = await window.nostr?.signEvent?.(unsignedEvent);
     return signedEvent;
+  } catch {
+    console.log(
+      "Unable to sign event with NIP-07 extension, falling back to an anon zap"
+    );
+    // if user rejects prompt, fallback to anon
+    const signedEvent = signAnonZapEvent({
+      content,
+      amount,
+      lnurl,
+      recepientPubKey,
+      zappedEvent,
+    });
+    return signedEvent;
+  }
+};
+
+export const signAnonZapEvent = async ({
+  content,
+  amount,
+  lnurl,
+  recepientPubKey,
+  zappedEvent,
+}: {
+  content: string;
+  amount: number;
+  lnurl: string;
+  recepientPubKey: string;
+  zappedEvent: Event;
+}): Promise<Event> => {
+  const { anonPubKey, anonPrivKey } = getAnonPubKey();
+
+  const unsignedEvent: UnsignedEvent = {
+    kind: 9734,
+    content,
+    pubkey: anonPubKey,
+    created_at: Math.floor(Date.now() / 1000),
+    tags: [
+      ["relays", "wss://relay.wavlake.com/"],
+      ["amount", sats2millisats(amount).toString()],
+      ["lnurl", lnurl],
+      ["p", recepientPubKey],
+      ["e", zappedEvent.id],
+    ],
+  };
+  return {
+    ...unsignedEvent,
+    id: getEventHash(unsignedEvent),
+    sig: signEvent(unsignedEvent, anonPrivKey),
+  };
+};
+
+export const getLNURLFromEvent = (event: Event): string | undefined => {
+  const zapTag = event.tags.find((tag) => tag[0] === "zap");
+  if (!zapTag) return;
+
+  const [zap, zapAddress, lud] = zapTag;
+  const [username, domain] = zapAddress.split("@");
+  if (!username || !domain) return;
+
+  return `${protocol}://${domain}/.well-known/lnurlp/${username}`;
+};
+
+export const fetchLNURLInfo = async (
+  lnurl: string
+): Promise<{
+  allowsNostr?: boolean;
+  callback?: string;
+  nostrPubKey?: string;
+  error?: string;
+}> => {
+  try {
+    const res = await fetch(lnurl);
+    const {
+      allowsNostr,
+      callback,
+      maxSendable,
+      metadata,
+      minSendable,
+      nostrPubKey,
+      tag,
+    } = await res.json();
+
+    if (!validateNostrPubKey(nostrPubKey)) {
+      throw `Invalid nostr pubkey ${nostrPubKey}`;
+    }
+    if (!allowsNostr) {
+      throw "lnurl does not allow nostr";
+    }
+
+    return { allowsNostr, callback, nostrPubKey };
   } catch (err) {
-    console.log("error signing zap event", { err, lnurl, zappedEvent });
+    console.error("Error fetching lnurl info", { err, lnurl });
+    return { error: "Error fetching lnurl info" };
+  }
+};
+
+export const sendZapRequestReceivePaymentRequest = async ({
+  signedZapEvent,
+  callback,
+  amount,
+  lnurl,
+}: {
+  signedZapEvent: Event;
+  callback: string;
+  // in satoshis
+  amount: number;
+  lnurl: string;
+}): Promise<string | undefined> => {
+  const event = JSON.stringify(signedZapEvent);
+  const encodedEvent = encodeURIComponent(event);
+  const url = encodeURI(
+    `${callback}?amount=${sats2millisats(
+      amount
+    )}&nostr=${encodedEvent}&lnurl=${lnurl}`
+  );
+  const paymentRequestRes = await fetch(url);
+  const { pr } = await paymentRequestRes.json();
+
+  if (!pr) {
+    console.error({ callback, lnurl, signedZapEvent });
+    throw "Error fetching payment request";
+  }
+  return pr;
+};
+
+export const getDTagFromEvent = (event?: Event): string => {
+  const [tagType, aTag] =
+    event?.tags?.find(([tagType]) => tagType === "a") || [];
+  return aTag?.replace("32123:", "")?.split(":")?.[1] || "";
+};
+
+export const listEvents = async (
+  relay: Relay,
+  filter: Filter[],
+  opts?: SubscriptionOptions
+) => {
+  if (relay) {
+    if (relay.status === 3) await relay.connect();
+    const events = await relay.list(filter, opts);
+    return events;
   }
 };

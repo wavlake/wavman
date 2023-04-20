@@ -9,12 +9,15 @@ import {
   coerceEnvVarToBool,
   COMMENTS_VIEW,
 } from "../lib/shared";
+import Links from "./Links";
 import Logo from "./Logo";
-import Button from "./PlayerControls/Button";
+import Nip07InfoModal from "./Nip07InfoModal";
 import PlayerControls from "./PlayerControls/PlayerControls";
+import ReactPlayerWrapper from "./ReactPlayerWrapper";
 import Screen from "./Screen/Screen";
-import { useRelay } from "@/nostr";
+import { WavlakeEventContent, useRelay } from "@/nostr";
 import { getInvoice } from "@/nostr/zapLogic";
+import { getDTagFromEvent, listEvents } from "@/nostr/zapUtils";
 import { Event } from "nostr-tools";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -27,115 +30,33 @@ export interface Form {
 const randomTrackFeatureFlag = coerceEnvVarToBool(
   process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
 );
-const randomSHA256String = (length: number) => {
-  const alphanumericString = Array.from(Array(length + 30), () =>
-    Math.floor(Math.random() * 36).toString(36)
-  ).join("");
-  const SHA256Regex = /[^A-Fa-f0-9-]/g;
-  return alphanumericString.replace(SHA256Regex, "").slice(0, length);
-};
 
-const WavmanPlayer: React.FC<{}> = ({}) => {
-  // 4 characters returns ~90-130 tracks
-  // will need to re-randomize this filter once the user reaches the end of the list
-  const [randomChars, setRandomChars] = useState<string[]>(
-    Array.from(randomSHA256String(30))
-  );
-
-  ///////// NOSTR /////////
-  const { useListEvents, useEventSubscription, usePublishEvent } = useRelay();
-
-  // this should be switched to querying for a tags, but a tag values are different for each track
-  // add a new tag to the track to make it easier to query for?
-  const wavlakePubKey =
-    "7759fb24cec56fc57550754ca8f6d2c60183da2537c8f38108fdf283b20a0e58";
-  // Get a batch of kind 1 events
-  const { data: kind1Tracks, loading: tracksLoading } = useListEvents([
-    {
-      kinds: [1],
-      ...(randomTrackFeatureFlag ? { ["#f"]: randomChars } : {}),
-      ["#p"]: [wavlakePubKey],
-      limit: 40,
-    },
-  ]);
-  // Post a comment mutation (not used at the moment)
-  const [
-    publishEvent,
-    {
-      data: postedComment,
-      loading: publishEventLoading,
-      error: publishEventError,
-    },
-  ] = usePublishEvent();
-  const [trackIndex, setTrackIndex] = useState(0);
-
-  const [kind1NowPlaying, setKind1NowPlaying] = useState<Event>();
-
-  // 32123 event listener
-  const [tagName, kind1ATag] =
-    kind1NowPlaying?.tags?.find(([tagType]) => tagType === "a") || [];
-  const kind32123DTag = kind1ATag?.replace("32123:", "")?.split(":")?.[1];
-  const skipKind32123 = !kind32123DTag;
-  // get the kind 1's replaceable 32123 event
-  const { data: kind32123NowPlaying, loading: kind32123NowPlayingLoading } =
-    useListEvents(
-      [
-        {
-          kinds: [32123],
-          ["#d"]: [kind32123DTag],
-          limit: 40,
-        },
-      ],
-      skipKind32123
-    );
-
-  const [paymentRequest, setpaymentRequest] = useState("");
-
-  // ZapReceipt Listener
-  const skipZapReceipts = !kind1NowPlaying?.id;
-  const {
-    allEvents: zapReceipts,
-    lastEvent: lastZapReceipt,
-    loading: zapReceiptsLoading,
-  } = useEventSubscription(
-    [{ kinds: [9735], ["#e"]: [kind1NowPlaying?.id || ""] }],
-    skipZapReceipts
-  );
-
-  // Get track comments, skip till a track is ready
-  const skipComments = !kind1NowPlaying;
-  const { allEvents: comments, loading: commentsLoading } =
-    useEventSubscription(
-      [{ ["#e"]: [kind1NowPlaying?.id || ""], limit: 20 }],
-      skipComments
-    );
-
-  ///////// UI /////////
-  const pickRandomTrack = (kind1Tracks: Event[]) => {
-    setKind1NowPlaying(kind1Tracks[trackIndex]);
-    if (randomTrackFeatureFlag) {
-      setKind1NowPlaying(
-        kind1Tracks[Math.floor(Math.random() * kind1Tracks.length)]
-      );
-    } else {
-      setTrackIndex(trackIndex + 1);
-    }
-  };
-  const turnOnPlayer = () => {
-    setCurrentPage(PLAYER_VIEW);
-  };
-
-  // The player currently auto turns on when tracks are loaded
-  // Tracks load automatically when the page loads
+const WavmanPlayer: React.FC<{
+  kind1NowPlaying?: Event;
+  pickRandomTrack: () => void;
+  zapReceipts: Event[];
+  lastZapReceipt?: Event;
+  zapReceiptsLoading: boolean;
+  paymentRequest: string;
+  setPaymentRequest: (paymentRequest: string) => void;
+}> = ({
+  kind1NowPlaying,
+  pickRandomTrack,
+  zapReceipts,
+  lastZapReceipt,
+  zapReceiptsLoading,
+  paymentRequest,
+  setPaymentRequest,
+}) => {
   useEffect(() => {
-    if (kind1Tracks?.length) {
-      pickRandomTrack(kind1Tracks);
-      turnOnPlayer();
+    // runs only on startup
+    if (currentPage === SPLASH_VIEW && kind1NowPlaying) {
+      setCurrentPage(PLAYER_VIEW);
     }
-  }, [kind1Tracks]);
+  }, [kind1NowPlaying]);
 
   const skipHandler = () => {
-    if (kind1Tracks?.length) pickRandomTrack(kind1Tracks);
+    pickRandomTrack();
   };
 
   const zapHandler = async () => {
@@ -148,7 +69,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     setIsPlaying(!isPlaying);
   };
 
-  ///////// NAVIGATION /////////
   const [selectedActionIndex, setSelectedActionIndex] = useState(0);
   const [currentPage, setCurrentPage] = useState<PageView>(SPLASH_VIEW);
   const setPageViewAndResetSelectedAction = (pageView: PageView) => {
@@ -181,13 +101,6 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
   const [commenterPubKey, setCommenterPubKey] = useState<string | undefined>();
 
-  const setUserPubKey = () => {
-    window.nostr
-      ?.getPublicKey?.()
-      .then((pubKey) => setCommenterPubKey(pubKey))
-      .catch((e: string) => console.log(e));
-  };
-
   const confirmZapAmount = () => {
     setPageViewAndResetSelectedAction(ZAP_COMMENT_VIEW);
   };
@@ -196,6 +109,7 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
   };
 
   const processZap = async () => {
+    setPaymentRequest("");
     setPageViewAndResetSelectedAction(QR_VIEW);
 
     if (!kind1NowPlaying) {
@@ -205,24 +119,23 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     if (!isFormValid()) return;
     if (satAmount && satAmount > 0) {
       const invoice = await getInvoice({
-        kind1NowPlaying,
+        nowPlayingTrack: kind1NowPlaying,
         satAmount,
         content,
       });
       if (!invoice) {
-        console.log("Error retrieving invoice");
         setPageViewAndResetSelectedAction(ZAP_AMOUNT_VIEW);
         return;
       }
-      setpaymentRequest(invoice);
-      const { enabled } = (await window.webln?.enable()) || {};
-      // use webLN to pay
-      if (enabled) {
-        try {
+      setPaymentRequest(invoice);
+      try {
+        // use webLN to pay
+        const { enabled } = (await window.webln?.enable()) || {};
+        if (enabled) {
           await window.webln?.sendPayment(invoice);
-        } catch (e) {
-          console.log("Error paying via webln:", e);
         }
+      } catch (e) {
+        console.log("Error paying via webln:", e);
       }
     }
   };
@@ -233,27 +146,61 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
     // If user is on the QR_VIEW and a zap receipt is received for the current payment request
     if (currentPage === QR_VIEW && paymentRequest === lastPaymentRequest) {
       setPageViewAndResetSelectedAction(COMMENTS_VIEW);
+      // reset payment request so that the payment request listener will know to reconnect next time
+      setPaymentRequest("");
     }
   }, [lastZapReceipt, paymentRequest]);
 
-  const [nowPlayingTrackContent] = kind32123NowPlaying || [];
+  const [kind32123Events, setKind32123Events] = useState<Event[]>([]);
+
+  const { relay } = useRelay();
+  useEffect(() => {
+    const kind32123Filter = [
+      {
+        kinds: [32123],
+        ["#d"]: [getDTagFromEvent(kind1NowPlaying)],
+        limit: 4,
+      },
+    ];
+    if (relay && kind1NowPlaying) {
+      listEvents(relay, kind32123Filter).then((events) => {
+        events && setKind32123Events(events);
+      });
+    }
+  }, [kind1NowPlaying, relay]);
+
+  const [kind32123NowPlaying] = kind32123Events || [];
+  const defaultTrackInfo: Partial<WavlakeEventContent> = {
+    title: "",
+    enclosure: "",
+    creator: "",
+    link: "",
+  }
+  const trackContent: WavlakeEventContent = JSON.parse(
+    kind32123NowPlaying?.content || JSON.stringify(defaultTrackInfo)
+  );
+
   return (
     // Page Container
     <>
+      <ReactPlayerWrapper
+        url={trackContent.enclosure}
+        isPlaying={isPlaying}
+        onEnded={skipHandler}
+      />
       <FormProvider {...methods}>
         <form>
-          <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray">
+          <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray md:mt-20">
             <Screen
               zapError={zapError}
-              nowPlayingTrackContent={nowPlayingTrackContent}
+              nowPlayingTrackContent={trackContent}
               isPlaying={isPlaying}
-              commentsLoading={commentsLoading}
-              comments={zapReceipts || []}
+              commentsLoading={zapReceiptsLoading}
+              comments={zapReceipts}
               currentPage={currentPage}
               paymentRequest={paymentRequest}
               selectedActionIndex={selectedActionIndex}
               commenterPubKey={commenterPubKey}
-              skipHandler={skipHandler}
               isCenterButtonPressed={centerButtonPressedState[0] || false}
             />
             <Logo />
@@ -282,12 +229,13 @@ const WavmanPlayer: React.FC<{}> = ({}) => {
           </div>
         </form>
       </FormProvider>
-      <Button
-        className="mx-auto mt-4 w-28 self-start bg-white"
-        clickHandler={setUserPubKey}
-      >
-        Login
-      </Button>
+      <Nip07InfoModal
+        setCommenterPubKey={setCommenterPubKey}
+        commenterPubKey={commenterPubKey}
+      />
+      <div className="mx-auto mt-8 flex">
+        <Links />
+      </div>
     </>
   );
 };

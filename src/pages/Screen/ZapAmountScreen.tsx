@@ -8,7 +8,7 @@ const ZapAmountScreen: React.FC<{
   const methods = useFormContext();
 
   return (
-    <div className="m-4 justify-self-center">
+    <div className="mx-4 h-32 justify-self-center">
       Zap Amount
       <input
         {...methods?.register("satAmount")}

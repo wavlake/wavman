@@ -1,7 +1,7 @@
 {
   "name": "wavman",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "dev": "PORT=3003 next dev",
     "build": "next build",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@sentry/nextjs": "^7.48.0",
+    "@headlessui/react": "^1.7.14",
     "@types/node": "18.15.11",
     "@types/react": "18.0.32",
     "@types/react-dom": "18.0.11",
