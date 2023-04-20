@@ -10,7 +10,7 @@ export interface Form {
   satAmount: number;
 }
 
-const RANDOM_CHAR_FILTER_AMOUNT = 10;
+const RANDOM_CHAR_FILTER_AMOUNT = 3;
 const randomTrackFeatureFlag = coerceEnvVarToBool(
   process.env.NEXT_PUBLIC_ENABLE_RANDOM_TRACKS
   );
@@ -59,7 +59,7 @@ const LiftedWavmanPlayer: React.FC<{}> = ({}) => {
         kinds: [1],
         ["#f"]: randomChars,
         ["#p"]: [trackPubKey],
-        limit: KIND1_LIMIT,
+        // limit: KIND1_LIMIT,
       },
     ];
     if (relay) {
