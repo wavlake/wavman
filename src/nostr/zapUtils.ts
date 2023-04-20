@@ -136,7 +136,7 @@ export const fetchLNURLInfo = async (
 ): Promise<{
   allowsNostr?: boolean;
   callback?: string;
-  nostrPubKey?: string;
+  nostrPubkey?: string;
   error?: string;
 }> => {
   try {
@@ -147,18 +147,18 @@ export const fetchLNURLInfo = async (
       maxSendable,
       metadata,
       minSendable,
-      nostrPubKey,
+      nostrPubkey,
       tag,
     } = await res.json();
 
-    if (!validateNostrPubKey(nostrPubKey)) {
-      throw `Invalid nostr pubkey ${nostrPubKey}`;
+    if (!validateNostrPubKey(nostrPubkey)) {
+      throw `Invalid nostr pubkey ${nostrPubkey}`;
     }
     if (!allowsNostr) {
       throw "lnurl does not allow nostr";
     }
 
-    return { allowsNostr, callback, nostrPubKey };
+    return { allowsNostr, callback, nostrPubkey };
   } catch (err) {
     console.error("Error fetching lnurl info", { err, lnurl });
     return { error: "Error fetching lnurl info" };
