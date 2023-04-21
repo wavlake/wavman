@@ -22,10 +22,10 @@ export const getInvoice = async ({
       console.log(`failed to parse lnurl from event`, { nowPlayingTrack });
       return;
     }
-    const { allowsNostr, callback, nostrPubKey, error } = await fetchLNURLInfo(
+    const { allowsNostr, callback, nostrPubkey, error } = await fetchLNURLInfo(
       lnurl
     );
-    if (error || !nostrPubKey || !callback || !allowsNostr) {
+    if (error || !nostrPubkey || !callback || !allowsNostr) {
       console.error(error);
       return;
     }
@@ -37,7 +37,7 @@ export const getInvoice = async ({
           content,
           amount,
           lnurl,
-          recepientPubKey: nostrPubKey,
+          recepientPubKey: nostrPubkey,
           zappedEvent: nowPlayingTrack,
           pubkey: nip07PubKey,
         });
@@ -60,7 +60,7 @@ export const getInvoice = async ({
         content,
         amount,
         lnurl,
-        recepientPubKey: nostrPubKey,
+        recepientPubKey: nostrPubkey,
         zappedEvent: nowPlayingTrack,
       });
 
