@@ -1,6 +1,7 @@
 import LiftedWavmanPlayer from "./LiftedWavmanPlayer";
 import RelayProvider from "@/nostr/relayProvider";
 import Head from "next/head";
+import { HotkeysProvider } from 'react-hotkeys-hook'
 
 const relayUrl = process.env.NEXT_PUBLIC_RELAY_URL || "";
 
@@ -34,7 +35,9 @@ export default function Home() {
       </Head>
       <main className="py-4 md:py8">
         <RelayProvider url={relayUrl}>
-          <LiftedWavmanPlayer />
+          <HotkeysProvider initiallyActiveScopes={['player']}>
+            <LiftedWavmanPlayer />
+          </HotkeysProvider>
         </RelayProvider>
       </main>
     </>
