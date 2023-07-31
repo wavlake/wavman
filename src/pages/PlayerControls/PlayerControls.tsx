@@ -1,3 +1,4 @@
+import { useHotkeys } from "react-hotkeys-hook";
 import {
   ActionHandler,
   Actions,
@@ -74,6 +75,11 @@ const PlayerControls: React.FC<{
     setSelectedActionIndex((selectedActionIndex) =>
       calcMoveIndexRight(selectedActionIndex)
     );
+
+  useHotkeys('enter,space', centerHandler, { scopes: ['player']});
+  useHotkeys('leftarrow', leftHandler, { scopes: ['player']});
+  useHotkeys('rightarrow', rightHandler, { scopes: ['player']});
+  useHotkeys('p', playHandler, { scopes: ['player']});
 
   return (
     <div className="relative mx-auto my-4 w-40 border-8 border-black p-0">
