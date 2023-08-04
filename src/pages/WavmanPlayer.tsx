@@ -175,7 +175,7 @@ const WavmanPlayer: React.FC<{
     enclosure: "",
     creator: "",
     link: "",
-  }
+  };
   const trackContent: WavlakeEventContent = JSON.parse(
     kind32123NowPlaying?.content || JSON.stringify(defaultTrackInfo)
   );
@@ -189,7 +189,11 @@ const WavmanPlayer: React.FC<{
         onEnded={skipHandler}
       />
       <FormProvider {...methods}>
-        <form>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+          }}
+        >
           <div className="relative mx-auto mt-4 grid h-[34rem] w-[22rem] justify-center border-8 border-black bg-wavgray md:mt-20">
             <Screen
               zapError={zapError}
