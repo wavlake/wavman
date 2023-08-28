@@ -128,16 +128,23 @@ const WavmanPlayer: React.FC<{
         return;
       }
       setPaymentRequest(invoice);
-      try {
-        // use webLN to pay
-        const { enabled } = (await window.webln?.enable()) || {};
-        if (enabled) {
-          await window.webln?.sendPayment(invoice);
-        }
-      } catch (e) {
-        console.log("Error paying via webln:", e);
-      }
+      payWithWebLN(invoice);
     }
+  };
+
+  const payWithWebLN = async (invoice: string): Promise<boolean> => {
+    try {
+      if (typeof window.webln !== "undefined") {
+        await window.webln.enable();
+        const { preimage } = await window.webln.sendPayment(invoice);
+        return true;
+      }
+    } catch (e) {
+      // User denied permission or cancelled
+      console.log("Error paying via webln:", e);
+      return false;
+    }
+    return false;
   };
 
   useEffect(() => {
