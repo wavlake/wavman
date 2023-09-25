@@ -177,13 +177,12 @@ export const sendZapRequestReceivePaymentRequest = async ({
   amount: number;
   lnurl: string;
 }): Promise<string | undefined> => {
+  // https://github.com/nostr-protocol/nips/blob/master/57.md#appendix-b-zap-request-http-request
   const event = JSON.stringify(signedZapEvent);
-  const encodedEvent = encodeURIComponent(event);
-  const url = encodeURI(
-    `${callback}?amount=${sats2millisats(
-      amount
-    )}&nostr=${encodedEvent}&lnurl=${lnurl}`
-  );
+  const encodedEvent = encodeURI(event);
+  const url = `${callback}?amount=${sats2millisats(
+    amount
+  )}&nostr=${encodedEvent}&lnurl=${lnurl}`;
   const paymentRequestRes = await fetch(url);
   const { pr } = await paymentRequestRes.json();
 
