@@ -128,7 +128,9 @@ export const getLNURLFromEvent = (event: Event): string | undefined => {
   const [username, domain] = zapAddress.split("@");
   if (!username || !domain) return;
 
-  return `${protocol}://${domain}/.well-known/lnurlp/${username}`;
+  // this is a hack to address the move of the wavlake endpoint from www.wavlake.com to wavlake.com
+  // the proper fix is to update the events to include the new domain
+  return `${protocol}://${domain.replace("www.", "")}/.well-known/lnurlp/${username}`;
 };
 
 export const fetchLNURLInfo = async (
